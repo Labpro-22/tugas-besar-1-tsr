@@ -62,6 +62,7 @@ public:
     std::string getAllLogs()const;
     std::string getRecentLogs(int n)const;
     void clearLogs();
+    std::string toSave();
 
     ~TransactionLog(){}
 };

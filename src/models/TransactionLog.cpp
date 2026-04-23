@@ -79,3 +79,11 @@ std::string TransactionLog::getRecentLogs(int n)const{
 void TransactionLog::clearLogs(){
     logs.clear();
 }
+std::string TransactionLog::toSave(){
+    if(logs.empty()) return "";
+    std::string temp;
+    for(LogEntry log : logs){
+        temp+=(std::to_string(log.getTurnNumber())+log.getUsername()+log.getTextForEnum(log.getActionType())+log.getDesc());
+    }
+    return temp;
+}
