@@ -7,35 +7,48 @@ class PropertyTile;
 
 class SkillCard;
 
+enum PlayerState {
+    FREE,
+    INJAIL
+};
+
 class Player {
 private:
     std::string name;
     int balance;
     int position;
+    PlayerState player_state;
     std::vector<PropertyTile*> owned_properties;
     std::vector<std::unique_ptr<SkillCard>> saved_cards;
     std::vector<std::unique_ptr<Effect>> active_effects;
 
 public:
-    Player(std::string name, int balance, int position);
+    Player(std::string name, int balance, int position, PlayerState player_state);
+
     Player& operator+=(int amount);
     Player& operator-=(int amount);
     Player operator+(int amount) const;
     Player operator-(int amount) const;
+
     int processPayment(int amount) const;
     int pay(int amount);
     void receive(int amount);       
     void transferTo(Player&, int); 
+
     void movePlayer(int steps);
     void addProperty(PropertyTile* property);
     void removeProperty(PropertyTile* property);
     void addSkillCard(std::unique_ptr<SkillCard> card);
+
     void useSkillCard(int index);
     void addEffect(std::unique_ptr<Effect> effect);
+
     int getTotalAssetValue();
     bool canPay(int amount);
     int liquidateAsset(int required);
     void declareBankruptcy();
+
+    bool inJail();
     void setInJail();
     void setFree();
     void startTurn();

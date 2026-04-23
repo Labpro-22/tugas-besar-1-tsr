@@ -1,12 +1,11 @@
 #include "PropertyTile.hpp"
+#include "TileVisitor.hpp"
 
 // PropertyTile
 PropertyTile::PropertyTile(int index, std::string name, std::string code, std::string color, int buy_price, int mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status)
     : Tile(index, name, code, color), buy_price(buy_price), mortgage_price(mortgage_price), owner(owner), festival_level(festival_level), festival_turns_left(festival_turns_left), property_status(property_status) {}
 
-void PropertyTile::onLand(Player& p) {
-
-}
+void PropertyTile::onLand(Player& p, TileVisitor& visitor) {}
 
 void PropertyTile::applyFestival() {
     festival_level++;
@@ -49,8 +48,8 @@ int RailroadTile::calculateRent() const {
 
 }
 
-void RailroadTile::onLand(Player& p) {
-
+void RailroadTile::onLand(Player& p, TileVisitor& visitor) {
+    visitor.visitRailroadTile(this, p);
 }
 
 // UtilityTile
@@ -61,6 +60,6 @@ int UtilityTile::calculateRent() const {
 
 }
 
-void UtilityTile::onLand(Player& p) {
-
+void UtilityTile::onLand(Player& p, TileVisitor& visitor) {
+    visitor.visitUtilityTile(this, p);
 }
