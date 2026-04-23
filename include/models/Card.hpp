@@ -1,6 +1,7 @@
 #include <vector>
 class Player;
 class Board;
+class TileVisitor;
 
 class Card
 {
@@ -8,7 +9,7 @@ private:
     /* data */
 public:
     virtual ~Card() = default; // Butuh for dynamically allocated cards nanti
-    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all) = 0;
+    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) = 0;
 };
 
 /**

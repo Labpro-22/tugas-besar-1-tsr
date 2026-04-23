@@ -3,7 +3,7 @@
 #include "Player.hpp"
 #include "PropertyTile.hpp"
 
-void StationActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all) {
+void StationActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     int current_pos = p.getPosition();
     
     int total_tiles = b.getSize(); 
@@ -13,8 +13,7 @@ void StationActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all) {
         RailroadTile* station = dynamic_cast<RailroadTile*>(&ref);
         if (station != nullptr) {
             p.movePlayer(i);
-            station->onLand(p);
-            
+            station->onLand(p, visitor);
             return;
         }
     }

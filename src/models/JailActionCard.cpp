@@ -11,7 +11,7 @@ JailActionCard::JailActionCard(){
     sentenceLength = sentence_dist(gen);
 }
 
-void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all){
+void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
     int current_pos = p.getPosition();
     
     int total_tiles = b.getSize(); 
@@ -21,7 +21,7 @@ void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all){
         GoToJailTile* jail = dynamic_cast<GoToJailTile*>(&ref);
         if (jail != nullptr) {
             p.movePlayer(i);
-            jail->onLand(p);
+            p.setInJail();
             
             return;
         }

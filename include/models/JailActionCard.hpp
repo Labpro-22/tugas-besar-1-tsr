@@ -7,7 +7,7 @@ class JailActionCard : public ActionCard {
         int sentenceLength;
     public:
         JailActionCard();
-        void onDraw(Player& p, Board& b, std::vector<Player>& all) override;
+        void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) override;
         
 
 };

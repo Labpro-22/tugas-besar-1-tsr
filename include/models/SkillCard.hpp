@@ -8,10 +8,10 @@ class SkillCard: public Card
 private:
     /* data */
 public:
-    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all){
+    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         p.addSkillCard(std::unique_ptr<SkillCard>(this));
     }
-    virtual void useEffect(Player& p, Board& b, std::vector<Player>& all)=0;
+    virtual void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor)=0;
 };
 
 class MoveSkillCard: public SkillCard
@@ -19,14 +19,14 @@ class MoveSkillCard: public SkillCard
 private:
     int step;
 public:
-virtual void onDraw(Player& p, Board& b, std::vector<Player>& all){
+virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         p.addSkillCard(std::unique_ptr<SkillCard>(this));
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dist(1, 100); 
         this->step=dist(gen);
     }
-    void useEffect(Player& p, Board& b, std::vector<Player>& all){
+    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         p.movePlayer(this->step);
     }
 };
@@ -35,14 +35,14 @@ class DiscountSkillCard: public SkillCard
 private:
     float percentage;
 public:
-    void onDraw(Player& p, Board& b, std::vector<Player>& all){
+    void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         p.addSkillCard(std::unique_ptr<SkillCard>(this));
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_real_distribution<> dist(1, 100); 
         this->percentage=dist(gen);
     }
-    void useEffect(Player& p, Board& b, std::vector<Player>& all){
+    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         p.addEffect(std::unique_ptr<Effect>(new DiscountEffect(this->percentage)));
     }
 };
@@ -51,7 +51,7 @@ class ShieldSkillCard: public SkillCard
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all){
+    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         p.addEffect(std::unique_ptr<Effect>(new ShieldEffect()));
     }
 };
@@ -60,7 +60,7 @@ class TeleportSkillCard: public SkillCard
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all){
+    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         int steps;
         // std::cin>>steps;
         p.movePlayer(steps);
@@ -71,7 +71,7 @@ class LassoSkillCard: public SkillCard
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all){
+    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
         Player *moved;
         int distance=INFINITY;
         for (auto& pl: all){
@@ -89,5 +89,5 @@ class DemolitionSkillCard: public SkillCard
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all);
+    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor);
 };
