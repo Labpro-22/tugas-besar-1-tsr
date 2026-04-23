@@ -69,7 +69,7 @@ std::string GameManager::toSaveFormat() const{
     std::ostringstream out;
     out << current_turn_count << " " << max_turns << "\n";
     out << players.size();
-    for(std::shared_ptr<Player> p:players){
+    for(const std::shared_ptr<Player>& p:players){
         out << p->toSaveFormat();
     }
     return out.str();
