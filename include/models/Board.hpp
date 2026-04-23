@@ -10,7 +10,7 @@ class Player;
 class Board {
 private:
     std::vector<std::unique_ptr<Tile>> tiles;
-    std::unordered_map<std::string, std::vector<Tile*>> colorTileMap;
+    std::unordered_map<std::string, std::vector<Tile*>> color_tile_map;
 
 public:
     Board();
