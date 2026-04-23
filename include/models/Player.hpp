@@ -38,8 +38,10 @@ public:
     void movePlayer(int steps);
     void addProperty(PropertyTile* property);
     void removeProperty(PropertyTile* property);
-    void addSkillCard(std::unique_ptr<SkillCard> card);
+    int countOwnedRailroad() const;
+    int countOwnedUtility() const;
 
+    void addSkillCard(std::unique_ptr<SkillCard> card);
     void useSkillCard(int index);
     void addEffect(std::unique_ptr<Effect> effect);
 
