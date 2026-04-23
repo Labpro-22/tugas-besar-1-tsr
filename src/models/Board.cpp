@@ -1,65 +1,70 @@
 #include "Board.hpp"
 #include "Tile.hpp"
+#include "PropertyTile.hpp"
 #include "Player.hpp"
 #include <stdexcept>
-#include <algorithm>
 
 Tile& Board::getTile(int index) {
     if (tiles.empty()) {
-        throw std::out_of_range("Papan masih kosong, tidak ada Tile!");
+        throw std::runtime_error("Cannot get tile: Board is empty!");
     }
-    
-    index = index % tiles.size(); 
-    return *tiles[index];
+    int safe_index = index % tiles.size();
+    return *tiles[safe_index];
 }
 
 void Board::addTile(std::unique_ptr<Tile> tile) {
-    if (!tile) return;
-
-    std::string color_group = tile->getColor(); 
-    Tile* tile_ptr = tile.get();
-    
-    tiles.push_back(std::move(tile));
-
-    if (!color_group.empty()) {
-        color_tile_map[color_group].push_back(tile_ptr);
+    Tile* raw_ptr = tile.get();
+    std::string color = raw_ptr->getColor();
+    if (!color.empty() && color != "None") {
+        colorTileMap[color].push_back(raw_ptr);
     }
+
+    tiles.push_back(std::move(tile));
 }
 
 const std::vector<Tile*>& Board::getPropertiesByGroup(const std::string& color) const {
-    auto it = color_tile_map.find(color);
-    if (it != color_tile_map.end()) {
+    auto it = colorTileMap.find(color);
+    
+    if (it != colorTileMap.end()) {
         return it->second;
     }
-    
-    static const std::vector<Tile*> empty_list; 
-    return empty_list;
+
+    static const std::vector<Tile*> empty_vector;
+    return empty_vector;
 }
 
 std::vector<std::string> Board::getAllGroups() const {
     std::vector<std::string> groups;
-    groups.reserve(color_tile_map.size()); 
-    
-    for (const auto& pair : color_tile_map) {
+
+    for (const auto& pair : colorTileMap) {
         groups.push_back(pair.first);
     }
     
     return groups;
 }
 
+
 bool Board::checkMonopoly(const Player& player, const std::string& color) const {
-    auto it = color_tile_map.find(color);
-    if (it == color_tile_map.end() || it->second.empty()) {
-        return false; 
+    auto it = colorTileMap.find(color);
+
+    if (it == colorTileMap.end() || it->second.empty()) {
+        return false;
     }
-
-    const std::vector<Tile*>& group_tiles = it->second;
-
-    for (Tile* current_tile : group_tiles) {
-        if (current_tile->owner() != &player) {
-            return false; 
+    for (Tile* tile : it->second) {
+        PropertyTile* prop = dynamic_cast<PropertyTile*>(tile);
+        
+        if (prop != nullptr) {
+            std::shared_ptr<Player> owner = prop->getPropertyOwner().lock();
+            if (!owner || owner.get() != &player) {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
+    return true;
+}
 
-    return true; 
+int Board::getSize() {
+    return static_cast<int>(tiles.size());
 }
