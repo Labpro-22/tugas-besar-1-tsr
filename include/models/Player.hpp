@@ -21,11 +21,8 @@ public:
     Player& operator+=(int amount);
     Player& operator-=(int amount);
     Player operator+(int amount) const;
-    Player operator-(int amount) const;
-    int processPayment(int amount) const;
-    int pay(int amount);
-    void receive(int amount);       
-    void transferTo(Player&, int); 
+    Player operator-(int amount) const;    
+    void transferTo(Player& player, int amount); 
     void movePlayer(int steps);
     void addProperty(PropertyTile* property);
     void removeProperty(PropertyTile* property);
@@ -34,6 +31,8 @@ public:
     void addEffect(std::unique_ptr<Effect> effect);
     int getTotalAssetValue();
     bool canPay(int amount);
+    void buyProperty(PropertyTile &property);
+    void sellProperty(PropertyTile &property, Player& other);
     int liquidateAsset(int required);
     void declareBankruptcy();
     void setInJail();
