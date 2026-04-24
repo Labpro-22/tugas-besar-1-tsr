@@ -1,6 +1,11 @@
-#include "PropertyTile.hpp"
-#include "TileVisitor.hpp"
-#include "Player.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/core/TileVisitor.hpp"
+#include "../../include/models/Player.hpp"
+
+
+const std::map<int, int> RailroadTile::railroad_multiplier;
+
+const std::map<int, int> UtilityTile::utility_multiplier;
 
 // PropertyTile
 PropertyTile::PropertyTile(int index, std::string name, std::string code, std::string color, int buy_price, int mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status)
@@ -67,6 +72,9 @@ int RailroadTile::calculateRent() const {
 void RailroadTile::onLand(Player& p, TileVisitor& visitor) {
     visitor.visitRailroadTile(this, p);
 }
+PropertyType RailroadTile::getPropertyType() const{
+    return type;
+};
 
 // UtilityTile
 UtilityTile::UtilityTile(int index, std::string name, std::string code, std::string color, int buy_price, int mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status) 
@@ -94,3 +102,6 @@ int UtilityTile::calculateRent() const {
 void UtilityTile::onLand(Player& p, TileVisitor& visitor) {
     visitor.visitUtilityTile(this, p);
 }
+PropertyType UtilityTile::getPropertyType() const{
+    return type;
+};

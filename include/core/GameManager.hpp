@@ -6,12 +6,12 @@
 #include <unordered_map>
 #include <functional>
 
-#include "TileVisitor.hpp"
-#include "CardManager.hpp"
-#include "PropertyManager.hpp"
-#include "EconomyManager.hpp"
-#include "Player.hpp"
-#include "TransactionLog.hpp"
+#include "../../include/core/TileVisitor.hpp"
+#include "../../include/core/CardManager.hpp"
+#include "../../include/core/PropertyManager.hpp"
+#include "../../include/core/EconomyManager.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/core/TransactionLog.hpp"
 
 // State Machine
 enum class GameState {
@@ -77,7 +77,7 @@ public:
     ~GameManager() = default;
 
     // Siklus utama permainan
-    void startGame();
+    void startGame(){}
     void processCommand(const std::string& commandLine);
     
     GameState getState() const { return current_state; }

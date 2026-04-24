@@ -1,7 +1,7 @@
-#include "StationActionCard.hpp"
-#include "Board.hpp"
-#include "Player.hpp"
-#include "PropertyTile.hpp"
+#include "../../include/models/StationActionCard.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/models/PropertyTile.hpp"
 
 void StationActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     int current_pos = p.getPosition();

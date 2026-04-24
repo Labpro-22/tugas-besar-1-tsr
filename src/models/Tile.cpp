@@ -1,5 +1,5 @@
-#include "Tile.hpp"
-#include "TileVisitor.hpp"
+#include "../../include/models/Tile.hpp"
+#include "../../include/core/TileVisitor.hpp"
 
 // Tile
 Tile::Tile(int index, std::string name, std::string code, std::string color) 
@@ -16,11 +16,16 @@ std::string Tile::getName() const {
 std::string Tile::getCode() const {
     return code;
 }
+std::string Tile::getColor() const{
+    return color;
+}
 
 // CardTile 
 CardTile::CardTile(int index, std::string name, std::string code, std::string color, CardType card) 
     : Tile(index, name, code, color), card(card) {}
-
+CardType CardTile::getType(){
+    return card;
+}
 void CardTile::onLand(Player& p, TileVisitor& visitor) {
     visitor.visitCardTile(this, p);
 }
@@ -28,7 +33,9 @@ void CardTile::onLand(Player& p, TileVisitor& visitor) {
 // TaxTile
 TaxTile::TaxTile(int index, std::string name, std::string code, std::string color, TaxType tax_type, int tax_amount)
     :  Tile(index, name, code, color), tax_type(tax_type), tax_amount(tax_amount) {}
-
+int TaxTile::getTaxAmount(){
+    return tax_amount;
+}
 void TaxTile::onLand(Player& p, TileVisitor& visitor) {
     visitor.visitTaxTile(this, p);
 }
@@ -48,7 +55,6 @@ GoTile::GoTile(int index, std::string name, std::string code, std::string color,
 int GoTile::getReward(){
     return go_reward;
 }
-
 void GoTile::onLand(Player& p, TileVisitor& visitor) {
     visitor.visitGoTile(this, p);
 }

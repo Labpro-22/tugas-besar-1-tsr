@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ActionCard.hpp"
 
 class StationActionCard : public ActionCard {

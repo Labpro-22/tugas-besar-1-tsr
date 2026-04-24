@@ -1,4 +1,6 @@
-#include "Saveable.hpp"
+#pragma once
+
+#include "../../include/models/Saveable.hpp"
 #include <string>
 class GameManager;
 class SaveLoadManager{

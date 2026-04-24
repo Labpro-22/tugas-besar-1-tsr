@@ -1,7 +1,7 @@
-#include "JailActionCard.hpp"
-#include "Tile.hpp"
-#include "Board.hpp"
-#include "Player.hpp"
+#include "../../include/models/JailActionCard.hpp"
+#include "../../include/models/Tile.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/Player.hpp"
 
 std::random_device JailActionCard::rd;
 std::mt19937 JailActionCard::gen(JailActionCard::rd());

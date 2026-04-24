@@ -2,10 +2,10 @@
 
 #include <memory>
 #include <string>
-#include "Board.hpp"
-#include "PropertyTile.hpp"
-#include "StreetTile.hpp"
-#include "Player.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/models/StreetTile.hpp"
+#include "../../include/models/Player.hpp"
 
 class PropertyManager {
 private:

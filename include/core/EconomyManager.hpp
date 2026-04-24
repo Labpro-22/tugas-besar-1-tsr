@@ -2,9 +2,9 @@
 
 #include <memory>
 #include <vector>
-#include "Player.hpp"
-#include "PropertyTile.hpp"
-#include "Saveable.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/models/Saveable.hpp"
 
 class PropertyManager;
 class TransactionLog; 

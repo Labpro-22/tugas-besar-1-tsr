@@ -1,7 +1,7 @@
-#include "MoveActionCard.hpp"
-#include "Player.hpp"
-#include "Board.hpp"
-#include "PropertyTile.hpp"
+#include "../../include/models/MoveActionCard.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/PropertyTile.hpp"
 
 std::random_device MoveActionCard::rd;
 std::mt19937 MoveActionCard::gen(MoveActionCard::rd());

@@ -2,11 +2,11 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Saveable.hpp"
+#include "../../include/models/Saveable.hpp"
+#include "../../include/models/Effect.hpp"
+#include "../../include/models/SkillCard.hpp"
 
 class PropertyTile;
-
-class SkillCard;
 
 enum PlayerState {
     FREE,
@@ -60,37 +60,4 @@ public:
 
     //Saveload impl
     std::string toSaveFormat() const;
-};
-
-class Effect {
-public:
-    virtual ~Effect() = default;
-    virtual void onTurnStart(Player&) {}
-    virtual void onTurnEnd(Player&) {}
-    virtual bool isExpired() const = 0;
-    virtual bool blocksPayment() const;
-    virtual int modifyPayment(int amount) const;
-};
-
-class ShieldEffect : public Effect {
-private:
-    int turns_left;
-
-public:
-    explicit ShieldEffect(int duration = 1);
-    void onTurnEnd(Player&) override;
-    bool isExpired() const override;
-    bool blocksPayment() const override;
-};
-
-class DiscountEffect : public Effect {
-private:
-    int percent;
-    int turns_left;
-
-public:
-    DiscountEffect(int percent, int duration = 1);
-    void onTurnEnd(Player&) override;
-    bool isExpired() const override;
-    int modifyPayment(int amount) const override;
 };

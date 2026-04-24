@@ -1,5 +1,5 @@
 #include "../../include/core/SaveLoadManager.hpp"
-#include "Board.hpp"
-#include "Player.hpp"
-#include "TransactionLog.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/core/TransactionLog.hpp"
 
