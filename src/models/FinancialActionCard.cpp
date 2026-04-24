@@ -5,8 +5,7 @@
 
 
 //Random number generator is a static member for performance
-std::random_device FinancialActionCard::rd;
-std::mt19937 FinancialActionCard::gen(FinancialActionCard::rd());
+
 
 FinancialActionCard::FinancialActionCard(){
     std::uniform_int_distribution<> amount_dist(1, 100); 

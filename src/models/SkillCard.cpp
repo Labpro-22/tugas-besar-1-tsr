@@ -4,53 +4,69 @@
 #include "../../include/models/Effect.hpp"
 #include <random>
 #include <limits>
+#include <sstream>
 
-// SkillCard::onDraw
+// SkillCard
+SkillCard::SkillCard(std::string name):name(name){};
 void SkillCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.addSkillCard(std::unique_ptr<SkillCard>(this));
 }
+std::string SkillCard::toSaveFormat() const{
+    std::ostringstream out;
+    out << name << "\n";
+    return out.str();
+}
 
-// MoveSkillCard::onDraw
+// MoveSkillCard
+MoveSkillCard::MoveSkillCard(std::string name):SkillCard(name){}
 void MoveSkillCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.addSkillCard(std::unique_ptr<SkillCard>(this));
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(1, 100);
     this->step = dist(gen);
 }
-
-// MoveSkillCard::useEffect
 void MoveSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.movePlayer(this->step);
 }
+std::string MoveSkillCard::toSaveFormat() const{
+    std::ostringstream out;
+    out << name << " " << step << "\n";
+    return out.str();
+}
 
-// DiscountSkillCard::onDraw
+// DiscountSkillCard
+DiscountSkillCard::DiscountSkillCard(std::string name):SkillCard(name){}
 void DiscountSkillCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.addSkillCard(std::unique_ptr<SkillCard>(this));
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::uniform_real_distribution<> dist(1, 100);
     this->percentage = dist(gen);
 }
 
-// DiscountSkillCard::useEffect
 void DiscountSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.addEffect(std::unique_ptr<Effect>(new DiscountEffect(this->percentage)));
 }
+std::string DiscountSkillCard::toSaveFormat() const{
+    std::ostringstream out;
+    out << name << " " << percentage << "\n";
+    return out.str();
+}
 
-// ShieldSkillCard::useEffect
+
+// ShieldSkillCard
+ShieldSkillCard::ShieldSkillCard(std::string name):SkillCard(name){}
 void ShieldSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.addEffect(std::unique_ptr<Effect>(new ShieldEffect()));
 }
 
-// TeleportSkillCard::useEffect
+// TeleportSkillCard
+TeleportSkillCard::TeleportSkillCard(std::string name):SkillCard(name){}
+TeleportSkillCard::TeleportSkillCard(std::string name):SkillCard(name){}
 void TeleportSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     int steps;
-    // std::cin>>steps;
     p.movePlayer(steps);
 }
 
-// LassoSkillCard::useEffect
+// LassoSkillCard
+LassoSkillCard::LassoSkillCard(std::string name):SkillCard(name){}
 void LassoSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     Player* moved = nullptr;
     int distance = (int)std::numeric_limits<float>::infinity();
@@ -66,7 +82,9 @@ void LassoSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, Ti
     }
 }
 
-// DemolitionSkillCard::useEffect
+
+// DemolitionSkillCard
+DemolitionSkillCard::DemolitionSkillCard(std::string name):SkillCard(name){}
 void DemolitionSkillCard::useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     // TODO: Implement demolition skill card effect
 }

@@ -3,13 +3,6 @@
 #include "../../include/models/Board.hpp"
 #include "../../include/models/Player.hpp"
 
-std::random_device JailActionCard::rd;
-std::mt19937 JailActionCard::gen(JailActionCard::rd());
-
-JailActionCard::JailActionCard(){
-    std::uniform_int_distribution<> sentence_dist(1, 4);
-    sentenceLength = sentence_dist(gen);
-}
 
 void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
     int current_pos = p.getPosition();
