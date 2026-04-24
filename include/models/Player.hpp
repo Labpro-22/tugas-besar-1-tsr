@@ -34,7 +34,7 @@ public:
     int processPayment(int amount) const;
     int pay(int amount);
     void receive(int amount);       
-    void transferTo(Player& player, int amount); 
+    void transferTo(Player& player, int amount); //DO NOT USE THIS FOR AUCTION OR LAND BUYING gitu, kalo mau itu pake sellProperty aja
     void movePlayer(int steps);
     void addProperty(PropertyTile* property);
     void removeProperty(PropertyTile* property);
@@ -42,7 +42,7 @@ public:
     int countOwnedUtility() const;
 
     void addSkillCard(std::unique_ptr<SkillCard> card);
-    void useSkillCard(int index);
+    void useSkillCard(int index,Board& b, std::vector<Player>& all, TileVisitor& visitor);
     void addEffect(std::unique_ptr<Effect> effect);
 
     int getTotalAssetValue();
@@ -55,7 +55,7 @@ public:
     bool inJail();
     void setInJail();
     void setFree();
-    void startTurn();
+    void startTurn(Board &board);
     void endTurn();
     int getPosition();
 
