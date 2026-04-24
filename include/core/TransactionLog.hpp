@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "../../include/models/Saveable.hpp"
 
 enum actions{
     DADU, // roll dadu 
@@ -26,6 +27,7 @@ enum actions{
     SAVE, 
     LOAD
 };
+extern const char* actionStrings[];
 
 class LogEntry{
 private:
@@ -39,22 +41,29 @@ public:
     : turn_number(turns), username(username), action_type(action_type), description(desc) {}
 
     void setDesc(std::string desc);
-    int getTurnNumber();
-    std::string getUsername();
-    std::string getDesc();
+    int getTurnNumber()const;
+    std::string getUsername() const;
+    std::string getDesc() const;
+    actions getActionType() const;
+    std::string printFormat()const;
+    const char * getTextForEnum( int enumVal )const
+    {
+      return actionStrings[enumVal];
+    }
 
     ~LogEntry(){}
 };
 
-class TransactionLog{
+class TransactionLog : public Saveable{
 private:
     std::vector<LogEntry> logs;
 public:
-    TransactionLog(){}
+    TransactionLog(){   }
     void recordEvent(LogEntry entry);
-    const std::vector<LogEntry>& getAllLogs() const;
-    std::vector<LogEntry> getRecentLogs(int n) const;
+    std::string getAllLogs()const;
+    std::string getRecentLogs(int n)const;
     void clearLogs();
+    std::string toSaveFormat() const override;
 
     ~TransactionLog(){}
 };

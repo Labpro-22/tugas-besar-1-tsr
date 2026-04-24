@@ -1,7 +1,7 @@
-#include "Board.hpp"
-#include "Tile.hpp"
-#include "PropertyTile.hpp"
-#include "Player.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/Tile.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/models/Player.hpp"
 #include <stdexcept>
 
 Tile& Board::getTile(int index) {
