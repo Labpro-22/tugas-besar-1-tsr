@@ -7,7 +7,7 @@
 #include <sstream>
 
 // SkillCard
-SkillCard::SkillCard(std::string name):name(name){};
+SkillCard::SkillCard(std::string name):Card(name){};
 void SkillCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     p.addSkillCard(std::unique_ptr<SkillCard>(this));
 }

@@ -1,42 +1,56 @@
 #pragma once
+#include "Saveable.hpp"
+#include "GameException.hpp" // Ensure this is included here now
 #include <stack>
 #include <vector>
+#include <memory>
 #include <algorithm>
 #include <random>
-#include "Card.hpp"
-#include "ActionCard.hpp"
-#include "SkillCard.hpp"
-#include "Saveable.hpp"
+#include <sstream>
+
 template <class T>
-class Deck : public Saveable
-{
+class Deck : public Saveable {
 private:
     std::stack<T> cards;
     std::vector<T> discard;
+
 public:
-    T drawCard(){
-        if(cards.empty()){
-            throw "placeholder";
+    T drawCard() {
+        if (cards.empty()) {
+            throw GameplayException("Deck: Cannot draw from an empty deck!");
         }
-        T temp= cards.top();
-        cards.pop();
+        
+        T temp = std::move(cards.top()); 
+        cards.pop(); 
         return temp;
     }
-    void shuffle(){
-        if(discard.empty()){
-            throw "placeholder";
+
+    void shuffle() {
+        if (discard.empty()) {
+            throw GameplayException("Deck: Nothing to shuffle!");
         }
+        
         std::random_device rd;
         std::mt19937 g(rd());
+        
         std::shuffle(discard.begin(), discard.end(), g);
+        
         for (auto& card : discard) {
-            cards.push(card);
+            cards.push(std::move(card));
         }
+        
         discard.clear();
     }
-    void AddToDiscard(T &card){ //belum ada di m1
-        discard.push_back(card);
+    void addToDiscard(T card) {
+        discard.push_back(std::move(card));
     }
-    std::string toSaveFormat()const override;
+    
+    std::string toSaveFormat() const override {
+        std::ostringstream out;
+        out << cards.size()+discard.size() << "\n";
+        for(const auto& card: cards){
+            
+        }
 
+    }
 };
