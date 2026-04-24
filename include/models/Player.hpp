@@ -34,8 +34,7 @@ public:
     int processPayment(int amount) const;
     int pay(int amount);
     void receive(int amount);       
-    void transferTo(Player&, int); 
-
+    void transferTo(Player& player, int amount); 
     void movePlayer(int steps);
     void addProperty(PropertyTile* property);
     void removeProperty(PropertyTile* property);
@@ -48,6 +47,8 @@ public:
 
     int getTotalAssetValue();
     bool canPay(int amount);
+    void buyProperty(PropertyTile &property);
+    void sellProperty(PropertyTile &property, Player& other);
     int liquidateAsset(int required);
     void declareBankruptcy();
 
