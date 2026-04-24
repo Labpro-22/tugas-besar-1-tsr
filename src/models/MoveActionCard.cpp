@@ -15,8 +15,6 @@ MoveActionCard::MoveActionCard(){
 void MoveActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
     p.movePlayer(walkDistance);
     Tile& t = b.getTile(p.getPosition());
-    PropertyTile* pt = dynamic_cast<PropertyTile*>(&t);
-    if(pt!=nullptr){
-        pt->onLand(p,visitor);
-    }
+    t.onLand(p,visitor);
+
 }

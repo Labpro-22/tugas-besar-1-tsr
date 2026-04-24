@@ -21,7 +21,7 @@ void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileV
         GoToJailTile* jail = dynamic_cast<GoToJailTile*>(&ref);
         if (jail != nullptr) {
             p.movePlayer(i);
-            p.setInJail();
+            jail->onLand(p,visitor);
             
             return;
         }
