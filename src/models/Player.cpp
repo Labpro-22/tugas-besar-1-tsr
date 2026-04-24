@@ -1,60 +1,178 @@
-#include "../../include/models/Player.hpp"
-#include <sstream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <algorithm>
+#include <SkillCard.hpp>
+#include "PropertyTile.hpp"
+class PropertyTile;
 
-Player::Player(std::string name, int balance, int position, PlayerState player_state){}
+class SkillCard;
 
-Player& Player::operator+=(int amount){}
-Player& Player::operator-=(int amount){}
-Player Player::operator+(int amount) const{}
-Player Player::operator-(int amount) const{}
+class Player {
+private:
+    std::string name;
+    int balance;
+    int position;
+    std::vector<PropertyTile*> owned_properties;
+    std::vector<std::unique_ptr<SkillCard>> saved_cards;
+    std::vector<std::unique_ptr<Effect>> active_effects;
 
-int Player::processPayment(int amount) const{}
-int Player::pay(int amount){}
-void Player::receive(int amount){}       
-void Player::transferTo(Player&, int){} 
+public:
+    Player(std::string name, int balance, int position);
+    Player& operator+=(int amount);
+    Player& operator-=(int amount);
+    Player operator+(int amount) const;
+    Player operator-(int amount) const;    
+    void transferTo(Player& player, int amount); 
+    void movePlayer(int steps);
+    void addProperty(PropertyTile* property);
+    void removeProperty(PropertyTile* property);
+    void addSkillCard(std::unique_ptr<SkillCard> card);
+    void useSkillCard(int index);
+    void addEffect(std::unique_ptr<Effect> effect);
+    int getTotalAssetValue();
+    bool canPay(int amount);
+    void buyProperty(PropertyTile &property);
+    void sellProperty(PropertyTile &property, Player& other);
+    int liquidateAsset(int required);
+    void declareBankruptcy();
+    void setInJail();
+    void setFree();
+    void startTurn();
+    void endTurn();
+};
 
-void Player::movePlayer(int steps){}
-void Player::addProperty(PropertyTile* property){}
-void Player::removeProperty(PropertyTile* property){}
-int Player::countOwnedRailroad() const{}
-int Player::countOwnedUtility() const{}
+Player::Player(std::string name, int balance, int position):name(name),balance(balance),position(position){}
+Player& Player::operator+=(int amount){
+    balance += amount;
+    return *this;
+}
+Player& Player::operator-=(int amount){
+    balance -= amount;
+    return *this;
+}
+Player Player::operator+(int amount) const{
+    Player result = *this;
+    result.balance += amount;
+    return result;
+}
+Player Player::operator-(int amount) const{
+    Player result = *this;
+    result.balance -= amount;
+    return result;
+}
 
-void Player::addSkillCard(std::unique_ptr<SkillCard> card){}
-void Player::useSkillCard(int index){}
-void Player::addEffect(std::unique_ptr<Effect> effect){}
+void Player::transferTo(Player& player, int amount){
+    player+=amount;
+} 
+void Player::movePlayer(int steps){
+    position+=steps;
+}
+void Player::addProperty(PropertyTile* property){
+    this->owned_properties.push_back(property);
+}
+void Player::removeProperty(PropertyTile* property){
+    owned_properties.erase(
+        std::remove(owned_properties.begin(), owned_properties.end(), property),
+        owned_properties.end()
+    );
+}
+void Player::addSkillCard(std::unique_ptr<SkillCard> card){
+    this->saved_cards.push_back(card);
+}
+void Player::useSkillCard(int index){
+    this->saved_cards[index]->useEffect();
+}
+void Player::addEffect(std::unique_ptr<Effect> effect){
+    this->active_effects.push_back(effect);
+}
+int Player::getTotalAssetValue(){
+    int sum=this->balance;
+    for (auto& asset:this->owned_properties){
+        sum+=asset->getSellValue();
+    }
+    return sum;
+}
+bool Player::canPay(int amount){
+    return this->balance>=amount;
+}
+void Player::buyProperty(PropertyTile &property){
+    float dihcount=0;
+    if(this.)
+    if(!this->canPay(property.getSellValue())){
+        throw "uang tak cukup";
+    }
+    *this-=property.getSellValue();
+    this->addProperty(&property);
+    property.setPropertyOwner(std::make_shared<Player>(this));
+}
+void Player::sellProperty(PropertyTile &property, Player& other){
+    this->removeProperty(&property);
+    *this+=property.getSellValue();
+    other.buyProperty(property);
+}
+int Player::liquidateAsset(int required){
+    std::vector<PropertyTile*> properties_to_sell = owned_properties;
+    std::sort(
+        properties_to_sell.begin(),
+        properties_to_sell.end(),
+        [](PropertyTile* a, PropertyTile* b) {
+            return a->getSellValue() < b->getSellValue();
+        }
+    );
 
-int Player::getTotalAssetValue(){}
-bool Player::canPay(int amount){}
-int Player::liquidateAsset(int required){}
-void Player::declareBankruptcy(){}
+    int liquidated = 0;
+    for (PropertyTile* property : properties_to_sell) {
+        if (liquidated >= required) {
+            break;
+        }
 
-bool Player::inJail(){}
-void Player::setInJail(){}
-void Player::setFree(){}
-void Player::startTurn(){}
-void Player::endTurn(){}
-int Player::getPosition(){}
-
-std::string Player::toSaveFormat() const {
-    std::ostringstream out;
-    out << name << " " << balance << " " << position;
-    switch (player_state)
-    {
-    case PlayerState::FREE:
-        out<<"FREE\n";
-        break;
-    case PlayerState::INJAIL:
-        out<<"INJAIL\n";
-        break;
+        int sell_value = property->getSellValue();
+        liquidated += sell_value;
+        balance += sell_value;
+        removeProperty(property);
+        property->setPropertyStatus(BANK);
+        property->setPropertyOwner(std::shared_ptr<Player>());
     }
 
-    out << saved_cards.size() << "\n";
-
-    
-    // for(const std::unique_ptr<SkillCard>& card : saved_cards){
-    //     card->
-    // }
-
-
-    return out.str();
+    return liquidated;
 }
+
+
+
+
+
+
+
+class Effect {
+public:
+    virtual ~Effect() = default;
+    virtual void onTurnStart(Player&) {}
+    virtual void onTurnEnd(Player&) {}
+    virtual bool isExpired() const = 0;
+    virtual bool blocksPayment() const;
+    virtual int modifyPayment(int amount) const;
+};
+
+class ShieldEffect : public Effect {
+private:
+    int turns_left;
+
+public:
+    explicit ShieldEffect(int duration = 1);
+    void onTurnEnd(Player&) override;
+    bool isExpired() const override;
+    bool blocksPayment() const override;
+};
+
+class DiscountEffect : public Effect {
+private:
+    int percent;
+    int turns_left;
+
+public:
+    DiscountEffect(int percent, int duration = 1);
+    void onTurnEnd(Player&) override;
+    bool isExpired() const override;
+    int modifyPayment(int amount) const override;
+};ropertyOwner()
