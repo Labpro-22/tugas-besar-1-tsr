@@ -44,7 +44,14 @@ public:
     int countOwnedUtility() const;
 
     void addSkillCard(std::unique_ptr<SkillCard> card);
-    void useSkillCard(int index,Board& b, std::vector<Player>& all, TileVisitor& visitor);
+
+    /*
+    Refactor: this will only remove the skillcard and then pass it to GameManager. 
+    GameManager would be the one executing the card. This is because to use a card,
+    it needs to discard it to the correct deck. Such jobs are managed by manager
+    classes. -Billie
+    */
+    std::unique_ptr<SkillCard> useSkillCard(int index);
     void addEffect(std::unique_ptr<Effect> effect);
 
     int getTotalAssetValue();

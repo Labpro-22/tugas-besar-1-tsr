@@ -49,8 +49,17 @@ void Player::removeProperty(PropertyTile* property){
 void Player::addSkillCard(std::unique_ptr<SkillCard> card){
     this->saved_cards.push_back(std::move(card));
 }
-void Player::useSkillCard(int index,Board& b, std::vector<Player>& all, TileVisitor& visitor){
-    this->saved_cards[index]->useEffect(*this,  b, all, visitor);
+
+/*
+Refactored, check Player.hpp for further details
+*/
+std::unique_ptr<SkillCard> Player::useSkillCard(int index){
+    if (index < 0 || index >= saved_cards.size()) {
+        return nullptr;
+    }
+    std::unique_ptr<SkillCard> cardToUse = std::move(saved_cards[index]);
+    saved_cards.erase(saved_cards.begin() + index);
+    return cardToUse;
 }
 void Player::addEffect(std::unique_ptr<Effect> effect){
     this->active_effects.push_back(std::move(effect));

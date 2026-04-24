@@ -11,11 +11,13 @@ void CardManager::initializeDecks(){}
 void CardManager::drawKesempatan(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
     std::unique_ptr<Card> card = chance_deck.drawCard();
     card->onDraw(player,b,all,visitor);
+    discardSkillCard(std::move(card),chance_deck);
 }
 // Ketika pemain mendarat di petak Dana Umum
 void CardManager::drawDanaUmum(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
     std::unique_ptr<Card> card = chance_deck.drawCard();
     card->onDraw(player,b,all,visitor);
+    discardSkillCard(std::move(card),chance_deck);
 }
 // Memberikan Skill Card ke pemain
 void CardManager::giveSkillCardToPlayer(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
@@ -23,8 +25,8 @@ void CardManager::giveSkillCardToPlayer(Player& player, Board& b, std::vector<st
     card->onDraw(player,b,all,visitor);
 }
 // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
-void CardManager::discardSkillCard(std::unique_ptr<Card> usedCard){
-    
+void CardManager::discardSkillCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck){
+       deck.addToDiscard(std::move(usedCard));
 }
 std::string CardManager::toSaveFormat() const{
     std::ostringstream out;
