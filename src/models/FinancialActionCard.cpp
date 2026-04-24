@@ -4,10 +4,7 @@
 #include "../../include/models/PropertyTile.hpp"
 
 
-//Random number generator is a static member for performance
-
-
-FinancialActionCard::FinancialActionCard(){
+FinancialActionCard::FinancialActionCard(std::string name):ActionCard(name){
     std::uniform_int_distribution<> amount_dist(1, 100); 
     std::uniform_int_distribution<> type_dist(0, 3); // SUBJECT TO CHANGE
     amount = amount_dist(gen);

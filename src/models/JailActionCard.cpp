@@ -4,6 +4,7 @@
 #include "../../include/models/Player.hpp"
 
 
+JailActionCard::JailActionCard(std::string name):ActionCard(name){}
 void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
     int current_pos = p.getPosition();
     

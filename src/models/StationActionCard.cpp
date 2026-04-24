@@ -3,6 +3,9 @@
 #include "../../include/models/Player.hpp"
 #include "../../include/models/PropertyTile.hpp"
 
+
+StationActionCard::StationActionCard(std::string name):ActionCard(name){}
+
 void StationActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
     int current_pos = p.getPosition();
     

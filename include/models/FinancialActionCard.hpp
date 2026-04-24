@@ -9,7 +9,7 @@ class FinancialActionCard : public ActionCard {
         transaction_type t;
         int amount;
     public:
-        FinancialActionCard();
+        FinancialActionCard(std::string name);
         /**
          * 
          * @brief 
