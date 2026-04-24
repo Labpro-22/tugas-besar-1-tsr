@@ -1,5 +1,6 @@
 #pragma once
 #include "../../include/models/Saveable.hpp"
+#include <vector>
 
 class Player;
 class CardTile;
@@ -12,6 +13,7 @@ class JailTile;
 class StreetTile;
 class RailroadTile;
 class UtilityTile;
+class Board;
 
 class TileVisitor : public Saveable{ //sebenernya butuh di GameManager but ternyata parentnya GameManager tuh ini
 public:
@@ -19,7 +21,7 @@ public:
 
     // Setiap fungsi ini nantinya akan diimplementasikan oleh GameManager
     
-    virtual void visitCardTile(CardTile* tile, Player& player) = 0;
+    virtual void visitCardTile(CardTile* tile, Player& player, Board& board, TileVisitor& visitor) = 0;
     virtual void visitTaxTile(TaxTile* tile, Player& player) = 0;
     virtual void visitFestivalTile(FestivalTile* tile, Player& player) = 0;
     virtual void visitGoTile(GoTile* tile, Player& player) = 0;

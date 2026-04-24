@@ -11,7 +11,7 @@
 template <class T>
 class Deck : public Saveable {
 private:
-    std::stack<T> cards;
+    std::vector<T> cards;
     std::vector<T> discard;
 
 public:
@@ -20,8 +20,8 @@ public:
             throw GameplayException("Deck: Cannot draw from an empty deck!");
         }
         
-        T temp = std::move(cards.top()); 
-        cards.pop(); 
+        T temp = std::move(cards.back()); 
+        cards.pop_back();
         return temp;
     }
 
@@ -49,8 +49,11 @@ public:
         std::ostringstream out;
         out << cards.size()+discard.size() << "\n";
         for(const auto& card: cards){
-            
+            out << card->getName() << "\n";
         }
-
+        for(const auto& card: discard){
+            out << "~" <<card->getName() << "\n";
+        }
+        return out.str();
     }
 };

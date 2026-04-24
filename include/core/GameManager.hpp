@@ -84,7 +84,7 @@ public:
 
     // Implementasi visitor tile
 
-    void visitCardTile(CardTile* tile, Player& player) override;
+    void visitCardTile(CardTile* tile, Player& player, Board& board, TileVisitor& visitor) override;
     void visitTaxTile(TaxTile* tile, Player& player) override;
     void visitFestivalTile(FestivalTile* tile, Player& player) override;
     void visitGoTile(GoTile* tile, Player& player) override;

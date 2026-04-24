@@ -11,23 +11,28 @@ FinancialActionCard::FinancialActionCard(std::string name):ActionCard(name){
     t = static_cast<transaction_type>(type_dist(gen));
 }
 
-void FinancialActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) {
+void FinancialActionCard::onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) {
     switch(t){
         case transaction_type::PLAYER_TO_ALL:
-            for(Player& pl:all){
-                if(&pl==&p)continue;
-                else p.transferTo(pl,amount);
+            for(std::shared_ptr<Player>& pl_ptr : all) {
+                if(pl_ptr.get() == &p) continue; 
+                
+                p.transferTo(*pl_ptr, amount);
             }
             break;
+            
         case transaction_type::ALL_TO_PLAYER:
-            for(Player& pl:all){
-                if(&pl==&p)continue;
-                pl.transferTo(p,amount);
+            for(std::shared_ptr<Player>& pl_ptr : all) {
+                if(pl_ptr.get() == &p) continue;
+                
+                pl_ptr->transferTo(p, amount);
             }
             break;
+            
         case transaction_type::PLAYER_TO_BANK:
             p.pay(amount);
             break;
+            
         case transaction_type::BANK_TO_PLAYER:
             p.receive(amount);
             break;

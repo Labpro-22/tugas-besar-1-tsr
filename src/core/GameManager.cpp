@@ -6,12 +6,12 @@
 
 
 
-void GameManager::visitCardTile(CardTile* tile, Player& player) {
+void GameManager::visitCardTile(CardTile* tile, Player& player, Board& board, TileVisitor& visitor) {
     if(tile->getType() == CHANCE){
-        card_manager->drawKesempatan(player);
+        card_manager->drawKesempatan(player,property_manager->getBoard(),players,*this);
     }
     else{
-        card_manager->drawDanaUmum(player);
+        card_manager->drawDanaUmum(player,property_manager->getBoard(),players,*this);
     }
 }
 

@@ -17,12 +17,12 @@ public:
     ~CardManager() = default;
 
     void initializeDecks();
-    void drawKesempatan(Player& player);
-    void drawDanaUmum(Player& player);
-    void giveSkillCardToPlayer(Player& player);
+    void drawKesempatan(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor);
+    void drawDanaUmum(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor);
+    void giveSkillCardToPlayer(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor);
     
 
-    void discardSkillCard(SkillCard* usedCard); 
+    void discardSkillCard(std::unique_ptr<Card> usedCard); 
     
     std::string toSaveFormat() const override;
 };

@@ -1,21 +1,35 @@
 #include "../../include/core/CardManager.hpp"
+#include "ActionCard.hpp"
+#include "SkillCard.hpp"
+#include <sstream>
 
 // Membaca file konfigurasi dan mengisi ketiga deck di atas
 void CardManager::initializeDecks(){}
 
 
 // Ketika pemain mendarat di petak Kesempatan
-void CardManager::drawKesempatan(Player& player){
-
+void CardManager::drawKesempatan(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
+    std::unique_ptr<Card> card = chance_deck.drawCard();
+    card->onDraw(player,b,all,visitor);
 }
 // Ketika pemain mendarat di petak Dana Umum
-void CardManager::drawDanaUmum(Player& player){}
+void CardManager::drawDanaUmum(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
+    std::unique_ptr<Card> card = chance_deck.drawCard();
+    card->onDraw(player,b,all,visitor);
+}
 // Memberikan Skill Card ke pemain
-void CardManager::giveSkillCardToPlayer(Player& player){}
+void CardManager::giveSkillCardToPlayer(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
+    std::unique_ptr<Card> card = chance_deck.drawCard();
+    card->onDraw(player,b,all,visitor);
+}
 // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
-void CardManager::discardSkillCard(SkillCard* usedCard){
+void CardManager::discardSkillCard(std::unique_ptr<Card> usedCard){
     
 }
 std::string CardManager::toSaveFormat() const{
-    
+    std::ostringstream out;
+    out << chance_deck.toSaveFormat();
+    out << community_chest_deck.toSaveFormat();
+    out << skill_deck.toSaveFormat();
+    return out.str();
 }

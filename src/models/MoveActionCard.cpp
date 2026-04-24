@@ -11,7 +11,7 @@ MoveActionCard::MoveActionCard(std::string name):ActionCard(name){
     walkDistance = forwardorbackwardhmmiwonder(gen)?move(gen):move(gen)*(-1);
 }
 
-void MoveActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
+void MoveActionCard::onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
     p.movePlayer(walkDistance);
     Tile& t = b.getTile(p.getPosition());
     t.onLand(p,visitor);

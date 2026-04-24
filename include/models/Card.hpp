@@ -2,6 +2,7 @@
 #include <vector>
 #include <random>
 #include <string>
+#include <memory>
 class Player;
 class Board;
 class TileVisitor;
@@ -15,7 +16,8 @@ protected:
 public:
     Card(std::string name);
     virtual ~Card() = default; // Butuh for dynamically allocated cards nanti
-    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) = 0;
+    virtual void onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) = 0;
+    std::string getName();
 };
 
 /**

@@ -10,5 +10,5 @@ class MoveActionCard:public ActionCard{
         int walkDistance;
     public:
         MoveActionCard(std::string name);
-        void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) override;
+        void onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
 };
