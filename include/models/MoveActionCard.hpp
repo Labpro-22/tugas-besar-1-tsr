@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ActionCard.hpp"
 #include <random>
 
@@ -8,5 +10,5 @@ class MoveActionCard:public ActionCard{
         int walkDistance;
     public:
         MoveActionCard();
-        void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) override;
+        void onDraw(Player& p) override;
 };

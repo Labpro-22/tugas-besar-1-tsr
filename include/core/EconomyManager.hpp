@@ -2,11 +2,10 @@
 
 #include <memory>
 #include <vector>
-#include "Player.hpp"
-#include "PropertyTile.hpp"
-#include "Saveable.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/models/Saveable.hpp"
 
-class PropertyManager;
 class TransactionLog; 
 
 class EconomyManager : Saveable {
@@ -34,11 +33,13 @@ public:
     bool placeBid(int amount);
     void foldBid();
     bool isAuctionOver() const;
-    void resolveAuction(PropertyManager& propMgr, TransactionLog& logger);
-    const Player* getCurrentBidder() const;
+    void resolveAuction(TransactionLog& logger);
+    std::shared_ptr<Player> getCurrentBidder() const;
     int getHighestBid() const;
 
     // Proses ketika pemain tidak bisa membayar kewajiban
     bool isBankruptcyInevitable(const Player& player, int debtAmount) const;
-    void executeBankruptcy(Player& bankruptPlayer, Player* creditor, PropertyManager& propMgr, TransactionLog& logger);
+    void executeBankruptcy(Player& bankruptPlayer, 
+                           std::shared_ptr<Player> creditor, 
+                           TransactionLog& logger);
 };

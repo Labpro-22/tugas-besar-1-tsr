@@ -1,9 +1,11 @@
+#pragma once
+
 #include "ActionCard.hpp"
 
 class StationActionCard : public ActionCard {
  
     public:
-        void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) override;
+        void onDraw(Player& p) override;
 
 
 };

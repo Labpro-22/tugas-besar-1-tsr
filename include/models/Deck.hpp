@@ -1,3 +1,4 @@
+#pragma once
 #include <stack>
 #include <vector>
 #include <algorithm>
@@ -36,16 +37,6 @@ public:
     void AddToDiscard(T &card){ //belum ada di m1
         discard.push_back(card);
     }
-    std::string toSaveFormat();
+    std::string toSaveFormat()const override;
 
 };
-template <class ActionCard>
-ActionCard Deck<ActionCard>::drawCard(){
-    if(cards.empty()){
-        throw "placeholder";
-    }
-    ActionCard temp= cards.top();
-    cards.pop();
-    this->AddToDiscard(temp);
-    return temp;
-}

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <memory>
-#include "Deck.hpp"
-#include "Card.hpp"
-#include "Player.hpp" 
-#include "Saveable.hpp"
+#include "../../include/models/Deck.hpp"
+#include "../../include/models/Card.hpp"
+#include "../../include/models/Player.hpp" 
+#include "../../include/models/Saveable.hpp"
 
 class CardManager : Saveable {
 private:
@@ -30,5 +30,5 @@ public:
 
     // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
     void discardSkillCard(SkillCard* usedCard);
-    std::string toSaveFormat();
+    std::string toSaveFormat() const override;
 };

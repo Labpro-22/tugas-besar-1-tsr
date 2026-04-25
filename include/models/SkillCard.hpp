@@ -1,17 +1,20 @@
-#include "Card.hpp"
-#include <algorithm>
-#include <random>
+#pragma once
+#include "../../include/models/Card.hpp"
+#include "../../include/models/Effect.hpp"
 #include <memory>
-#include "Player.hpp"
+#include <string>
+
+
 class SkillCard: public Card
 {
-private:
-    /* data */
+protected:
+    std::string name;
 public:
-    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        p.addSkillCard(std::unique_ptr<SkillCard>(this));
-    }
-    virtual void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor)=0;
+    SkillCard(std::string name);
+    void onDraw(Player& p) override;
+    virtual void useEffect(Player& p) = 0;
+
+    virtual std::string toSaveFormat() const;
 };
 
 class MoveSkillCard: public SkillCard
@@ -19,75 +22,55 @@ class MoveSkillCard: public SkillCard
 private:
     int step;
 public:
-virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        p.addSkillCard(std::unique_ptr<SkillCard>(this));
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dist(1, 100); 
-        this->step=dist(gen);
-    }
-    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        p.movePlayer(this->step);
-    }
+    MoveSkillCard(std::string name);
+    void onDraw(Player& p) override;
+    void useEffect(Player& p) override;
+    std::string toSaveFormat() const override;
 };
+
 class DiscountSkillCard: public SkillCard
 {
 private:
     float percentage;
 public:
-    void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        p.addSkillCard(std::unique_ptr<SkillCard>(this));
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dist(1, 100); 
-        this->percentage=dist(gen);
-    }
-    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        p.addEffect(std::unique_ptr<Effect>(new DiscountEffect(this->percentage)));
-    }
+    DiscountSkillCard(std::string name);
+    void onDraw(Player& p) override;
+    void useEffect(Player& p) override;
+    std::string toSaveFormat() const override;
 };
+
 class ShieldSkillCard: public SkillCard
 {
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        p.addEffect(std::unique_ptr<Effect>(new ShieldEffect()));
-    }
+    ShieldSkillCard(std::string name);
+    void useEffect(Player& p) override;
 };
+
 class TeleportSkillCard: public SkillCard
 {
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        int steps;
-        // std::cin>>steps;
-        p.movePlayer(steps);
-    }
+    TeleportSkillCard(std::string name);
+    void useEffect(Player& p) override;
 };
+
 class LassoSkillCard: public SkillCard
 {
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
-        Player *moved;
-        int distance=INFINITY;
-        for (auto& pl: all){
-            int temp=pl.getPosition()-p.getPosition();
-            if(temp < distance && temp>=0 && &p!=&pl){
-                distance=temp;
-                moved=&pl;
-            }
-        }
-        moved->movePlayer(-distance);
-    }
+    LassoSkillCard(std::string name);
+    void useEffect(Player& p) override;
 };
+
 class DemolitionSkillCard: public SkillCard
 {
 private:
     /* data */
 public:
-    void useEffect(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor);
+    DemolitionSkillCard(std::string name);
+    void useEffect(Player& p) override;
 };

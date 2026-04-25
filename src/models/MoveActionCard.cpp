@@ -1,7 +1,8 @@
-#include "MoveActionCard.hpp"
-#include "Player.hpp"
-#include "Board.hpp"
-#include "PropertyTile.hpp"
+#include "../../include/models/MoveActionCard.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/core/PropertyManager.hpp"
 
 std::random_device MoveActionCard::rd;
 std::mt19937 MoveActionCard::gen(MoveActionCard::rd());
@@ -12,11 +13,10 @@ MoveActionCard::MoveActionCard(){
     walkDistance = forwardorbackwardhmmiwonder(gen)?move(gen):move(gen)*(-1);
 }
 
-void MoveActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
+void MoveActionCard::onDraw(Player& p){
+    Board& b=PropertyManager::getBoard();
     p.movePlayer(walkDistance);
     Tile& t = b.getTile(p.getPosition());
-    PropertyTile* pt = dynamic_cast<PropertyTile*>(&t);
-    if(pt!=nullptr){
-        pt->onLand(p,visitor);
-    }
+    t.onLand(p);
+
 }

@@ -1,4 +1,4 @@
-#include "../../include/models/TransactionLog.hpp"
+#include "../../include/core/TransactionLog.hpp"
 
 
 const char* actionStrings[] = {
@@ -79,7 +79,7 @@ std::string TransactionLog::getRecentLogs(int n)const{
 void TransactionLog::clearLogs(){
     logs.clear();
 }
-std::string TransactionLog::toSave(){
+std::string TransactionLog::toSaveFormat() const{
     if(logs.empty()) return "";
     std::string temp;
     for(LogEntry log : logs){

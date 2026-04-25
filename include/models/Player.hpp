@@ -2,11 +2,11 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Saveable.hpp"
+#include "../../include/models/Saveable.hpp"
+#include "../../include/models/Effect.hpp"
+#include "../../include/models/SkillCard.hpp"
 
 class PropertyTile;
-
-class SkillCard;
 
 enum PlayerState {
     FREE,
@@ -15,6 +15,8 @@ enum PlayerState {
 
 class Player : public Saveable {
 private:
+    static std::random_device rd;
+    static std::mt19937 gen;
     std::string name;
     int balance;
     int position;
@@ -29,13 +31,8 @@ public:
     Player& operator+=(int amount);
     Player& operator-=(int amount);
     Player operator+(int amount) const;
-    Player operator-(int amount) const;
-
-    int processPayment(int amount) const;
-    int pay(int amount);
-    void receive(int amount);       
-    void transferTo(Player&, int); 
-
+    Player operator-(int amount) const;    
+    void transferTo(Player& player, int amount); //DO NOT USE THIS FOR AUCTION OR LAND BUYING gitu, kalo mau itu pake sellProperty aja
     void movePlayer(int steps);
     void addProperty(PropertyTile* property);
     void removeProperty(PropertyTile* property);
@@ -48,49 +45,18 @@ public:
 
     int getTotalAssetValue();
     bool canPay(int amount);
+    void buyProperty(PropertyTile &property);
+    void sellProperty(PropertyTile &property, Player& other);
     int liquidateAsset(int required);
     void declareBankruptcy();
 
     bool inJail();
     void setInJail();
     void setFree();
-    void startTurn();
+    void startTurn(Board &board);
     void endTurn();
     int getPosition();
 
     //Saveload impl
     std::string toSaveFormat() const;
-};
-
-class Effect {
-public:
-    virtual ~Effect() = default;
-    virtual void onTurnStart(Player&) {}
-    virtual void onTurnEnd(Player&) {}
-    virtual bool isExpired() const = 0;
-    virtual bool blocksPayment() const;
-    virtual int modifyPayment(int amount) const;
-};
-
-class ShieldEffect : public Effect {
-private:
-    int turns_left;
-
-public:
-    explicit ShieldEffect(int duration = 1);
-    void onTurnEnd(Player&) override;
-    bool isExpired() const override;
-    bool blocksPayment() const override;
-};
-
-class DiscountEffect : public Effect {
-private:
-    int percent;
-    int turns_left;
-
-public:
-    DiscountEffect(int percent, int duration = 1);
-    void onTurnEnd(Player&) override;
-    bool isExpired() const override;
-    int modifyPayment(int amount) const override;
 };

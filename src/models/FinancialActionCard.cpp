@@ -1,12 +1,11 @@
-#include "FinancialActionCard.hpp"
-#include "Board.hpp"
-#include "Player.hpp"
-#include "PropertyTile.hpp"
-
-
+#include "../../include/models/FinancialActionCard.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/core/PropertyManager.hpp"
+#include "../../include/core/GameManager.hpp"
 //Random number generator is a static member for performance
-std::random_device FinancialActionCard::rd;
-std::mt19937 FinancialActionCard::gen(FinancialActionCard::rd());
+
 
 FinancialActionCard::FinancialActionCard(){
     std::uniform_int_distribution<> amount_dist(1, 100); 
@@ -15,18 +14,19 @@ FinancialActionCard::FinancialActionCard(){
     t = static_cast<transaction_type>(type_dist(gen));
 }
 
-void FinancialActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all) {
+void FinancialActionCard::onDraw(Player& p) {
+    auto& all=GameManager::players; 
     switch(t){
         case transaction_type::PLAYER_TO_ALL:
-            for(Player& pl:all){
-                if(&pl==&p)continue;
-                else p.transferTo(pl,amount);
+            for(auto& pl:all){
+                if(pl.get() == &p) continue;
+                else p.transferTo(*pl,amount);
             }
             break;
         case transaction_type::ALL_TO_PLAYER:
-            for(Player& pl:all){
-                if(&pl==&p)continue;
-                pl.transferTo(p,amount);
+            for(auto& pl:all){
+                if(pl.get() == &p) continue;
+                pl->transferTo(p,amount);
             }
             break;
         case transaction_type::PLAYER_TO_BANK:

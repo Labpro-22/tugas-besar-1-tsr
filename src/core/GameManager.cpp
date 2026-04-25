@@ -1,4 +1,4 @@
-#include "GameManager.hpp"
+#include "../../include/core/GameManager.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -43,7 +43,7 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
     std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
     int rent = tile->calculateRent();
     if(current_owner && current_owner.get() != &player){
-        bool success = this->economy_manager->transferMoney(player, *current_owner, rent);
+        bool success = economy_manager->transferMoney(player, *current_owner, rent);
     }
 }
 
@@ -51,7 +51,7 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
     std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
     int rent = tile->calculateRent();
     if(current_owner && current_owner.get() != &player){
-        bool success = this->economy_manager->transferMoney(player, *current_owner, rent);
+        bool success = economy_manager->transferMoney(player, *current_owner, rent);
     }
 }
 
@@ -60,7 +60,7 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
     std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
     int rent = tile->calculateRent();
     if(current_owner && current_owner.get() != &player){
-        bool success = this->economy_manager->transferMoney(player, *current_owner, rent);
+        bool success = economy_manager->transferMoney(player, *current_owner, rent);
     }
 }
 

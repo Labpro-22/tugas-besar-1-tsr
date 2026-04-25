@@ -1,17 +1,12 @@
-#include "JailActionCard.hpp"
-#include "Tile.hpp"
-#include "Board.hpp"
-#include "Player.hpp"
+#include "../../include/models/JailActionCard.hpp"
+#include "../../include/models/Tile.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/Player.hpp"
+#include "../../include/core/GameManager.hpp"
 
-std::random_device JailActionCard::rd;
-std::mt19937 JailActionCard::gen(JailActionCard::rd());
 
-JailActionCard::JailActionCard(){
-    std::uniform_int_distribution<> sentence_dist(1, 4);
-    sentenceLength = sentence_dist(gen);
-}
-
-void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
+void JailActionCard::onDraw(Player& p){
+    auto& b=PropertyManager::getBoard();
     int current_pos = p.getPosition();
     
     int total_tiles = b.getSize(); 
@@ -21,7 +16,7 @@ void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileV
         GoToJailTile* jail = dynamic_cast<GoToJailTile*>(&ref);
         if (jail != nullptr) {
             p.movePlayer(i);
-            p.setInJail();
+            jail->onLand(p);
             
             return;
         }

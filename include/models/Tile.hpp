@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 
-class Player;
-class TileVisitor;
 
 class Tile {
 protected:
@@ -18,7 +16,7 @@ public:
     std::string getName() const;
     std::string getCode() const;
     std::string getColor() const;
-    virtual void onLand(Player& p, TileVisitor& visitor) = 0;
+    virtual void onLand(Player& p) = 0;
 };
 
 enum CardType {
@@ -33,7 +31,7 @@ private:
 public:
     CardTile(int index, std::string name, std::string code, std::string color, CardType card);
     CardType getType();
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };
 
 enum TaxType {
@@ -49,13 +47,13 @@ private:
 public:
     TaxTile(int index, std::string name, std::string code, std::string color, TaxType tax_type, int tax_amount);
     int getTaxAmount();
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };
 
 class FestivalTile : public Tile {
 public:
     FestivalTile(int index, std::string name, std::string code, std::string color);
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };
 
 class GoTile : public Tile {
@@ -65,19 +63,19 @@ private:
 public:
     GoTile(int index, std::string name, std::string code, std::string color, int go_reward);
     int getReward();
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };
 
 class GoToJailTile : public Tile {
 public:
     GoToJailTile(int index, std::string name, std::string code, std::string color);
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };
 
 class FreeParkingTile : public Tile {
 public:
     FreeParkingTile(int index, std::string name, std::string code, std::string color);
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };
 
 class JailTile : public Tile {
@@ -86,5 +84,5 @@ private:
 
 public:
     JailTile(int index, std::string name, std::string code, std::string color, int jail_fine);
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
 };

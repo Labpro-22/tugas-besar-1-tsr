@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "../../include/models/Saveable.hpp"
 
 enum actions{
     DADU, // roll dadu 
@@ -53,7 +54,7 @@ public:
     ~LogEntry(){}
 };
 
-class TransactionLog{
+class TransactionLog : public Saveable{
 private:
     std::vector<LogEntry> logs;
 public:
@@ -62,7 +63,7 @@ public:
     std::string getAllLogs()const;
     std::string getRecentLogs(int n)const;
     void clearLogs();
-    std::string toSave();
+    std::string toSaveFormat() const override;
 
     ~TransactionLog(){}
 };

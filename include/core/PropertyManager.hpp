@@ -2,19 +2,19 @@
 
 #include <memory>
 #include <string>
-#include "Board.hpp"
-#include "PropertyTile.hpp"
-#include "StreetTile.hpp"
-#include "Player.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/models/StreetTile.hpp"
+#include "../../include/models/Player.hpp"
 
 class PropertyManager {
 private:
-    std::unique_ptr<Board> board;
+    static std::unique_ptr<Board> board;
 
 public:
     PropertyManager(std::unique_ptr<Board> gameBoard);
     ~PropertyManager() = default;
-    Board& getBoard() const;
+    static Board& getBoard();
     Tile& getTileAt(int position) const;
 
     // Mengurus pergantian status dan pointer owner saat dibeli/dilelang
