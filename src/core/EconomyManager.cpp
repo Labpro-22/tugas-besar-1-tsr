@@ -10,15 +10,17 @@ void EconomyManager::addMoney(Player& player, float amount){
 }
 bool EconomyManager::deductMoney(Player& player, float amount){
     if(!player.canPay(amount)){
-        executeBankruptcy(player,nil);
+        return false;
     }
     player-=amount;
+    return true;
 }
 bool EconomyManager::transferMoney(Player& payer, Player& receiver, int amount){
     payer.transferTo(receiver,amount);
 }
 // Pemrosesan pajak
-bool EconomyManager::processTax(Player& player, TaxType type, int baseTaxAmount, TransactionLog& logger){
+bool EconomyManager::processTax(Player& player, TaxType type, int baseTaxAmount){
+    auto &logger=GameManager::logger;
     float tax;
     if (type==TaxType::PPH){
         int pilihan;
@@ -33,7 +35,9 @@ bool EconomyManager::processTax(Player& player, TaxType type, int baseTaxAmount,
         tax=baseTaxAmount;
     }
     if(deductMoney(player,tax)){
-        logger.recordEvent(LogEntry(0,player.getname(),actions::PAJAK,"bayar pajak sebanyak "));
+        logger->recordEvent(LogEntry(0,player.getname(),actions::PAJAK,"bayar pajak sebanyak "));
+    } else{
+        executeBankruptcy(player,nullptr);
     }
 }
 // Proses lelang
@@ -103,5 +107,5 @@ bool EconomyManager::isBankruptcyInevitable(Player& player, int debtAmount) cons
     }
     return false;
 }
-void EconomyManager::executeBankruptcy(Player& bankruptPlayer, 
-                       std::shared_ptr<Player> creditor){}
+void EconomyManager::executeBankruptcy(Player& bankruptPlayer, std::shared_ptr<Player> creditor){
+}

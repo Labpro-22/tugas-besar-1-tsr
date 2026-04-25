@@ -26,7 +26,7 @@ public:
     bool transferMoney(Player& payer, Player& receiver, int amount);
 
     // Pemrosesan pajak
-    bool processTax(Player& player, TaxType type, int baseTaxAmount, TransactionLog& logger);
+    bool processTax(Player& player, TaxType type, int baseTaxAmount);
 
     // Proses lelang
     void startAuction(PropertyTile* property, const std::vector<std::shared_ptr<Player>>& players);
