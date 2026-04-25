@@ -102,7 +102,4 @@ bool EconomyManager::isBankruptcyInevitable(Player& player, int debtAmount) cons
 }
 void EconomyManager::executeBankruptcy(Player& bankruptPlayer, 
                        std::shared_ptr<Player> creditor, 
-                       PropertyManager& propMgr, 
-                       TransactionLog& logger){
-
-}
+                       TransactionLog& logger){}

@@ -1,6 +1,5 @@
 #include "../../include/models/Tile.hpp"
-#include "../../include/core/TileVisitor.hpp"
-
+#include "../../include/core/GameManager.hpp"
 // Tile
 Tile::Tile(int index, std::string name, std::string code, std::string color) 
     : index(index), name(name), code(code), color(color) {}
@@ -26,8 +25,8 @@ CardTile::CardTile(int index, std::string name, std::string code, std::string co
 CardType CardTile::getType(){
     return card;
 }
-void CardTile::onLand(Player& p, TileVisitor& visitor) {
-    visitor.visitCardTile(this, p);
+void CardTile::onLand(Player& p) {
+    GameManager::visitCardTile(this, p);
 }
 
 // TaxTile
@@ -36,16 +35,16 @@ TaxTile::TaxTile(int index, std::string name, std::string code, std::string colo
 int TaxTile::getTaxAmount(){
     return tax_amount;
 }
-void TaxTile::onLand(Player& p, TileVisitor& visitor) {
-    visitor.visitTaxTile(this, p);
+void TaxTile::onLand(Player& p) {
+    GameManager::visitTaxTile(this, p);
 }
 
 // FestivalTile
 FestivalTile::FestivalTile(int index, std::string name, std::string code, std::string color)
     : Tile(index, name, code, color) {}
 
-void FestivalTile::onLand(Player& p, TileVisitor& visitor){
-    visitor.visitFestivalTile(this, p);
+void FestivalTile::onLand(Player& p){
+    GameManager::visitFestivalTile(this, p);
 }
 
 // GoTile
@@ -55,30 +54,30 @@ GoTile::GoTile(int index, std::string name, std::string code, std::string color,
 int GoTile::getReward(){
     return go_reward;
 }
-void GoTile::onLand(Player& p, TileVisitor& visitor) {
-    visitor.visitGoTile(this, p);
+void GoTile::onLand(Player& p) {
+    GameManager::visitGoTile(this, p);
 }
 
 // GoToJailTile
 GoToJailTile::GoToJailTile(int index, std::string name, std::string code, std::string color)
     : Tile(index, name, code, color) {}
 
-void GoToJailTile::onLand(Player& p, TileVisitor& visitor) {
-    visitor.visitGoToJailTile(this, p);
+void GoToJailTile::onLand(Player& p) {
+    GameManager::visitGoToJailTile(this, p);
 }
 
 // FreeParkingTile
 FreeParkingTile::FreeParkingTile(int index, std::string name, std::string code, std::string color)
     : Tile(index, name, code, color) {}
 
-void FreeParkingTile::onLand(Player& p, TileVisitor& visitor) {
-    visitor.visitFreeParkingTile(this, p);
+void FreeParkingTile::onLand(Player& p) {
+    GameManager::visitFreeParkingTile(this, p);
 }
 
 // JailTile
 JailTile::JailTile(int index, std::string name, std::string code, std::string color, int jail_fine)
     : Tile(index, name, code, color), jail_fine(jail_fine) {}
 
-void JailTile::onLand(Player& p, TileVisitor& visitor) {
-    visitor.visitJailTile(this, p);
+void JailTile::onLand(Player& p) {
+    GameManager::visitJailTile(this, p);
 }
