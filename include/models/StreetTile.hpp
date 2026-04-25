@@ -13,7 +13,7 @@ public:
     StreetTile(int index, std::string name, std::string code, std::string color, int buy_price, int mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status, int building_level, const std::vector<int>& rent_list, int house_price, int hotel_price);
                
     int calculateRent() const override;
-    void onLand(Player& p, TileVisitor& visitor) override;
+    void onLand(Player& p) override;
     PropertyType getPropertyType() const override;
 
     int getBuildingLevel() const;

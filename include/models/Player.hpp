@@ -40,7 +40,7 @@ public:
     int countOwnedUtility() const;
 
     void addSkillCard(std::unique_ptr<SkillCard> card);
-    void useSkillCard(int index,Board& b, std::vector<Player>& all, TileVisitor& visitor);
+    void useSkillCard(int index);
     void addEffect(std::unique_ptr<Effect> effect);
 
     int getTotalAssetValue();

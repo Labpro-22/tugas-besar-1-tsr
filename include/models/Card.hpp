@@ -13,7 +13,7 @@ protected:
 public:
     Card();
     virtual ~Card() = default; // Butuh for dynamically allocated cards nanti
-    virtual void onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor) = 0;
+    virtual void onDraw(Player& p) = 0;
 };
 
 /**

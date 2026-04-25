@@ -2,9 +2,11 @@
 #include "../../include/models/Tile.hpp"
 #include "../../include/models/Board.hpp"
 #include "../../include/models/Player.hpp"
+#include "../../include/core/GameManager.hpp"
 
 
-void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileVisitor& visitor){
+void JailActionCard::onDraw(Player& p){
+    auto& b=PropertyManager::getBoard();
     int current_pos = p.getPosition();
     
     int total_tiles = b.getSize(); 
@@ -14,7 +16,7 @@ void JailActionCard::onDraw(Player& p, Board& b, std::vector<Player>& all, TileV
         GoToJailTile* jail = dynamic_cast<GoToJailTile*>(&ref);
         if (jail != nullptr) {
             p.movePlayer(i);
-            jail->onLand(p,visitor);
+            jail->onLand(p);
             
             return;
         }

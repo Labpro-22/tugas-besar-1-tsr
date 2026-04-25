@@ -6,7 +6,6 @@
 #include "../../include/models/PropertyTile.hpp"
 #include "../../include/models/Saveable.hpp"
 
-class PropertyManager;
 class TransactionLog; 
 
 class EconomyManager : Saveable {
@@ -34,7 +33,7 @@ public:
     bool placeBid(int amount);
     void foldBid();
     bool isAuctionOver() const;
-    void resolveAuction(PropertyManager& propMgr, TransactionLog& logger);
+    void resolveAuction(TransactionLog& logger);
     std::shared_ptr<Player> getCurrentBidder() const;
     int getHighestBid() const;
 
@@ -43,6 +42,5 @@ public:
     bool isBankruptcyInevitable(const Player& player, int debtAmount) const;
     void executeBankruptcy(Player& bankruptPlayer, 
                            std::shared_ptr<Player> creditor, 
-                           PropertyManager& propMgr, 
                            TransactionLog& logger);
 };

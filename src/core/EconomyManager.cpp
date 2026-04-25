@@ -10,12 +10,11 @@ void EconomyManager::startAuction(PropertyTile* property, const std::vector<std:
 bool EconomyManager::placeBid(int amount){}
 void EconomyManager::foldBid(){}
 bool EconomyManager::isAuctionOver() const{}
-void EconomyManager::resolveAuction(PropertyManager& propMgr, TransactionLog& logger){}
+void EconomyManager::resolveAuction(TransactionLog& logger){}
 std::shared_ptr<Player> EconomyManager::getCurrentBidder() const{}
 int EconomyManager::getHighestBid() const{}
 // Proses ketika pemain tidak bisa membayar kewajiban
 bool EconomyManager::isBankruptcyInevitable(const Player& player, int debtAmount) const{}
 void EconomyManager::executeBankruptcy(Player& bankruptPlayer, 
                        std::shared_ptr<Player> creditor, 
-                       PropertyManager& propMgr, 
                        TransactionLog& logger){}

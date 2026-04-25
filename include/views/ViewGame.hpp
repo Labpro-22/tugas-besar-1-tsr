@@ -16,7 +16,7 @@ public:
     ViewGame() = default;
     ~ViewGame() = default;
 
-    void renderBoard(const Board& board, const std::vector<std::shared_ptr<Player>>& players) const;
+    void renderBoard(const Board& board) const; //kalo butuh list of player ambil dari gamemanager::players
     void renderPlayerStats(const Player& player) const;
     void renderPropertyList(const std::vector<PropertyTile*>& properties) const;
     void renderMenu(GameState currentState, const std::string& playerName) const;

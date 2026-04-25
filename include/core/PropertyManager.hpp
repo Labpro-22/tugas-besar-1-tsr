@@ -9,12 +9,12 @@
 
 class PropertyManager {
 private:
-    std::unique_ptr<Board> board;
+    static std::unique_ptr<Board> board;
 
 public:
     PropertyManager(std::unique_ptr<Board> gameBoard);
     ~PropertyManager() = default;
-    Board& getBoard() const;
+    static Board& getBoard();
     Tile& getTileAt(int position) const;
 
     // Mengurus pergantian status dan pointer owner saat dibeli/dilelang
