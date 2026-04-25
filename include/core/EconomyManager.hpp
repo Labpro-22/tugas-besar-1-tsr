@@ -30,19 +30,15 @@ public:
     bool processTax(Player& player, TaxType type, int baseTaxAmount, TransactionLog& logger);
 
     // Proses lelang
-    void startAuction(PropertyTile* property, const std::vector<std::shared_ptr<Player>>& players);
+    void startAuction(PropertyTile* property, std::vector<Player*> players);
     bool placeBid(int amount);
     void foldBid();
     bool isAuctionOver() const;
     void resolveAuction(PropertyManager& propMgr, TransactionLog& logger);
-    std::shared_ptr<Player> getCurrentBidder() const;
+    const Player* getCurrentBidder() const;
     int getHighestBid() const;
 
     // Proses ketika pemain tidak bisa membayar kewajiban
-
     bool isBankruptcyInevitable(const Player& player, int debtAmount) const;
-    void executeBankruptcy(Player& bankruptPlayer, 
-                           std::shared_ptr<Player> creditor, 
-                           PropertyManager& propMgr, 
-                           TransactionLog& logger);
+    void executeBankruptcy(Player& bankruptPlayer, Player* creditor, PropertyManager& propMgr, TransactionLog& logger);
 };
