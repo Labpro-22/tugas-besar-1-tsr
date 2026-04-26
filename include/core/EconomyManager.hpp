@@ -24,7 +24,7 @@ public:
     // Transaksi Dasar
     void addMoney(Player& player, float amount);
     bool deductMoney(Player& player, float amount);
-    bool transferMoney(Player& payer, Player& receiver, float amount);
+    bool transferMoney(std::shared_ptr<Player> payer, std::shared_ptr<Player> receiver, float amount);
 
     // Pemrosesan pajak
     bool processTax(std::shared_ptr<Player> player, TaxType type, float baseTaxAmount);

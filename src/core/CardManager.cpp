@@ -107,12 +107,14 @@ void CardManager::initializeDecks() {
 void CardManager::drawKesempatan(Player& player){
     std::unique_ptr<ActionCard> card = chance_deck.drawCard();
     card->onDraw(player);
+    ViewGame::displayCardDraw("kartu kesempatan", card->getName());
     discardCard(std::move(card), chance_deck);
 }
 // Ketika pemain mendarat di petak Dana Umum
 void CardManager::drawDanaUmum(Player& player){
     std::unique_ptr<ActionCard> card = community_chest_deck.drawCard();
     card->onDraw(player);
+    ViewGame::displayCardDraw("kartu dana umum", card->getName());
     discardCard(std::move(card), community_chest_deck);
 }
 // Memberikan Skill Card ke pemain
