@@ -9,7 +9,7 @@
 #include <sstream>
 #include <iostream>
 // SkillCard
-SkillCard::SkillCard(std::string name):name(name){};
+SkillCard::SkillCard(std::string name):Card(name){};
 void SkillCard::onDraw(Player& p) {
 }
 std::string SkillCard::toSaveFormat() const{

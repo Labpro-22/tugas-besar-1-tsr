@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include "../../include/models/Board.hpp"
 #include "../../include/models/PropertyTile.hpp"
 #include "../../include/models/StreetTile.hpp"
@@ -10,6 +11,7 @@
 class PropertyManager {
 private:
     static std::unique_ptr<Board> board;
+    bool sellAllBuildingsOnColorGroup(std::shared_ptr<Player> player, const std::string& color);
 
 public:
     PropertyManager(std::unique_ptr<Board> gameBoard);
@@ -34,5 +36,11 @@ public:
     float getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const;
 
     // Memulai festival di suatu PropertyTile
-    void startFestival(PropertyTile& tile);
+    void startFestival(PropertyTile* tile);
+
+    std::vector<PropertyTile*> findPropertiesOwnedByPlayer(std::shared_ptr<Player> player) const;
+
+    void doMortgage(std::shared_ptr<Player> player);
+
+    void doUnmortgage(std::shared_ptr<Player> player);
 };
