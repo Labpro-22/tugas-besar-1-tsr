@@ -18,7 +18,7 @@ GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> init
                                 std::unique_ptr<TransactionLog> tLogger):
             current_turn_count(0),
             max_turns(maxTurns),
-            current_state(GameState::START_TURN) {
+            current_state(GameState::START_TURN),pending_debt(0.0f),pending_creditor(nullptr) {
         current_player_index=0;
         players = std::move(initialPlayers);
         card_manager = std::move(cMgr);
@@ -446,4 +446,28 @@ int GameManager::getCurrentTurn(){
 void GameManager::save(const std::string& filedir) {
     SaveLoadManager slm;
     slm.save(*this, filedir); 
+}
+
+void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::shared_ptr<Player> creditor, float amount) {
+    
+    if (payer->canPay(amount)) {
+        if (creditor) economy_manager->transferMoney(*payer, *creditor, amount);
+        else economy_manager->deductMoney(*payer, amount);
+    } 
+    else if (!economy_manager->isBankruptcyInevitable(*payer, amount)) {
+        std::cout << "Warning! You owe " << amount << " but only have " << payer->getBalance() << ".\n";
+        std::cout << "Entering Liquidation Mode. Use MORTGAGE or SELL.\n";
+        
+        pending_debt = amount; 
+        pending_creditor = creditor;
+        current_state = GameState::WAITING_FOR_LIQUIDATION;
+    } 
+    else {
+        // DEATH
+        std::cout << payer->getName() << " HAS GONE BANKRUPT!\n";
+        economy_manager->executeBankruptcy(payer, creditor, amount);
+        
+        logger->recordEvent(LogEntry(current_turn_count, payer->getName(), BANKRUPT, "Went Bankrupt"));
+        checkGameOver();
+    }
 }

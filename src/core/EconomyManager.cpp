@@ -127,21 +127,27 @@ bool EconomyManager::isBankruptcyInevitable(Player& player, float debtAmount) co
     }
     return false;
 }
-void EconomyManager::executeBankruptcy(std::shared_ptr<Player>  bankruptPlayer, std::shared_ptr<Player> creditor,float amount){
-    if(isBankruptcyInevitable(*bankruptPlayer,amount)){
-        bankruptPlayer->declareBankruptcy();
-    }
-    // printopsi(bankruptPlayer)
-    PropertyTile *dijual = nullptr;
-    //dijual=pilihopsi(bankruptPlayer)
-    if (dijual != nullptr) // jual=true, mortgage=false;
-    {
-        bankruptPlayer->sellProperty(*dijual);
-    } else{
-        GameManager::property_manager.get()->tryMortgage(bankruptPlayer,dijual);
-    }
+void EconomyManager::executeBankruptcy(std::shared_ptr<Player> bankruptPlayer, std::shared_ptr<Player> creditor, float amount) {
+    bankruptPlayer->declareBankruptcy();
+    float remaining_cash = bankruptPlayer->getBalance();
+    bankruptPlayer->pay(remaining_cash); 
+    
     if (creditor) {
-        bankruptPlayer->transferTo(*creditor,amount);
+        creditor->receive(remaining_cash);
+    }
+    std::vector<PropertyTile*> owned_properties = GameManager::property_manager->findPropertiesOwnedByPlayer(bankruptPlayer);
+
+    for (PropertyTile* prop : owned_properties) {
+        if (creditor) {
+            GameManager::property_manager->assignOwnership(prop, creditor);
+        } else {
+            GameManager::property_manager->assignOwnership(prop, nullptr);
+            prop->setPropertyStatus(BANK);
+            
+            if (prop->getPropertyType() == PropertyType::STREET) {
+                dynamic_cast<StreetTile*>(prop)->resetBuildings(); 
+            }
+        }
     }
 }
 
