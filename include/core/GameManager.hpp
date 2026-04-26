@@ -37,22 +37,22 @@ private:
 
     // void setupCommands(); // Fungsi mendaftarkan isi commandMap
 
-    // // Handler tiap command
-    // void printBoard(const std::string& args);
-    // void printCertificate(const std::string& args);     
-    // void printProperty(const std::string& args);
-    // void printLog(const std::string& args);     
-    // void mortgage(const std::string& args);
-    // void redeem(const std::string& args);
-    // void build(const std::string& args);       
-    // void useAbility(const std::string& args);
-    // void rollDice(const std::string& args);
-    // void setDice(const std::string& args);     
-    // void bid(const std::string& args);       
-    // void pass(const std::string& args);          
-    // void save(const std::string& args); 
-    // void load(const std::string& args);
-    // void endTurn(const std::string& args);
+    // Handler tiap command
+    void printBoard(const std::string& args);
+    void printCertificate(const std::string& args);     
+    void printProperty(const std::string& args);
+    void printLog(const std::string& args);     
+    void mortgage(const std::string& args);
+    void redeem(const std::string& args);
+    void build(const std::string& args);       
+    void useAbility(const std::string& args);
+    void rollDice(const std::string& args);
+    void setDice(const std::string& args);     
+    void bid(const std::string& args);       
+    void pass(const std::string& args);          
+    void save(const std::string& args); 
+    void load(const std::string& args);
+    void endTurn(const std::string& args);
 
 
     std::shared_ptr<Player> getCurrentPlayer();
@@ -83,7 +83,7 @@ static std::unique_ptr<CardManager> card_manager;
     // Implementasi visitor tile
 
     static void visitCardTile(CardTile* tile, Player& player) ;
-    static void visitTaxTile(TaxTile* tile, Player& player) ;
+    static void visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) ;
     static void visitFestivalTile(FestivalTile* tile, Player& player) ;
     static void visitGoTile(GoTile* tile, Player& player) ;
     static void visitGoToJailTile(GoToJailTile* tile, Player& player) ;

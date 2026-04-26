@@ -5,24 +5,32 @@
 
 void GameManager::printBoard(const std::string& args){
     ViewGame v;
-    v.renderBoard(property_manager->getBoard());
+    v.displayBoard();
 }
 
 void GameManager::printProperty(const std::string& args){
-    
+    std::cout<<"kode petak: ";
+    std::string kode;
+    std::cin>>kode;
+    ViewGame::displayPropertyDeed(kode);
 }
 
-int rollDice(const std::string& args){
+void GameManager::rollDice(const std::string& args){
     std::random_device rd; 
     std::mt19937 gen(rd()); 
 
     std::uniform_int_distribution<> distr(1, 6);
-
-    return distr(gen) + distr(gen);
+    int dice1=distr(gen);
+    int dice2=distr(gen);
+    auto player=players[current_player_index];
+    player->movePlayer(dice1+dice2);;
+    ViewGame::displayDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
 }
 
 void GameManager::mortgage(const std::string& args){
-    bool mortgageTry = property_manager->tryMortgage();
+    ViewGame::displayMortgageList(players[current_player_index]->owned_properties);
+    int index=ViewGame::getInt(10);
+    bool mortgageTry = property_manager->tryMortgage(players[current_player_index],players[current_player_index]->owned_properties[index]);
 }
 
 
@@ -47,19 +55,19 @@ void GameManager::visitCardTile(CardTile* tile, Player& player) {
     }
 }
 
-void GameManager::visitTaxTile(TaxTile* tile, Player& player) {
-    bool trying = economy_manager->processTax(player, tile->getTaxType(), tile->getTaxAmount(), logger);;
+void GameManager::visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) {
+    bool trying = economy_manager->processTax(player, tile->getTaxType(), tile->getTaxAmount());;
 }
 
-void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
-    ViewGame v;
-    std::string input = v.getInput();
+// void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
+//     ViewGame v;
+//     std::string input = v.getInput();
 
-    //Someone help with handling inputs please like parsing it
+//     //Someone help with handling inputs please like parsing it
     
-    //Zek make a player set festival so i could call it
+//     //Zek make a player set festival so i could call it
 
-}
+// }
 
 void GameManager::visitGoTile(GoTile* tile, Player& player) {
     economy_manager->addMoney(player, tile->getReward());
@@ -78,36 +86,61 @@ void GameManager::visitJailTile(JailTile* tile, Player& player) {
 }
 
 void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
-    std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
-    int rent = tile->calculateRent();
-    if(current_owner && current_owner.get() != &player){
-        bool success = economy_manager->transferMoney(player, *current_owner, rent);
+    PropertyStatus status = tile->getPropertyStatus();
+    if (status == PropertyStatus::BANK) {
+        int nak;
+        std::cin>>nak;
+        if (player.canPay(tile->getBuyPrice())&&nak==1) {
+            player.buyProperty(*tile);
+        } else{
+            economy_manager->startAuction(tile);
+        }
+    } else if (status == PropertyStatus::OWNED) {
+        std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
+        if(current_owner && current_owner.get() != &player){
+            float rent = tile->calculateRent();
+            bool success = economy_manager->transferMoney(player, *current_owner, rent);
+        }
     }
-    else{
-        player.buyProperty(*tile);
-    }
+    // Jika MORTGAGED, tidak ada aksi
 }
 
 void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
-    std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
-    int rent = tile->calculateRent();
-    if(current_owner && current_owner.get() != &player){
-        bool success = economy_manager->transferMoney(player, *current_owner, rent);
-    }
-    else{
-        player.buyProperty(*tile);
+    PropertyStatus status = tile->getPropertyStatus();
+    if (status == PropertyStatus::BANK) {
+        int nak;
+        if (player.canPay(tile->getBuyPrice())&&nak==1) {
+            player.buyProperty(*tile);
+        } else{
+            economy_manager->startAuction(tile);
+        }
+    } else if (status == PropertyStatus::OWNED) {
+        std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
+        if(current_owner && current_owner.get() != &player){
+            std::cout<<current_owner->getname();
+            float rent = tile->calculateRent();
+            bool success = economy_manager->transferMoney(player, *current_owner, rent);
+        }
     }
 }
 
 
 void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
-    std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
-    int rent = tile->calculateRent();
-    if(current_owner && current_owner.get() != &player){
-        bool success = economy_manager->transferMoney(player, *current_owner, rent);
-    }
-    else{
-        player.buyProperty(*tile);
+    PropertyStatus status = tile->getPropertyStatus();
+    if (status == PropertyStatus::BANK) {
+        int nak;
+        std::cin>>nak;
+        if (player.canPay(tile->getBuyPrice())&&nak==1) {
+            player.buyProperty(*tile);
+        } else{
+            economy_manager->startAuction(tile);
+        }
+    } else if (status == PropertyStatus::OWNED) {
+        std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
+        if(current_owner && current_owner.get() != &player){
+            float rent = tile->calculateRent();
+            bool success = economy_manager->transferMoney(player, *current_owner, rent);
+        }
     }
 }
 
