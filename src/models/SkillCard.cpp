@@ -60,7 +60,6 @@ void ShieldSkillCard::useEffect(Player& p) {
 
 // TeleportSkillCard
 TeleportSkillCard::TeleportSkillCard(std::string name):SkillCard(name){}
-TeleportSkillCard::TeleportSkillCard(std::string name):SkillCard(name){}
 void TeleportSkillCard::useEffect(Player& p) {
     int steps;
     p.movePlayer(steps);

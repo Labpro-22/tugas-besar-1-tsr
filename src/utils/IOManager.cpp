@@ -1,6 +1,100 @@
 #include "../../include/utils/IOManager.hpp"
 #include <algorithm>
 
+GameSaveData IOManager::loadGameData(const std::string& filepath){
+    GameSaveData res;
+    
+    std::ifstream file("./data/"+filepath);
+    std::string line;
+
+    // header
+    std::getline(file,line);
+    std::istringstream header1(line);
+    header1 >> res.current_turn >> res.max_turn;
+    std::getline(file,line);
+    std::istringstream header2(line);
+    header2 >> res.player_count;
+    
+    // players
+    std::string username, pos, status;
+    int balance;
+    for(int i=0;i<res.player_count;i++){
+        std::getline(file,line);
+        std::istringstream playerLine(line);
+        PlayerSaveData player;
+        int cardCount;
+        playerLine >> player.username >> player.balance >> player.position_code >> player.status;
+        std::getline(file,line);
+        std::istringstream playerCardsCount(line);
+        if(playerCardsCount >> cardCount){
+            if(cardCount>0){
+                for(int j=0;j<cardCount;j++){
+                    std::getline(file,line);
+                    std::istringstream playerCards(line);
+                    CardSaveData card;
+                    if(playerCards >> card.card_type >> card.value >> card.remaining_duration){
+                        player.hand_cards.push_back(card);
+                    }
+                }
+            }
+        }
+        res.players.push_back(player);
+    }
+
+    // turns
+    std::getline(file,line);
+    std::istringstream turnOrder(line);
+    std::string name;
+    while(turnOrder>>name){
+        res.turn_order.push_back(name);
+    }
+    std::getline(file,line);
+    std::istringstream curr_player(line);
+    curr_player >> res.current_active_player;
+
+    // property
+    std::getline(file,line);
+    std::istringstream propertyCount(line);
+    int property_count;
+    propertyCount >> property_count;
+    for(int i=0;i<property_count;i++){
+        std::getline(file,line);
+        std::istringstream propertyLine(line);
+        PropertySaveData property;
+        propertyLine >> property.tile_code >> property.type >> property.owner_name >> property.status >> property.festival_multiplier >> property.festival_duration >> property.build_level;
+        res.properties.push_back(property);
+    }
+
+    // deck
+    std::getline(file,line);
+    std::istringstream cardDeckCount(line);
+    int card_deck_count;
+    cardDeckCount >> card_deck_count;
+    for(int i=0;i<card_deck_count;i++){
+        std::getline(file,line);
+        std::istringstream deckLine(line);
+        std::string card;
+        deckLine >> card;
+        res.skill_card_deck.push_back(card);        
+    }
+
+    // logs
+    std::getline(file,line);
+    std::istringstream logsCount(line);
+    int logs_count;
+    logsCount >> logs_count;
+    for(int i=0;i<logs_count;i++){
+        std::getline(file,line);
+        std::istringstream logsLine(line);
+        LogSaveData log;
+        logsLine >> log.turn >> log.username >> log.action_type;
+        std::getline(logsLine >> std::ws, log.detail);
+        res.logs.push_back(log);
+    }
+
+    return res;
+}
+
 FullConfigData IOManager::loadAllConfigs(const std::string& configDirectoryPath){
     IOManager manager;
     std::vector<std::unique_ptr<Tile>> allTiles;
@@ -13,35 +107,6 @@ FullConfigData IOManager::loadAllConfigs(const std::string& configDirectoryPath)
     std::map<int,int> UtilityMult = manager.IOparseUtilityConfig(configDirectoryPath+"/utility.txt");
 
     return FullConfigData(std::move(Properties),std::move(ActionTile),RailroadSewa,UtilityMult,taxes.at(0),taxes.at(1),taxes.at(2),special.at(0),special.at(1),misc.at(0),misc.at(1));
-
-    // std::cout << "GO_SALARY: " << std::to_string(special.at(0)) << std::endl;
-    // std::cout << "JAIL_FINE: " << std::to_string(special.at(1)) << std::endl <<std::endl;
-    // std::cout << "PPH_FLAT: " << std::to_string(taxes.at(0)) << std::endl;
-    // std::cout << "PPH_PERCENT: " << std::to_string(taxes.at(1)) << std::endl;
-    // std::cout << "PBM_FLAT: " << std::to_string(taxes.at(2)) << std::endl << std::endl;
-    // std::cout << "MAX_TURN: " << std::to_string(special.at(0)) << std::endl;
-    // std::cout << "SALDO_AWAL: " << std::to_string(special.at(1)) << std::endl <<std::endl;
-    
-    // for(auto& tile : Properties) {
-    //     allTiles.push_back(std::move(tile));
-    // }
-    // for(auto& tile : ActionTile) {
-    //     allTiles.push_back(std::move(tile));
-    // }
-    // std::sort(allTiles.begin(), allTiles.end(), 
-    //     [](const std::unique_ptr<Tile>& a, const std::unique_ptr<Tile>& b) {
-    //         return a->getIndex() < b->getIndex();
-    //     });
-    // for (const auto& tile : allTiles){
-    //     std::cout << tile->getIndex() << " " << tile->getCode() << " " << tile->getName() << std::endl;
-    // }
-    // std::cout << "\n";
-    // for(const auto& pair : RailroadSewa){
-    //     std::cout << "Jumlah Railroad: " << pair.first << " (" << pair.second << ")" << std::endl;
-    // }
-    // for(const auto& pair : UtilityMult){
-    //     std::cout << "Jumlah Utility: " << pair.first << " (" << pair.second << ")" << std::endl;
-    // }
 }
 
 std::vector<std::unique_ptr<Tile>> IOManager::IOparsePropertyTileConfig(const std::string& filepath){
