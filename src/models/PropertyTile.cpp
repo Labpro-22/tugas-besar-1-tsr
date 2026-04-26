@@ -82,7 +82,7 @@ std::string RailroadTile::getStatusString() const {
         return ""; 
     }
 
-    return current_owner->getName();
+    return current_owner->getname();
 }
 
 // UtilityTile
@@ -122,5 +122,5 @@ std::string UtilityTile::getStatusString() const {
         return ""; 
     }
 
-    return current_owner->getName();
+    return current_owner->getname();
 }

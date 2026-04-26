@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-
+#include <functional>
 #include "../../include/core/CardManager.hpp"
 #include "../../include/core/PropertyManager.hpp"
 #include "../../include/core/EconomyManager.hpp"
