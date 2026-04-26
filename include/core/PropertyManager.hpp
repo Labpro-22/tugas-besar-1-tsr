@@ -11,7 +11,7 @@
 #include "../utils/ConfigData.hpp"
 #include "../utils/SaveData.hpp"
 
-class PropertyManager {
+class PropertyManager:public Saveable {
 private:
     static std::unique_ptr<Board> board;
     std::map<int, int> railroad_rent_map;
@@ -19,6 +19,7 @@ private:
     bool sellAllBuildingsOnColorGroup(std::shared_ptr<Player> player, const std::string& color);
 
 public:
+    std::string toSaveFormat() const override;
     PropertyManager(std::unique_ptr<Board> gameBoard);
     ~PropertyManager() = default;
     static Board& getBoard();
@@ -36,7 +37,7 @@ public:
     // Mengecek: Tidak boleh digadai jika masih ada bangunan di color group tersebut
     bool tryMortgage(std::shared_ptr<Player> player, PropertyTile* tile);
     bool tryUnmortgage(std::shared_ptr<Player> player, PropertyTile* tile);
-
+    bool canMortgaged(PropertyTile* tile);
     // Membungkus panggilan tile->calculateRent(), misal tambahan untuk kasus khusus UtilityTile yang membutuhkan nilai dadu
     float getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const;
 

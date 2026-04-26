@@ -11,6 +11,7 @@
 #include "../../include/models/Player.hpp"
 #include "../../include/core/TransactionLog.hpp"
 #include "../utils/IOManager.hpp"
+#include "../views/ViewGame.hpp"
 
 // State Machine
 enum class GameState {
@@ -59,8 +60,8 @@ private:
     void save(const std::string& args); 
     void load(const std::string& args);
     void endTurn(const std::string& args);
-
-
+    void loadConfig(const std::string& args);
+    void loadSaveState(std::string& args);
     std::shared_ptr<Player> getCurrentPlayer();
     void nextPlayer();
     void checkGameOver();

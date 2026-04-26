@@ -143,7 +143,6 @@ bool PropertyManager::tryBuildHotel(std::shared_ptr<Player> player, StreetTile* 
     tile->buildHotel();
     return true;
 }
-
 bool PropertyManager::tryMortgage(std::shared_ptr<Player> player, PropertyTile* tile){
     if (!player || !tile || !board) {
         return false;
@@ -393,6 +392,8 @@ void PropertyManager::loadBoardState(std::vector<PropertySaveData> data){
             }
         }
     }
+}
+
 std::string PropertyManager::toSaveFormat() const {
     std::ostringstream out;
     std::vector<PropertyTile*> properties;

@@ -62,7 +62,7 @@ void GameManager::startGame() {
         }
 
         auto current_player = players[current_player_index];
-
+        current_player->startTurn();
         if (current_player->getPlayerState() == PlayerState::BANKCRUPT) {
             current_player_index = (current_player_index + 1) % players.size();
             if (current_player_index == 0) current_turn_count++;
@@ -191,8 +191,8 @@ void GameManager::rollDice(const std::string& args){
 
 void GameManager::mortgage(const std::string& args){
     ViewGame::displayMortgageList(players[current_player_index]->owned_properties);
-    int index=ViewGame::getInt(10);
-    bool mortgageTry = property_manager->tryMortgage(players[current_player_index],players[current_player_index]->owned_properties[index]);
+    int index=ViewGame::getInt(players[current_player_index]->owned_properties.size());
+    property_manager->tryMortgage(players[current_player_index],players[current_player_index]->owned_properties[index]);
 }
 void GameManager::redeem(const std::string& args){
     ViewGame::displayUnmortgageList(players[current_player_index]->owned_properties, players[current_player_index]->getBalance());
@@ -436,7 +436,9 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
     PropertyStatus status = tile->getPropertyStatus();
     if (status == PropertyStatus::BANK) {
         ViewGame::displayBuyPromptStreet(tile->getName(), tile->getCode(), tile->getColor(), tile->getBuyPrice(), tile->getRentList(), player.getBalance());
-        ViewGame::displayMessage("Apakah kamu ingin membeli properti ini seharga M400? (y/n):");
+        std::ostringstream prompt;
+        prompt << "Apakah kamu ingin membeli properti ini seharga M" << tile->getBuyPrice() << "? (y/n):";
+        ViewGame::displayMessage(prompt.str());        
         bool nak = ViewGame::getYesNo();
         if (player.canPay(tile->getBuyPrice()) && nak) {
             std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M1." << player.getBalance() << "\n"; 
@@ -449,6 +451,7 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
+            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
             bool success = economy_manager->transferMoney(player, *current_owner, rent);
         }
     } else if (status == PropertyStatus::MORTGAGED) {
@@ -464,8 +467,8 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
-            std::cout<<current_owner->getname();
             float rent = tile->calculateRent();
+            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
             bool success = economy_manager->transferMoney(player, *current_owner, rent);
         }
     }
@@ -481,6 +484,7 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
+            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
             bool success = economy_manager->transferMoney(player, *current_owner, rent);
         }
     }
@@ -523,7 +527,7 @@ std::string GameManager::toSaveFormat() const {
     return out.str();
 }
 
-void GameManager::loadConfig(){
+void GameManager::loadConfig(const std::string& args){
     std::string configPath= "./config";
     std::ifstream sanityCheck(configPath + "/property.txt");
     if (!sanityCheck.good()) {
@@ -548,7 +552,8 @@ void GameManager::loadConfig(){
     }
 }
 
-void GameManager::loadSaveState(std::string filename){
+void GameManager::loadSaveState(std::string& args){
+    std::string& filename = args;
     GameSaveData data = IOManager::loadGameData(filename);
 
     current_turn_count = data.current_turn;

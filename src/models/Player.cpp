@@ -184,14 +184,10 @@ void Player::setFree() {
     player_state = PlayerState::FREE;
 }
 
-void Player::startTurn(int step) {
-    auto& board = PropertyManager::getBoard();
+void Player::startTurn() {
     for (const auto& effect : active_effects) {
         effect->onTurnStart(*this);
     }
-    // std::uniform_int_distribution<> dist(1, 100);
-    this->movePlayer(step);
-    board.getTile(this->position).onLand(*this);
 }
 
 void Player::endTurn() {
