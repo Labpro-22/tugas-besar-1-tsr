@@ -16,6 +16,37 @@ void PropertyManager::assignOwnership(PropertyTile* tile, std::shared_ptr<Player
 }
 
 
+bool PropertyManager::sellAllBuildingsOnColorGroup(std::shared_ptr<Player> player, const std::string& color) {
+    if (!player || !board) {
+        return false;
+    }
+
+    const std::vector<Tile*>& sameColorTiles = board->getPropertiesByGroup(color);
+
+    for (Tile* groupedTile : sameColorTiles) {
+        StreetTile* groupedStreet = dynamic_cast<StreetTile*>(groupedTile);
+        if (groupedStreet == nullptr) {
+            return false;
+        }
+
+        std::shared_ptr<Player> owner = groupedStreet->getPropertyOwner().lock();
+        if (!owner || owner.get() != player.get()) {
+            return false;
+        }
+
+        while (groupedStreet->canSellBuilding()) {
+            const float sellPrice = (groupedStreet->getBuildingLevel() == 5)
+                ? groupedStreet->getHotelPrice() / 2.0f
+                : groupedStreet->getHousePrice() / 2.0f;
+            GameManager::economy_manager->addMoney(*player, sellPrice);
+            groupedStreet->sellBuilding();
+        }
+    }
+
+    return true;
+}
+
+
 bool PropertyManager::tryBuildHouse(std::shared_ptr<Player> player, StreetTile* tile){
     if (!player || !tile || !board) {
         return false;
@@ -114,19 +145,39 @@ bool PropertyManager::tryMortgage(std::shared_ptr<Player> player, PropertyTile* 
     }
 
     if (tile->getPropertyType() == PropertyType::STREET) {
-        StreetTile* street = dynamic_cast<StreetTile*>(tile);
-        if (street == nullptr) {
-            return false;
+        const std::vector<Tile*>& sameColorTiles = board->getPropertiesByGroup(tile->getColor());
+        bool hasBuildingsInGroup = false;
+
+        for (Tile* groupedTile : sameColorTiles) {
+            StreetTile* groupedStreet = dynamic_cast<StreetTile*>(groupedTile);
+            if (groupedStreet == nullptr) {
+                return false;
+            }
+
+            if (groupedStreet->canSellBuilding()) {
+                hasBuildingsInGroup = true;
+                break;
+            }
         }
 
-        while (street->canSellBuilding()) {
-            street->sellBuilding();
+        if (hasBuildingsInGroup) {
+            std::cout << "DO YOU WANT TO SELL ALL BUILDINGS IN COLOR GROUP: ";
+            if (!ViewGame::getYesNo()) {
+                return false;
+            }
+
+            if (!sellAllBuildingsOnColorGroup(player, tile->getColor())) {
+                return false;
+            }
         }
     }
-
-    tile->setPropertyStatus(MORTGAGED);
-    GameManager::economy_manager->addMoney(*player, tile->getMortgageValue());
-    return true;
+    std::cout << "DO YOU STILL WANT TO MORTGAGE"; 
+    if(ViewGame::getYesNo()){
+        tile->setPropertyStatus(MORTGAGED);
+        GameManager::economy_manager->addMoney(*player, tile->getMortgageValue());
+        return true;
+    }
+    else return false;
 }
 
 bool PropertyManager::tryUnmortgage(std::shared_ptr<Player> player, PropertyTile* tile){
@@ -149,7 +200,7 @@ bool PropertyManager::tryUnmortgage(std::shared_ptr<Player> player, PropertyTile
             return false;
         }
     }
-    if(GameManager::economy_manager->deductMoney(*player, tile->getBuyPrice())){
+    if(!GameManager::economy_manager->deductMoney(*player, tile->getBuyPrice())){
         return false;
     }
 
@@ -157,7 +208,7 @@ bool PropertyManager::tryUnmortgage(std::shared_ptr<Player> player, PropertyTile
     return true;
 }
 
-int PropertyManager::getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const{
+float PropertyManager::getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const{
     if(diceRoll == 0){
         return tile->calculateRent();
     }

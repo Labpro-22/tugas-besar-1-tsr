@@ -11,6 +11,7 @@
 class PropertyManager {
 private:
     static std::unique_ptr<Board> board;
+    bool sellAllBuildingsOnColorGroup(std::shared_ptr<Player> player, const std::string& color);
 
 public:
     PropertyManager(std::unique_ptr<Board> gameBoard);
