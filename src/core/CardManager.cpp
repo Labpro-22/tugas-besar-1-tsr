@@ -62,7 +62,45 @@ std::unique_ptr<Card> CardManager::createSkillDeckCard(const std::string& cardNa
 }
 
 // Membaca file konfigurasi dan mengisi ketiga deck di atas
-void CardManager::initializeDecks(){}
+#include "../../include/core/CardManager.hpp"
+// Include all specific card headers
+#include "../../include/models/FinancialActionCard.hpp"
+#include "../../include/models/JailActionCard.hpp"
+#include "../../include/models/MoveActionCard.hpp"
+#include "../../include/models/StationActionCard.hpp"
+#include "../../include/models/SkillCard.hpp" 
+#include <iostream>
+
+void CardManager::initializeDecks() {
+    std::cout << "No config provided. Initializing decks randomly...\n";
+    for (int i = 0; i < 3; i++) {
+        skill_deck.addToDiscard(std::make_unique<MoveSkillCard>("move"));
+        skill_deck.addToDiscard(std::make_unique<DiscountSkillCard>("discount"));
+        skill_deck.addToDiscard(std::make_unique<ShieldSkillCard>("shield"));
+        skill_deck.addToDiscard(std::make_unique<TeleportSkillCard>("teleport"));
+        skill_deck.addToDiscard(std::make_unique<LassoSkillCard>("lasso"));
+        skill_deck.addToDiscard(std::make_unique<DemolitionSkillCard>("demolition"));
+    }
+    for (int i = 0; i < 4; i++) {
+        chance_deck.addToDiscard(std::make_unique<FinancialActionCard>("Pajak Mendadak"));
+        chance_deck.addToDiscard(std::make_unique<JailActionCard>("Tertangkap Tilang"));
+        chance_deck.addToDiscard(std::make_unique<MoveActionCard>("Maju 3 Langkah"));
+        chance_deck.addToDiscard(std::make_unique<StationActionCard>("Tiket Kereta Api"));
+    }
+
+    for (int i = 0; i < 4; i++) {
+        community_chest_deck.addToDiscard(std::make_unique<FinancialActionCard>("Bonus Deviden"));
+        community_chest_deck.addToDiscard(std::make_unique<JailActionCard>("Salah Tangkap"));
+        community_chest_deck.addToDiscard(std::make_unique<MoveActionCard>("Jalan Mundur"));
+        community_chest_deck.addToDiscard(std::make_unique<StationActionCard>("Kereta Cepat"));
+    }
+
+    skill_deck.shuffle();
+    chance_deck.shuffle();
+    community_chest_deck.shuffle();
+
+    std::cout << "Random decks successfully generated and shuffled!\n";
+}
 
 
 // Ketika pemain mendarat di petak Kesempatan
@@ -93,14 +131,22 @@ void CardManager::discardCard(std::unique_ptr<ActionCard> usedCard, Deck<std::un
 }
 
 void CardManager::loadCardState(const GameSaveData& data){
-    std::vector<std::unique_ptr<Card>> skillCards;
+    std::vector<std::unique_ptr<SkillCard>> skillCards;
     skillCards.reserve(data.skill_card_deck.size());
+    
     for (const auto& cardName : data.skill_card_deck) {
-        auto card = createSkillDeckCard(cardName);
-        if (card) {
-            skillCards.push_back(std::move(card));
+        std::unique_ptr<Card> base_card = createSkillDeckCard(cardName);
+        
+        if (base_card) {
+            if (SkillCard* raw_skill_card = dynamic_cast<SkillCard*>(base_card.get())) {
+                base_card.release();
+                std::unique_ptr<SkillCard> new_skill_card(raw_skill_card);
+                skillCards.push_back(std::move(new_skill_card));
+            } else {
+            }
         }
     }
+    
     skill_deck.setCards(std::move(skillCards));
     skill_deck.clearDiscard();
 
