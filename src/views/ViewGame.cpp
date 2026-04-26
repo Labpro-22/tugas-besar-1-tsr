@@ -1,9 +1,10 @@
-#include "ViewGame.hpp"
-#include "GameManager.hpp"
+#include "../../include/views/ViewGame.hpp"
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <map>
+#include <sstream>
+#include <algorithm>
 
 const std::string ANSI_RESET   = "\033[0m";
 const std::string ANSI_RED     = "\033[1;31m";
@@ -14,28 +15,61 @@ const std::string ANSI_MAGENTA = "\033[1;35m";
 const std::string ANSI_CYAN    = "\033[1;36m";
 const std::string ANSI_WHITE   = "\033[1;37m";
 const std::string ANSI_ORANGE  = "\033[38;5;208m";
+const std::string ANSI_BROWN   = "\033[38;5;130m"; 
+const std::string ANSI_GRAY    = "\033[1;30m";
 
-std::string padTo(const std::string& str, const size_t num) {
-    if (str.length() >= num) return str.substr(0, num);
-    return str + std::string(num - str.length(), ' ');
+void ViewGame::displayException(const GameException& e) {
+    std::cout << ANSI_RED << e.what() << ANSI_RESET << "\n";
 }
 
-std::string getColorCode(const std::string& colorName) {
-    if (colorName == "MERAH") return ANSI_RED;
-    if (colorName == "HIJAU") return ANSI_GREEN;
-    if (colorName == "KUNING") return ANSI_YELLOW;
-    if (colorName == "BIRU MUDA") return ANSI_CYAN;
-    if (colorName == "BIRU TUA") return ANSI_BLUE;
-    if (colorName == "MERAH MUDA" || colorName == "PINK") return ANSI_MAGENTA;
-    if (colorName == "ORANGE") return ANSI_ORANGE;
-    return ANSI_WHITE;
-}
+    std::string padTo(const std::string& str, const size_t num) {
+        if (str.length() >= num) return str.substr(0, num);
+        return str + std::string(num - str.length(), ' ');
+    }
+
+    std::string getColorCode(const std::string& colorName) {
+        if (colorName == "MERAH") return ANSI_RED;
+        if (colorName == "HIJAU") return ANSI_GREEN;
+        if (colorName == "KUNING") return ANSI_YELLOW;
+        if (colorName == "BIRU_MUDA") return ANSI_CYAN;
+        if (colorName == "BIRU_TUA") return ANSI_BLUE;
+        if (colorName == "MERAH_MUDA") return ANSI_MAGENTA;
+        if (colorName == "ORANGE") return ANSI_ORANGE;
+        if (colorName == "COKLAT") return ANSI_BROWN;
+        if (colorName == "ABU_ABU") return ANSI_GRAY;
+        return ANSI_WHITE;
+    }
 
 std::string ViewGame::getUserCommand() {
+    std::vector<std::string> valid_commands = {
+        "CETAK_PAPAN", "LEMPAR_DADU", "ATUR_DADU", "CETAK_AKTA", 
+        "CETAK_PROPERTI", "GADAI", "TEBUS", "BANGUN", "SIMPAN", 
+        "MUAT", "CETAK_LOG", "GUNAKAN_KEMAMPUAN"
+    };
+
     std::string input;
-    std::cout << "\n> ";
-    std::getline(std::cin >> std::ws, input);
-    return input;
+    while (true) {
+        std::cout << "\n> ";
+        std::getline(std::cin >> std::ws, input);
+
+        std::stringstream ss(input);
+        std::string base_cmd;
+        ss >> base_cmd;
+
+        bool is_valid = false;
+        for (const std::string& cmd : valid_commands) {
+            if (base_cmd == cmd) {
+                is_valid = true;
+                break;
+            }
+        }
+
+        if (is_valid) {
+            return input;
+        } else {
+            std::cout << ANSI_RED << "Perintah tidak dikenali! Silakan masukkan perintah yang valid." << ANSI_RESET << "\n";
+        }
+    }
 }
 
 std::string ViewGame::getPlayerName() {
@@ -52,7 +86,7 @@ std::string ViewGame::getPropertyName() {
     return input;
 }
 
-int ViewGame::gettInt(int max_int) {
+int ViewGame::getInt(int max_int) {
     int value;
     while (true) {
         if (std::cin >> value) {
@@ -72,11 +106,11 @@ bool ViewGame::getYesNo() {
     std::string input;
     while (true) {
         std::cin >> input;
-        if (input == "y" || input == "Y") {
+        if (input == "y") {
             std::cin.ignore(10000, '\n');
             return true;
         }
-        if (input == "n" || input == "N") {
+        if (input == "n") {
             std::cin.ignore(10000, '\n');
             return false;
         }
@@ -94,88 +128,116 @@ std::string ViewGame::getUserInput() {
     return input;
 }
 
-void ViewGame::displayBoard(const GameManager& gm) {
+void ViewGame::displayBoard() {
     const int CELL_WIDTH = 10;
-
-    auto fetchTileDisplayData = [&](int tileId) -> std::pair<std::string, std::string> {
-        auto& currentTile = GameManager::property_manager->getTileAt(tileId);
-
-        std::string code = currentTile.getCode();  
-        std::string color = currentTile.getColor();
-        std::string propertyStatus = currentTile.getStatusString(); 
-
-        std::string playersOnTile = "";
-        
-        for (size_t i = 0; i < GameManager::players.size(); ++i) {
-            if (GameManager::players[i]->getPosition() == tileId) {
-                playersOnTile += "(" + std::to_string(i + 1) + ")"; 
-            }
-        }
-
-        std::string secondLineText = propertyStatus;
-        if (!playersOnTile.empty()) {
-            if (!secondLineText.empty()) {
-                secondLineText += " ";
-            }
-            secondLineText += playersOnTile;
-        }
-
-        std::string line1 = getColorCode(color) + padTo(code, CELL_WIDTH) + ANSI_RESET;
-        std::string line2 = padTo(secondLineText, CELL_WIDTH);
-
-        return {line1, line2};
+    const int COLS       = 11;
+    const int TOTAL      = COLS * (CELL_WIDTH + 1) + 1;
+    const int MID_WIDTH  = TOTAL - 2 * (CELL_WIDTH + 1) - 2;
+    
+    auto pad = [](const std::string& s, int n) -> std::string {
+        if ((int)s.size() >= n) return s.substr(0, n);
+        return s + std::string(n - s.size(), ' ');
     };
 
-    auto printBorder = [&](int count) {
-        for (int i = 0; i < count; ++i) std::cout << "+----------";
+    auto padA = [](const std::string& s, int visibleWidth, int ansiLen) -> std::string {
+        int visible = (int)s.size() - ansiLen;
+        if (visible >= visibleWidth) return s;
+        return s + std::string(visibleWidth - visible, ' ');
+    };
+
+    auto centerStr = [&](const std::string& s) -> std::string {
+        if ((int)s.size() >= MID_WIDTH) return s.substr(0, MID_WIDTH);
+        int left  = (MID_WIDTH - (int)s.size()) / 2;
+        int right = MID_WIDTH - left - (int)s.size();
+        return std::string(left, ' ') + s + std::string(right, ' ');
+    };
+
+    auto fetchTileDisplayData = [&](int tileId) -> std::tuple<std::string, std::string, std::string> {
+        auto& currentTile      = GameManager::property_manager->getTileAt(tileId);
+        std::string code       = currentTile.getCode();
+        std::string color      = currentTile.getColor();
+        std::string propStatus = currentTile.getStatusString();
+
+        std::string playersOnTile = "";
+        for (size_t i = 0; i < GameManager::players.size(); ++i) {
+            if (GameManager::players[i]->getPosition() == tileId)
+                playersOnTile += "(" + std::to_string(i + 1) + ")";
+        }
+
+        std::string cc      = getColorCode(color);
+        int         ansiLen = (int)cc.size() + (int)ANSI_RESET.size();
+
+        std::string line1 = padA(cc + pad(code, CELL_WIDTH) + ANSI_RESET, CELL_WIDTH, ansiLen);
+        std::string line2 = pad(propStatus, CELL_WIDTH);
+        std::string line3 = pad(playersOnTile, CELL_WIDTH);
+
+        return {line1, line2, line3};
+    };
+
+    auto fullBorder = [&]() {
+        for (int i = 0; i < COLS; i++)
+            std::cout << "+" << std::string(CELL_WIDTH, '-');
         std::cout << "+\n";
     };
 
+    auto borderRow = [&]() {
+        std::cout << "+" << std::string(CELL_WIDTH, '-')
+                  << "+" << std::string(MID_WIDTH,  '-')
+                  << "+" << std::string(CELL_WIDTH, '-')
+                  << "+\n";
+    };
+
+    std::string playerCount = std::to_string(GameManager::players.size());
+    std::string turnInfo    = "TURN " + std::to_string(GameManager::getCurrentTurn())
+                            + " / "   + std::to_string(GameManager::getMaxTurns());
+
     std::cout << "\n";
 
-    printBorder(11);
-    for (int i = 21; i <= 31; ++i) std::cout << "|" << fetchTileDisplayData(i).first;
+    fullBorder();
+    for (int i = 21; i <= 31; ++i) std::cout << "|" << std::get<0>(fetchTileDisplayData(i));
     std::cout << "|\n";
-    for (int i = 21; i <= 31; ++i) std::cout << "|" << fetchTileDisplayData(i).second;
+    for (int i = 21; i <= 31; ++i) std::cout << "|" << std::get<1>(fetchTileDisplayData(i));
     std::cout << "|\n";
-    printBorder(11);
+    for (int i = 21; i <= 31; ++i) std::cout << "|" << std::get<2>(fetchTileDisplayData(i));
+    std::cout << "|\n";
+    fullBorder();
 
     for (int i = 0; i < 9; ++i) {
-        int leftId = 20 - i;
-        int rightId = 32 + i;
-        
-        auto leftTile = fetchTileDisplayData(leftId);
-        auto rightTile = fetchTileDisplayData(rightId);
+        auto [l1, l2, l3] = fetchTileDisplayData(20 - i);
+        auto [r1, r2, r3] = fetchTileDisplayData(32 + i);
 
-        std::cout << "|" << leftTile.first << "|";
-        
-        if (i == 1) {
-            std::cout << "   ==================================   " << std::string(40, ' ');
-        } else if (i == 2) {
-            std::cout << "   ||          NIMONSPOLI          ||   " << std::string(40, ' ');
-        } else if (i == 3) {
-            std::cout << "   ==================================   " << std::string(40, ' ');
-        } else if (i == 5) {
-            std::string turnInfo = "TURN " + std::to_string(gm.getCurrentTurn()) + " / " + std::to_string(gm.getMaxTurns());
-            std::cout << "           " << padTo(turnInfo, 23) << "        " << std::string(40, ' ');
-        } else {
-            std::cout << std::string(80, ' '); 
-        }
+        std::string m1(MID_WIDTH, ' ');
+        std::string m2(MID_WIDTH, ' ');
+        std::string m3(MID_WIDTH, ' ');
 
-        std::cout << "|" << rightTile.first << "|\n";
+        // Judul
+        if (i == 0) m1 = centerStr("==================================");
+        if (i == 1) m1 = centerStr("||         NIMONSPOLI          ||");
+        if (i == 2) m1 = centerStr("==================================");
+        // Turn
+        if (i == 3) m1 = centerStr(turnInfo);
+        // Legenda
+        if (i == 4) m1 = centerStr("P1-P" + playerCount + " : Properti milik Pemain ke-N");
+        if (i == 4) m2 = centerStr("^ = Lv1   ^^ = Lv2   ^^^ = Lv3   * = Hotel");
+        if (i == 5) m1 = centerStr("(1)-(N) : Bidak Pemain ke-N");
+        if (i == 6) m1 = centerStr("[CK]=Coklat  [MR]=Merah    [BM]=Biru Muda  [KN]=Kuning");
+        if (i == 7) m1 = centerStr("[PK]=Pink    [HJ]=Hijau    [OR]=Orange     [BT]=Biru Tua");
+        if (i == 8) m1 = centerStr("[DF]=Aksi    [AB]=Utilitas");
 
-        std::cout << "|" << leftTile.second << "|";
-        std::cout << std::string(80, ' ');
-        std::cout << "|" << rightTile.second << "|\n";
-
-        std::cout << "+----------+" << std::string(80, ' ') << "+----------+\n";
+        std::cout << "|" << l1 << "|" << m1 << "|" << r1 << "|\n";
+        std::cout << "|" << l2 << "|" << m2 << "|" << r2 << "|\n";
+        std::cout << "|" << l3 << "|" << m3 << "|" << r3 << "|\n";
+        borderRow();
     }
 
-    for (int i = 11; i >= 1; --i) std::cout << "|" << fetchTileDisplayData(i).first;
+    for (int i = 11; i >= 1; --i) std::cout << "|" << std::get<0>(fetchTileDisplayData(i));
     std::cout << "|\n";
-    for (int i = 11; i >= 1; --i) std::cout << "|" << fetchTileDisplayData(i).second;
+    for (int i = 11; i >= 1; --i) std::cout << "|" << std::get<1>(fetchTileDisplayData(i));
     std::cout << "|\n";
-    printBorder(11);
+    for (int i = 11; i >= 1; --i) std::cout << "|" << std::get<2>(fetchTileDisplayData(i));
+    std::cout << "|\n";
+    fullBorder();
+
     std::cout << "\n";
 }
 
@@ -197,7 +259,7 @@ void ViewGame::displayManualDiceRollResult(const std::string& playerName, int di
     std::cout << "Bidak mendarat di: " << destTile << ".\n";
 }
 
-void ViewGame::displayPropertyDeed(const GameManager& gm, const std::string& propertyCode) {
+void ViewGame::displayPropertyDeed(const std::string& propertyCode) {
     Tile* target_tile = nullptr;
     Board& board = GameManager::property_manager->getBoard();
     
@@ -267,7 +329,7 @@ void ViewGame::displayPropertyDeed(const GameManager& gm, const std::string& pro
     std::cout << "+================================+\n";
 }
 
-void ViewGame::displayPlayerProperties(const GameManager& gm, const std::string& playerName) {
+void ViewGame::displayPlayerProperties(const std::string& playerName) {
     std::cout << "\n=== Properti Milik: " << playerName << " ===\n";
 
     std::map<std::string, std::vector<PropertyTile*>> grouped_properties;
@@ -358,7 +420,7 @@ void ViewGame::displayPphPrompt() {
     std::cout << "Kamu mendarat di Pajak Penghasilan (PPH)!\n";
     std::cout << "Pilih opsi pembayaran pajak:\n";
     std::cout << "1. Bayar flat M150\n";
-    std::cout << "2. Bayar 10% dari total kekayaan\n";
+    std::cout << "2. Bayar 10\% dari total kekayaan\n";
     std::cout << "(Pilih sebelum menghitung kekayaan!)\n";
 }
 

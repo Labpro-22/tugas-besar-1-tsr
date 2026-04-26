@@ -1,15 +1,18 @@
 #pragma once
 
+#include "../all.hpp"
+
 #include <string>
 #include <vector>
 #include <iostream>
-
-class GameManager; 
+#include <map>
 
 class ViewGame {
 public:
     ViewGame() = default;
     ~ViewGame() = default;
+
+    static void displayException(const GameException& e);
 
     // ------ INPUT --------
 
@@ -19,7 +22,7 @@ public:
 
     static std::string getPropertyName();
 
-    static int gettInt(int max_int);
+    static int getInt(int max_int);
 
     static bool getYesNo();
 
@@ -29,14 +32,18 @@ public:
 
     // ------ OUTPUT --------
 
-    static void displayBoard(const GameManager& gm);
+    // CETAK_PAPAN
+    static void displayBoard();
     
+    // DADU
     static void displayDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile);
     static void displayManualDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile);
 
-    static void displayPropertyDeed(const GameManager& gm, const std::string& propertyCode);
+    // CETAK_AKTA
+    static void displayPropertyDeed(const std::string& propertyCode);
 
-    static void displayPlayerProperties(const GameManager& gm, const std::string& playerName);
+    // CETAK_PROPERTI
+    static void displayPlayerProperties(const std::string& playerName);
 
     // Buy
     static void displayBuyPromptStreet(const std::string& prop_name, const std::string& prop_code, const std::string& color, int price, int rent, int current_money);

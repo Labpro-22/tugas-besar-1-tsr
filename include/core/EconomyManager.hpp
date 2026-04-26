@@ -31,7 +31,7 @@ public:
     // Proses lelang
     void startAuction(PropertyTile* property, const std::vector<std::shared_ptr<Player>>& players);
     void placeBid(int amount, std::shared_ptr<Player> &player);
-    void EconomyManager::foldBid(std::vector<std::shared_ptr<Player>>::iterator p);
+    void foldBid(std::vector<std::shared_ptr<Player>>::iterator p);
     bool isAuctionOver() const;
     void resolveAuction(PropertyTile *tile,std::shared_ptr<Player> & winner);
     std::vector<std::shared_ptr<Player>> getCurrentBidder() const;
