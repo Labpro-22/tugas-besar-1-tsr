@@ -25,7 +25,7 @@ enum class GameState {
 
 class GameManager {
 private:
-    int current_player_index; 
+    static int current_player_index; 
     int current_turn_count;   
     int max_turns;
 

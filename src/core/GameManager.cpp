@@ -15,11 +15,11 @@ GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> init
                 std::unique_ptr<CardManager> cMgr, 
                 std::unique_ptr<PropertyManager> pMgr, 
                 std::unique_ptr<EconomyManager> eMgr,
-                                std::unique_ptr<TransactionLog> tLogger)
-        : current_player_index(0),
+                                std::unique_ptr<TransactionLog> tLogger):
             current_turn_count(0),
             max_turns(maxTurns),
             current_state(GameState::START_TURN) {
+        current_player_index=0;
         players = std::move(initialPlayers);
         card_manager = std::move(cMgr);
         property_manager = std::move(pMgr);
@@ -85,11 +85,20 @@ void GameManager::printProperty(const std::string& args){
 }
 
 void GameManager::setDice(const std::string& args){ //belum
+    std::stringstream ss(args);
     int dice1;
     int dice2;
-    auto player=players[current_player_index];
-    player->movePlayer(dice1+dice2);;
-    ViewGame::displayDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
+    if (!(ss >> dice1 >> dice2)) {
+        ViewGame::displayMessage("Format ATUR_DADU harus: ATUR_DADU <dadu1> <dadu2>. Contoh: ATUR_DADU 6 7");
+        return;
+    }
+    if (dice1 < 1 || dice1 > 6 || dice2 < 1 || dice2 > 6) {
+        ViewGame::displayMessage("Nilai dadu harus di antara 1 sampai 6.");
+        return;
+    }
+    auto player = players[current_player_index];
+    player->movePlayer(dice1 + dice2);
+    ViewGame::displayManualDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
 }
 
 void GameManager::rollDice(const std::string& args){
@@ -231,6 +240,7 @@ void GameManager::useAbility(const std::string& args){
     }
 
     player->useSkillCard(index);
+    GameManager::card_manager->takeSkillCardFromPlayer(*player,index);
     ViewGame::displaySkillCardActivated(selected_card->getName(), effect_desc);
 }
 
@@ -420,4 +430,7 @@ std::string GameManager::toSaveFormat() const{
     out << players[players.size()%current_turn_count]->getname() << "\n";
 
     return out.str();
+}
+int GameManager::getCurrentTurn(){
+    return current_player_index;
 }
