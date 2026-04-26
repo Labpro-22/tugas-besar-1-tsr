@@ -284,9 +284,39 @@ void GameManager::visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) {
 }
 
 void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
-    ViewGame::
-}
+    if (player.owned_properties.empty()) {
+        ViewGame::displayMessage("Anda tidak memiliki properti untuk merayakan festival!");
+        return;
+    }
 
+    PropertyTile* selected_property = nullptr;
+    bool finished = false;
+
+    while (!finished) {
+        ViewGame::displayFestivalStart(player.owned_properties);
+        ViewGame::displayMessage("Masukkan kode properti untuk festival:");
+        std::string property_code = ViewGame::getUserInput();
+
+        for (PropertyTile* prop : player.owned_properties) {
+            if (prop->getCode() == property_code) {
+                selected_property = prop;
+                finished = true;
+                break;
+            }
+        }
+
+        if (!finished) {
+            ViewGame::displayMessage("Kode properti tidak valid atau bukan milik Anda!");
+            ViewGame::displayMessage("Ketik 'CANCEL' untuk keluar atau coba lagi.");
+            if (property_code == "CANCEL") return;
+        }
+    }
+
+    if (selected_property) {
+        property_manager->startFestival(*selected_property); 
+        ViewGame::displayMessage("Efek festival diaktifkan di " + selected_property->getName() + "!");
+    }
+}
 void GameManager::visitGoTile(GoTile* tile, Player& player) {
     ViewGame::displayMessage("Kamu mengunjungi Petak Go\n");
     economy_manager->addMoney(player, tile->getReward());
@@ -294,11 +324,8 @@ void GameManager::visitGoTile(GoTile* tile, Player& player) {
 
 void GameManager::visitGoToJailTile(GoToJailTile* tile, Player& player) {
     ViewGame::displayMessage("Kamu mengunjungi Petak Masuk ke Penjara, kamu DIPENJARA!\n");
-    player.setInJail();
     Board& board = property_manager->getBoard();
-    
     int pen_index = 0;
-
     for (size_t i = 0; i < board.getSize(); ++i) {
         Tile& tile = board.getTile(i);
         if (tile.getCode() == "PEN") {
@@ -306,7 +333,7 @@ void GameManager::visitGoToJailTile(GoToJailTile* tile, Player& player) {
             break; 
         }
     }
-
+    player.setInJail();
     player.setPosition(pen_index);
 }
 
@@ -325,8 +352,6 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
         ViewGame::displayMessage("Apakah kamu ingin membeli properti ini seharga M400? (y/n):");
         bool nak = ViewGame::getYesNo();
         if (player.canPay(tile->getBuyPrice()) && nak) {
-            /*Jakarta kini menjadi milikmu!
-            Uang tersisa: M1.100*/
             std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M1." << player.getBalance() << "\n"; 
             player.buyProperty(*tile);
         } else{

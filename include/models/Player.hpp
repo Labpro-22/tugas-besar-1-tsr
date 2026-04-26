@@ -27,7 +27,7 @@ private:
     std::vector<std::unique_ptr<Effect>> active_effects;
 
 public:
-const std::vector<std::unique_ptr<SkillCard>>& getAllskillCard() const;
+    const std::vector<std::unique_ptr<SkillCard>>& getAllskillCard() const;
     std::vector<PropertyTile*> owned_properties;
     const std::vector<Tile*>& getPropertiesByGroup(const std::string& color) const;
     Player(std::string name, float balance, int position, PlayerState player_state);
