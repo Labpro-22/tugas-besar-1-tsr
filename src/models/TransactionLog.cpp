@@ -1,4 +1,5 @@
 #include "../../include/core/TransactionLog.hpp"
+#include <sstream>
 
 
 const char* actionStrings[] = {
@@ -48,9 +49,6 @@ std::string LogEntry::printFormat()const{
     }
     return "[Turn "+std::to_string(getTurnNumber())+"] "+getUsername()+" | "+enumstr+temp+" | "+getDesc();
 }
-std::string LogEntry::toSaveFormat()const{
-    return std::to_string(turn_number)+ " " +username+ " " +getTextForEnum(getActionType())+ " " +description;
-}
 
 void TransactionLog::recordEvent(LogEntry entry){
     logs.push_back(entry);
@@ -82,10 +80,25 @@ std::string TransactionLog::getRecentLogs(int n)const{
 void TransactionLog::clearLogs(){
     logs.clear();
 }
-std::string TransactionLog::toSaveFormat() const{
-    std::string temp=std::to_string(logs.size())+"\n";
-    for(LogEntry log : logs){
-        temp+=log.toSaveFormat() + "\n";
+std::string LogEntry::toSaveFormat() const {
+    std::ostringstream out;
+    // <TURN> <USERNAME> <JENIS_AKSI> <DETAIL>
+    out << turn_number << " " 
+        << username << " " 
+        << getTextForEnum(getActionType()) << " " 
+        << description << "\n";
+        
+    return out.str();
+}
+std::string TransactionLog::toSaveFormat() const {
+    std::ostringstream out;
+    
+    // <JUMLAH_ENTRI_LOG>
+    out << logs.size() << "\n";
+    
+    for (const auto& log : logs) {
+        out << log.toSaveFormat();
     }
-    return temp;
+    
+    return out.str();
 }

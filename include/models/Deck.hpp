@@ -49,10 +49,10 @@ public:
         std::ostringstream out;
         out << cards.size()+discard.size() << "\n";
         for(const auto& card: cards){
-            out << card->getName() << "\n";
+            out << card->toSaveFormat();
         }
         for(const auto& card: discard){
-            out << "~" <<card->getName() << "\n";
+            out << "~" <<card->toSaveFormat();
         }
         return out.str();
     }

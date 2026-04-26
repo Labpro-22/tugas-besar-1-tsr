@@ -4,6 +4,7 @@
 #include "../../include/views/ViewGame.hpp"
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 
 Tile& PropertyManager::getTileAt(int position) const{
@@ -247,7 +248,7 @@ void PropertyManager::doMortgage(std::shared_ptr<Player> player){
     std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
 
     ViewGame v;
-    std::string input = v.getInput();
+    std::string input = v.getUserInput();
 
     if(owned.empty()) return;
     
@@ -270,7 +271,7 @@ void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
     std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
 
     ViewGame v;
-    std::string input = v.getInput();
+    std::string input = v.getUserInput();
 
     if(owned.empty()) return;
     
@@ -287,4 +288,75 @@ void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
         }
     }
     throw "you dont have any property";
+}
+
+std::string PropertyManager::toSaveFormat() const {
+    std::ostringstream out;
+    std::vector<PropertyTile*> properties;
+
+    //cari <JUMLAH_PROPERTI>
+    int boardSize = board->getSize();
+    for (int i = 0; i < boardSize; ++i) {
+        Tile& tile = board->getTile(i);
+        PropertyTile* prop = dynamic_cast<PropertyTile*>(&tile);
+        if (prop != nullptr) {
+            properties.push_back(prop);
+        }
+    }
+
+    //<JUMLAH_PROPERTI>
+    out << properties.size() << "\n";
+
+    for (PropertyTile* prop : properties) {
+        
+        // <KODE_PETAK>
+        out << prop->getCode() << " ";
+
+        // <JENIS>
+        PropertyType type = prop->getPropertyType();
+        if (type == PropertyType::STREET) out << "street ";
+        else if (type == PropertyType::RAILROAD) out << "railroad ";
+        else if (type == PropertyType::UTILITY) out << "utility ";
+
+        // <PEMILIK>
+        std::shared_ptr<Player> owner = prop->getPropertyOwner().lock();
+        if (owner) {
+            out << owner->getname() << " ";
+        } else {
+            out << "BANK ";
+        }
+
+        // <STATUS>
+        PropertyStatus status = prop->getPropertyStatus();
+        if (status == BANK) out << "BANK ";
+        else if (status == OWNED) out << "OWNED ";
+        else if (status == MORTGAGED) out << "MORTGAGED ";
+
+        // <FMULT> and <FDUR>
+        int dur = prop->getFestivalTurnsLeft();
+        int level = prop->getFestivalLevel();
+        
+        // If duration is 0, festival is inactive, so multiplier is 1. 
+        // Otherwise,bitshift multiplier (1 << level)
+        int fmult = (dur > 0) ? (1 << level) : 1; 
+        
+        out << fmult << " " << dur << " ";
+
+        // <N_BANGUNAN>
+        if (type == PropertyType::STREET) {
+            StreetTile* street = dynamic_cast<StreetTile*>(prop);
+            int bLevel = street->getBuildingLevel();
+            
+            // 5 is Hotel, 0-4 is houses
+            if (bLevel == 5) {
+                out << "H\n";
+            } else {
+                out << bLevel << "\n";
+            }
+        } else {
+            out << "0\n"; 
+        }
+    }
+
+    return out.str();
 }

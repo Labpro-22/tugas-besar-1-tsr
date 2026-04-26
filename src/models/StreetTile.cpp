@@ -98,3 +98,7 @@ std::string StreetTile::getStatusString() const {
 std::vector<float> StreetTile::getRentList() const {
     return rent_list;
 }
+
+void StreetTile::resetBuildings() {
+    building_level = 0;
+}

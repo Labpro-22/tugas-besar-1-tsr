@@ -43,4 +43,8 @@ public:
     void doMortgage(std::shared_ptr<Player> player);
 
     void doUnmortgage(std::shared_ptr<Player> player);
+
+
+
+    std::string toSaveFormat() const;
 };

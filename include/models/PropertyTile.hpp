@@ -43,6 +43,8 @@ public:
     virtual float calculateRent() const = 0;
     virtual PropertyType getPropertyType() const = 0;
 
+    int getFestivalLevel() const { return festival_level; }
+    int getFestivalTurnsLeft() const { return festival_turns_left; }
     bool isProperty() const override { return true; }
 };
 

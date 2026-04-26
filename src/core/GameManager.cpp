@@ -18,7 +18,7 @@ GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> init
                                 std::unique_ptr<TransactionLog> tLogger):
             current_turn_count(0),
             max_turns(maxTurns),
-            current_state(GameState::START_TURN) {
+            current_state(GameState::START_TURN),pending_debt(0.0f),pending_creditor(nullptr) {
         current_player_index=0;
         players = std::move(initialPlayers);
         card_manager = std::move(cMgr);
@@ -485,27 +485,70 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
 }
 
 
-std::string GameManager::toSaveFormat() const{
+std::string GameManager::toSaveFormat() const {
     std::ostringstream out;
+    
     // <TURN_SAAT_INI> <MAX_TURN>
     out << current_turn_count << " " << max_turns << "\n";
+    
     // <JUMLAH_PEMAIN>
-    out << players.size();
+    out << players.size() << "\n";
 
-    //<STATE_PEMAIN_1..N>
-    for(const std::shared_ptr<Player>& p:players){
+    // <STATE_PEMAIN_1..N>
+    for(const std::shared_ptr<Player>& p : players){
         out << p->toSaveFormat();
     }
-    //<URUTAN_GILIRAN_1> <URUTAN_GILIRAN_2> … <URUTAN_GILIRAN_N>
-    for(int i = 0; i<current_turn_count; i++){
-        if(i!=current_turn_count-1) out << players[i]->getname() << " ";
-        else out << players[i]->getname() << "\n";
+    
+    // <URUTAN_GILIRAN_1> <URUTAN_GILIRAN_2> … <URUTAN_GILIRAN_N>
+    for(size_t i = 0; i < players.size(); i++){
+        if(i != players.size() - 1) {
+            out << players[i]->getName() << " ";
+        } else {
+            out << players[i]->getName() << "\n";
+        }
     }
-    //<GILIRAN_AKTIF_SAAT_INI>
-    out << players[players.size()%current_turn_count]->getname() << "\n";
+    
+    // <GILIRAN_AKTIF_SAAT_INI>
+    out << players[current_player_index]->getName() << "\n"; 
+
+    // <STATE_PROPERTI>
+    out << property_manager->toSaveFormat();
+    // <STATE_DECK>
+    out << card_manager->toSaveFormat();
+    // <STATE_LOG>
+    out << logger->toSaveFormat();
 
     return out.str();
 }
 int GameManager::getCurrentTurn(){
     return current_player_index;
+}
+
+void GameManager::save(const std::string& filedir) {
+    SaveLoadManager slm;
+    slm.save(*this, filedir); 
+}
+
+void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::shared_ptr<Player> creditor, float amount) {
+    
+    if (payer->canPay(amount)) {
+        if (creditor) economy_manager->transferMoney(*payer, *creditor, amount);
+        else economy_manager->deductMoney(*payer, amount);
+    } 
+    else if (!economy_manager->isBankruptcyInevitable(*payer, amount)) {
+        std::cout << "Warning! You owe " << amount << " but only have " << payer->getBalance() << ".\n";
+        std::cout << "Entering Liquidation Mode. Use MORTGAGE or SELL.\n";
+        
+        pending_debt = amount; 
+        pending_creditor = creditor;
+        current_state = GameState::WAITING_FOR_LIQUIDATION;
+    } 
+    else {
+        // DEATH
+        std::cout << payer->getName() << " HAS GONE BANKRUPT!\n";
+        economy_manager->executeBankruptcy(payer, creditor, amount);
+        
+        logger->recordEvent(LogEntry(current_turn_count, payer->getName(), BANKRUPT, "Went Bankrupt"));
+        checkGameOver();
+    }
 }

@@ -34,4 +34,5 @@ public:
     bool isStreet() const override { return true; }
 
     std::vector<float> getRentList() const;
+    void resetBuildings();
 };

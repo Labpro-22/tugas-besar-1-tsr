@@ -34,6 +34,9 @@ private:
     // Status permainan
     GameState current_state;
 
+    float pending_debt; 
+    std::shared_ptr<Player> pending_creditor;
+
     // Map yang menghubungkan command dengan fungsi. Parameter string di dalamnya digunakan untuk menampung argumen tambahan (contoh: "500" dari "BID 500")
     static std::unordered_map<std::string, std::function<void(const std::string&)>> command_map;
 
@@ -102,4 +105,6 @@ public:
 
     // Implementasi save
     std::string toSaveFormat() const;
+    void save(const std::string& filedir);
+    void processRequiredPayment(std::shared_ptr<Player> payer, std::shared_ptr<Player> creditor, float amount);
 };
