@@ -1,6 +1,9 @@
 #include "../../include/core/PropertyManager.hpp"
 #include "../../include/core/TransactionLog.hpp"
 #include "../../include/core/GameManager.hpp"
+#include "../../include/views/ViewGame.hpp"
+#include <algorithm>
+#include <iostream>
 
 
 Tile& PropertyManager::getTileAt(int position) const{
@@ -163,4 +166,74 @@ int PropertyManager::getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) con
 
 void PropertyManager::startFestival(PropertyTile* tile){
     tile->applyFestival();
+}
+
+std::vector<PropertyTile*> PropertyManager::findPropertiesOwnedByPlayer(std::shared_ptr<Player> player) const {
+    std::vector<PropertyTile*> ownedProperties;
+
+    if (!player || !board) {
+        return ownedProperties;
+    }
+
+    const int boardSize = board->getSize();
+    for (int i = 0; i < boardSize; ++i) {
+        Tile& currentTile = board->getTile(i);
+        PropertyTile* property = dynamic_cast<PropertyTile*>(&currentTile);
+        if (property == nullptr) {
+            continue;
+        }
+
+        std::shared_ptr<Player> owner = property->getPropertyOwner().lock();
+        if (owner && owner.get() == player.get()) {
+            ownedProperties.push_back(property);
+        }
+    }
+
+    return ownedProperties;
+}
+
+void PropertyManager::doMortgage(std::shared_ptr<Player> player){
+    std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
+
+    ViewGame v;
+    std::string input = v.getInput();
+
+    if(owned.empty()) return;
+    
+    auto p = std::find_if(owned.begin(), owned.end(), [input](PropertyTile* n){
+        return n->getCode() = input;
+    });
+
+    if(p != owned.end()){
+        if(tryMortgage(player, *p)){
+            std::cout << "it succeed";
+        }
+        else{
+            throw "it failed";
+        }
+    }
+    throw "you dont have any property";
+}
+
+void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
+    std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
+
+    ViewGame v;
+    std::string input = v.getInput();
+
+    if(owned.empty()) return;
+    
+    auto p = std::find_if(owned.begin(), owned.end(), [input](PropertyTile* n){
+        return n->getCode() = input;
+    });
+
+    if(p != owned.end()){
+        if(tryUnmortgage(player, *p)){
+            std::cout << "you got your property";
+        }
+        else{
+            throw "its still mortgage";
+        }
+    }
+    throw "you dont have any property";
 }

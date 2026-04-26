@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include "../../include/models/Board.hpp"
 #include "../../include/models/PropertyTile.hpp"
 #include "../../include/models/StreetTile.hpp"
@@ -35,4 +36,10 @@ public:
 
     // Memulai festival di suatu PropertyTile
     void startFestival(PropertyTile* tile);
+
+    std::vector<PropertyTile*> findPropertiesOwnedByPlayer(std::shared_ptr<Player> player) const;
+
+    void doMortgage(std::shared_ptr<Player> player);
+
+    void doUnmortgage(std::shared_ptr<Player> player);
 };
