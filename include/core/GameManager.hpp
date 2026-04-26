@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-
+#include <functional>
 #include "../../include/core/CardManager.hpp"
 #include "../../include/core/PropertyManager.hpp"
 #include "../../include/core/EconomyManager.hpp"
@@ -31,6 +31,29 @@ private:
 
     // Status permainan
     GameState current_state;
+
+    // Map yang menghubungkan command dengan fungsi. Parameter string di dalamnya digunakan untuk menampung argumen tambahan (contoh: "500" dari "BID 500")
+    static std::unordered_map<std::string, std::function<void(const std::string&)>> command_map;
+
+    // void setupCommands(); // Fungsi mendaftarkan isi commandMap
+
+    // Handler tiap command
+    void printBoard(const std::string& args);
+    void printCertificate(const std::string& args);     
+    void printProperty(const std::string& args);
+    void printLog(const std::string& args);     
+    void mortgage(const std::string& args);
+    void redeem(const std::string& args);
+    void build(const std::string& args);       
+    void useAbility(const std::string& args);
+    void rollDice(const std::string& args);
+    void setDice(const std::string& args);     
+    void bid(const std::string& args);       
+    void pass(const std::string& args);          
+    void save(const std::string& args); 
+    void load(const std::string& args);
+    void endTurn(const std::string& args);
+
 
     std::shared_ptr<Player> getCurrentPlayer();
     void nextPlayer();
@@ -60,7 +83,7 @@ public:
     // Implementasi visitor tile
 
     static void visitCardTile(CardTile* tile, Player& player) ;
-    static void visitTaxTile(TaxTile* tile, Player& player) ;
+    static void visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) ;
     static void visitFestivalTile(FestivalTile* tile, Player& player) ;
     static void visitGoTile(GoTile* tile, Player& player) ;
     static void visitGoToJailTile(GoToJailTile* tile, Player& player) ;

@@ -851,16 +851,16 @@ void ViewGame::displayCardBankruptcyWarning(int amount, int current_money) {
     std::cout << "Uang kamu saat ini: M" << current_money << "\n";
 }
 
-void ViewGame::displaySkillCardList(const std::vector<SkillCard*>& cards) {
+void ViewGame::displaySkillCardList(const std::vector<std::unique_ptr<SkillCard>>& cards) {
     std::cout << "\nDaftar Kartu Kemampuan Spesial Anda:\n";
     for (size_t i = 0; i < cards.size(); ++i) {
         std::string desc = "Efek kartu spesial";
         
         if (cards[i]->isMoveCard()) {
-            MoveSkillCard* mc = static_cast<MoveSkillCard*>(cards[i]);
+            MoveSkillCard* mc = static_cast<MoveSkillCard*>(cards[i].get());
             desc = "Maju " + std::to_string(mc->getStep()) + " Petak";
         } else if (cards[i]->isDiscountCard()) {
-            DiscountSkillCard* dc = static_cast<DiscountSkillCard*>(cards[i]);
+            DiscountSkillCard* dc = static_cast<DiscountSkillCard*>(cards[i].get());
             desc = "Diskon sewa sebesar " + std::to_string(static_cast<int>(dc->getPercentage())) + "%";
         } else if (cards[i]->isShieldCard()) {
             desc = "Kebal tagihan atau sanksi selama 1 giliran";

@@ -18,7 +18,7 @@ public:
     Tile& getTileAt(int position) const;
 
     // Mengurus pergantian status dan pointer owner saat dibeli/dilelang
-    void assignOwnership(PropertyTile& tile, Player& newOwner);
+    void assignOwnership(PropertyTile& tile, std::shared_ptr<Player> newOwner);
 
     // Mengecek: 1. Apakah Monopoli? 2. Apakah pemerataan bangunan (even build) terpenuhi? Jika valid, panggil tile->buildHouse()
     bool tryBuildHouse(Player& player, StreetTile& tile);

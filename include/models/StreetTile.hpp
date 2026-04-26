@@ -26,11 +26,12 @@ public:
     void buildHotel();
     void sellBuilding();
 
+    float getHousePrice() const;
+    float getHotelPrice() const;
+
     std::string getStatusString() const override;
 
     bool isStreet() const override { return true; }
 
     std::vector<float> getRentList() const;
-    float getHousePrice() const;
-    float getHotelPrice() const;
 };

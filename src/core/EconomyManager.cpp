@@ -91,7 +91,7 @@ bool EconomyManager::isAuctionOver() const{
 void EconomyManager::resolveAuction(PropertyTile *tile, std::shared_ptr<Player> & winner){
     auto& logger= GameManager::logger;
     auto &propMgr=GameManager::property_manager;
-    propMgr->assignOwnership(tile,winner);
+    propMgr->assignOwnership(*tile,winner);
     logger->recordEvent(LogEntry(0,winner->getname(),actions::LELANG,"si A menang lelang cuy"));
 }
 std::vector<std::shared_ptr<Player>> EconomyManager::getCurrentBidder() const{
