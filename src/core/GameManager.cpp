@@ -15,11 +15,11 @@ GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> init
                 std::unique_ptr<CardManager> cMgr, 
                 std::unique_ptr<PropertyManager> pMgr, 
                 std::unique_ptr<EconomyManager> eMgr,
-                                std::unique_ptr<TransactionLog> tLogger)
-        : current_player_index(0),
+                                std::unique_ptr<TransactionLog> tLogger):
             current_turn_count(0),
             max_turns(maxTurns),
             current_state(GameState::START_TURN) {
+        current_player_index=0;
         players = std::move(initialPlayers);
         card_manager = std::move(cMgr);
         property_manager = std::move(pMgr);
@@ -380,4 +380,7 @@ std::string GameManager::toSaveFormat() const{
     out << players[players.size()%current_turn_count]->getname() << "\n";
 
     return out.str();
+}
+int GameManager::getCurrentTurn(){
+    return current_player_index;
 }

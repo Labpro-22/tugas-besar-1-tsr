@@ -1,9 +1,12 @@
 #include "../../include/core/EconomyManager.hpp"
 #include "../../include/core/TransactionLog.hpp"
 #include "../../include/core/GameManager.hpp"
+#include "../../include/views/ViewGame.hpp"
+
 #include <memory>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include "../../include/core/PropertyManager.hpp"
 void EconomyManager::addMoney(Player& player, float amount){
     player+=amount;
@@ -48,27 +51,40 @@ void EconomyManager::startAuction(PropertyTile* property){
     active_bidders = GameManager::players;
     current_highest_bid = 0;
     current_highest_bidder.reset();
-    size_t bidder_index = 0;
+    size_t bidder_index = (GameManager::getCurrentTurn()+1 )% active_bidders.size();
+    ViewGame::displayAuctionStart(property->getName(),GameManager::players[bidder_index]->getname());
     while (!isAuctionOver()) {
-        int bid;
-        std::cin >> bid;
+        std::string highest_bidder_name = current_highest_bidder ? current_highest_bidder->getname() : "-";//
+        ViewGame::displayAuctionTurn(active_bidders[bidder_index]->getname(),current_highest_bid,highest_bidder_name);
+        std::string input;
+        std::getline(std::cin >> std::ws, input);
+        std::stringstream parser(input);
+        std::string command;
+        parser >> command;
+        std::transform(command.begin(), command.end(), command.begin(), ::toupper); //ini ga yakin rom
         try {
-            if (bid == 0) {
+            if (command == "PASS") {
                 active_bidders.erase(active_bidders.begin() + bidder_index);
                 if (bidder_index >= active_bidders.size()) {
                     bidder_index = 0;
                 }
-            } else {
-                placeBid(bid, active_bidders[bidder_index]);
+            } else if (command == "BID") {
+                float bid_amount;
+                if (!(parser >> bid_amount)) {
+                    ViewGame::displayMessage("Format BID salah. Gunakan: BID <jumlah>");
+                    continue;
+                }
+                placeBid(bid_amount, active_bidders[bidder_index]);
                 bidder_index = (bidder_index + 1) % active_bidders.size();
+            } else {
+                ViewGame::displayMessage("Perintah lelang tidak valid. Gunakan PASS atau BID <jumlah>");
             }
         }
         catch(const char* e) {
-            std::cerr << e << " " << current_highest_bid << ">" << bid << '\n';
+            std::cerr << e << " Penawaran saat ini: " << current_highest_bid << '\n';
         }
     }
     resolveAuction(property,active_bidders[0]);
- 
 }
 void EconomyManager::placeBid(float amount, std::shared_ptr<Player> &player){
     if (current_highest_bid<=amount){
