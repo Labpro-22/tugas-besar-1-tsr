@@ -193,8 +193,8 @@ void GameManager::build(const std::string& args){ //ga yakin, dibantu teman ini
         : static_cast<int>(selected_street->getHousePrice());
 
     bool success = (previous_level == 4)
-        ? property_manager->tryBuildHotel(*player, *selected_street)
-        : property_manager->tryBuildHouse(*player, *selected_street);
+        ? property_manager->tryBuildHotel(player, selected_street)
+        : property_manager->tryBuildHouse(player, selected_street);
 
     if (!success) {
         ViewGame::displayMessage("Pembangunan gagal. Pastikan aturan build terpenuhi dan uang mencukupi.");
@@ -323,7 +323,7 @@ void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
     }
 
     if (selected_property) {
-        property_manager->startFestival(*selected_property); 
+        property_manager->startFestival(selected_property); 
         ViewGame::displayMessage("Efek festival diaktifkan di " + selected_property->getName() + "!");
     }
 }
