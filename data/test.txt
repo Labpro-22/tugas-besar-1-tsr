@@ -1,0 +1,36 @@
+15 30
+4
+Daro 1500 JKT ACTIVE
+2
+MoveCard 5 0
+ShieldCard 1 2
+Romi 800 BDG ACTIVE
+0
+Zeki 2200 PKR ACTIVE
+1
+DiscountCard 30 1
+BilliE 0 PJR BANKRUPT
+0
+Uname2 Uname4 Uname1 Uname3
+Uname2
+10
+JKT street Uname1 OWNED 2 2 1
+BDG street Uname2 MORTGAGED 0 1 0
+KAI railroad Uname1 OWNED 1 0 0
+SBY street BANK BANK 0 1 0
+PLN utility Uname3 OWNED 1 0 0
+MGL street BANK BANK 0 0 0
+BKS street BANK BANK 0 0 0
+MND street BANK BANK 0 0 0
+PAM utility BANK BANK 0 0 0
+GUB railroad BANK BANK 0 0 0
+3
+MoveCard
+DiscountCard
+TeleportCard
+5
+1 Uname1 BELI Beli Jakarta (JKT) seharga M400
+1 Uname2 DADU Lempar: 4+5=9 mendarat di Surabaya (SBY)
+2 Uname3 KARTU Mendapat kartu DiscountCard 30%
+3 Uname4 BANKRUPT Bangkrut dan keluar dari permainan
+15 Uname1 SAVE Menyimpan permainan

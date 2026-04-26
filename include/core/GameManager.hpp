@@ -37,7 +37,7 @@ private:
     void checkGameOver();
 
 public:
-static std::unique_ptr<CardManager> card_manager;
+    static std::unique_ptr<CardManager> card_manager;
     static std::unique_ptr<PropertyManager> property_manager;
     static std::unique_ptr<EconomyManager> economy_manager;
     static std::unique_ptr<TransactionLog> logger;
