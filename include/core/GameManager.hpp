@@ -33,7 +33,7 @@ private:
     GameState current_state;
 
     // Map yang menghubungkan command dengan fungsi. Parameter string di dalamnya digunakan untuk menampung argumen tambahan (contoh: "500" dari "BID 500")
-    std::unordered_map<std::string, std::function<void(const std::string&)>> command_map;
+    static std::unordered_map<std::string, std::function<void(const std::string&)>> command_map;
 
     // void setupCommands(); // Fungsi mendaftarkan isi commandMap
 

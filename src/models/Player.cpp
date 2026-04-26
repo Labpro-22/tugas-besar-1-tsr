@@ -5,8 +5,11 @@
 #include "../../include/models/Player.hpp"
 #include "../../include/models/PropertyTile.hpp"
 #include "../../include/models/SkillCard.hpp"
+#include "../../include/models/Tile.hpp"
 #include "../../include/models/Board.hpp"
 #include "../../include/core/PropertyManager.hpp"
+#include "../../include/core/GameManager.hpp"
+
 
 std::random_device Player::rd;
 std::mt19937 Player::gen(Player::rd());
@@ -221,4 +224,18 @@ std::string Player::getName() const{
 
 int Player::getBalance() const{
     return balance;
+}
+const std::vector<Tile*>& Player::getPropertiesByGroup(const std::string& color) const {
+    auto colorTileMap=GameManager::property_manager->getBoard().getcolorTileMap();
+    auto it =colorTileMap.find(color);
+    
+    if (it != colorTileMap.end()) {
+        return it->second;
+    }
+
+    static const std::vector<Tile*> empty_vector;
+    return empty_vector;
+}
+const std::vector<std::unique_ptr<SkillCard>>& Player::getAllskillCard() const {
+    return saved_cards;
 }

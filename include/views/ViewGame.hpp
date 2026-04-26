@@ -128,7 +128,7 @@ public:
     static void displayCardBankruptcyWarning(int amount, int current_money);
 
     // Skill Card
-    static void displaySkillCardList(const std::vector<SkillCard*>& cards);
+    static void displaySkillCardList(const std::vector<std::unique_ptr<SkillCard>>& cards);
     static void displaySkillCardActivated(const std::string& card_name, const std::string& effect_desc);
     static void displaySkillCardShieldActive(int canceled_amount, int current_money);
     static void displaySkillCardErrorAlreadyUsed();
