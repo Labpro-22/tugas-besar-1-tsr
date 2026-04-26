@@ -17,6 +17,9 @@ public:
     std::string getCode() const;
     std::string getColor() const;
     virtual void onLand(Player& p) = 0;
+    virtual std::string getStatusString() const { return ""; }
+    virtual bool isProperty() const { return false; }
+    virtual bool isStreet() const { return false; }
 };
 
 enum CardType {

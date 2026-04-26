@@ -63,4 +63,8 @@ public:
 
     //Saveload impl
     std::string toSaveFormat() const;
+
+    std::string getName() const;
+
+    int getBalance() const;
 };

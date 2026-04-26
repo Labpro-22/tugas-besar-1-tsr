@@ -28,4 +28,10 @@ public:
 
     float getHousePrice() const;
     float getHotelPrice() const;
+
+    std::string getStatusString() const override;
+
+    bool isStreet() const override { return true; }
+
+    std::vector<int> getRentList() const;
 };

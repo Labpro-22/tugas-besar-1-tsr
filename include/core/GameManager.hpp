@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <functional>
 
 #include "../../include/core/CardManager.hpp"
 #include "../../include/core/PropertyManager.hpp"
@@ -56,9 +55,9 @@ private:
     // void endTurn(const std::string& args);
 
 
-    // std::shared_ptr<Player> getCurrentPlayer();
-    // void nextPlayer();
-    // void checkGameOver();
+    std::shared_ptr<Player> getCurrentPlayer();
+    void nextPlayer();
+    void checkGameOver();
 
 public:
 static std::unique_ptr<CardManager> card_manager;
@@ -94,6 +93,8 @@ static std::unique_ptr<CardManager> card_manager;
     static void visitRailroadTile(RailroadTile* tile, Player& player) ;
     static void visitUtilityTile(UtilityTile* tile, Player& player) ;
 
+    static int getCurrentTurn();
+    static int getMaxTurns();
 
     // Implementasi save
     std::string toSaveFormat() const;

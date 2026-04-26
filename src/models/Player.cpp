@@ -214,3 +214,11 @@ int Player::countOwnedUtility() const {
             return prop->getPropertyType() == PropertyType::UTILITY;
         });
 }
+
+std::string Player::getName() const{
+    return name;
+}
+
+int Player::getBalance() const{
+    return balance;
+}

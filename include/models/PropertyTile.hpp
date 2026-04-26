@@ -42,6 +42,8 @@ public:
     void onLand(Player& p) override;
     virtual float calculateRent() const = 0;
     virtual PropertyType getPropertyType() const = 0;
+
+    bool isProperty() const override { return true; }
 };
 
 class RailroadTile : public PropertyTile {
@@ -52,6 +54,8 @@ public:
     float calculateRent() const override;
     void onLand(Player& p) override;
     PropertyType getPropertyType() const override;
+
+    std::string getStatusString() const override;
 };
 
 class UtilityTile : public PropertyTile {
@@ -62,4 +66,6 @@ public:
     float calculateRent() const override;
     void onLand(Player& p) override;  
     PropertyType getPropertyType() const override;
+
+    std::string getStatusString() const override;
 };
