@@ -130,5 +130,11 @@ std::string GameManager::toSaveFormat() const{
     //<GILIRAN_AKTIF_SAAT_INI>
     out << players[players.size()%current_turn_count]->getname() << "\n";
 
+    //<STATE_PROPERTI>
+    //<STATE_DECK>
+    out << card_manager->toSaveFormat();
+    //<STATE_LOG>
+
+
     return out.str();
 }
