@@ -149,16 +149,16 @@ std::string Player::toSaveFormat() const {
         out<<"INJAIL\n";
         break;
     case PlayerState::BANKCRUPT:
-        out<<"BANKCRUPT\n";
+        out<<"BANKRUPT\n";
         break;
     }
 
     out << saved_cards.size() << "\n";
 
     
-    // for(const std::unique_ptr<SkillCard>& card : saved_cards){
-    //     card->
-    // }
+    for(const std::unique_ptr<SkillCard>& card : saved_cards){
+        out << card->toSaveFormat();
+    }
 
 
     return out.str();
