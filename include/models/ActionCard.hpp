@@ -6,5 +6,6 @@ class ActionCard: public Card
 private:
     /* data */
 public:
+    ActionCard(std::string name);
     
 };

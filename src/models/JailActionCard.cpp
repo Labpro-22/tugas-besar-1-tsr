@@ -5,6 +5,7 @@
 #include "../../include/core/GameManager.hpp"
 
 
+JailActionCard::JailActionCard(std::string name):ActionCard(name){}
 void JailActionCard::onDraw(Player& p){
     auto& b=PropertyManager::getBoard();
     int current_pos = p.getPosition();

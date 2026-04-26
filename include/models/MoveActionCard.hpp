@@ -9,6 +9,6 @@ class MoveActionCard:public ActionCard{
         static std::mt19937 gen;
         int walkDistance;
     public:
-        MoveActionCard();
+        MoveActionCard(std::string name);
         void onDraw(Player& p) override;
 };
