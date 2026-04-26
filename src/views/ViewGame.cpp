@@ -133,7 +133,7 @@ void ViewGame::displayBoard() {
     const int COLS       = 11;
     const int TOTAL      = COLS * (CELL_WIDTH + 1) + 1;
     const int MID_WIDTH  = TOTAL - 2 * (CELL_WIDTH + 1) - 2;
-    
+
     auto pad = [](const std::string& s, int n) -> std::string {
         if ((int)s.size() >= n) return s.substr(0, n);
         return s + std::string(n - s.size(), ' ');
@@ -293,13 +293,13 @@ void ViewGame::displayPropertyDeed(const std::string& propertyCode) {
     std::cout << "| " << getColorCode(tile_color) << "[" << tile_color << "] " << tile_name << " (" << tile_code << ")" << ANSI_RESET << " |\n";
     std::cout << "+================================+\n";
     std::cout << "| Harga Beli          : M" << property_tile->getBuyPrice() << "\n";
-    std::cout << "| Nilai Gadai         : M" << property_tile->getMortgagePrice() << "\n";
+    std::cout << "| Nilai Gadai         : M" << property_tile->getMortgageValue() << "\n";
     std::cout << "+--------------------------------+\n";
 
     if (target_tile->isStreet()) {
         StreetTile* street = static_cast<StreetTile*>(target_tile);
         
-        const std::vector<int>& rent_list = street->getRentList(); 
+        const std::vector<float>& rent_list = street->getRentList(); 
         if (rent_list.size() >= 6) {
             std::cout << "| Sewa (unimproved)   : M" << rent_list[0] << "\n";
             std::cout << "| Sewa (1 rumah)      : M" << rent_list[1] << "\n";
@@ -469,7 +469,7 @@ void ViewGame::displayMortgageList(const std::vector<PropertyTile*>& properties)
     for (size_t i = 0; i < properties.size(); ++i) {
         PropertyTile* prop = properties[i];
         std::cout << i + 1 << ". " << prop->getName() << " (" << prop->getCode() << ") [" << prop->getColor() << "] ";
-        std::cout << "Nilai Gadai: M" << prop->getMortgagePrice() << "\n";
+        std::cout << "Nilai Gadai: M" << prop->getMortgageValue() << "\n";
     }
     std::cout << "\n";
 }
@@ -715,7 +715,7 @@ void ViewGame::displayLiquidationPanel(int current_money, int debt, const std::v
         std::cout << "[Gadaikan Properti]\n";
         for (const auto* prop : mortgageables) {
             std::cout << index++ << ". " << prop->getName() << " (" << prop->getCode() << ") [" << prop->getColor() << "] ";
-            std::cout << "Nilai Gadai: M" << prop->getMortgagePrice() << "\n";
+            std::cout << "Nilai Gadai: M" << prop->getMortgageValue() << "\n";
         }
     }
 }

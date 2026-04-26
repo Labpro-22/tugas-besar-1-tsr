@@ -95,6 +95,6 @@ std::string StreetTile::getStatusString() const {
     return status;
 }
 
-std::vector<int> StreetTile::getRentList() const {
+std::vector<float> StreetTile::getRentList() const {
     return rent_list;
 }
