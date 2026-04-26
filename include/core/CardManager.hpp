@@ -16,7 +16,7 @@ private:
     Deck<std::unique_ptr<SkillCard>> skill_deck;
 
     std::unique_ptr<SkillCard> createSkillCardFromSave(const CardSaveData& cardData) const;
-    std::unique_ptr<Card> createSkillDeckCard(const std::string& cardName) const;
+    std::unique_ptr<SkillCard> createSkillDeckCard(const std::string& cardName) const;
 
 public:
     CardManager()=default;

@@ -13,20 +13,15 @@ std::unique_ptr<TransactionLog> GameManager::logger = nullptr;
 std::vector<std::shared_ptr<Player>> GameManager::players = {};
 std::unordered_map<std::string, std::function<void(const std::string&)>> GameManager::command_map = {};
 
-GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> initialPlayers, 
-                std::unique_ptr<CardManager> cMgr, 
-                std::unique_ptr<PropertyManager> pMgr, 
-                std::unique_ptr<EconomyManager> eMgr,
-                                std::unique_ptr<TransactionLog> tLogger):
+GameManager::GameManager(int maxTurns,int jumlah):
             current_turn_count(0),
             max_turns(maxTurns),
             current_state(GameState::START_TURN),pending_debt(0.0f),pending_creditor(nullptr) {
         current_player_index=0;
-        players = std::move(initialPlayers);
-        card_manager = std::move(cMgr);
-        property_manager = std::move(pMgr);
-        economy_manager = std::move(eMgr);
-        logger = std::move(tLogger);
+        card_manager =std::make_unique<CardManager>();
+        property_manager = std::make_unique<PropertyManager>(nullptr);
+        economy_manager = std::make_unique<EconomyManager>();
+        logger = std::make_unique<TransactionLog>();;
         command_map["CETAK_PAPAN"] = [this](const std::string& args) { this->printBoard(args); };
         command_map["LEMPAR_DADU"] = [this](const std::string& args) { this->rollDice(args); };
         command_map["ATUR_DADU"] = [this](const std::string& args) { this->setDice(args); };
@@ -36,12 +31,29 @@ GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> init
         command_map["TEBUS"] = [this](const std::string& args) { this->redeem(args); };
         command_map["BANGUN"] = [this](const std::string& args) { this->build(args); };
         command_map["SIMPAN"] = [this](const std::string& args) { this->save(args); };
-        command_map["MUAT"] = [this](const std::string& args) { this->load(args); };
-        command_map["CETAK_LOG"] = [this](const std::string& args) { this->printLog(args); };
+        command_map["MUAT"] = [this](const std::string& args) { this->loadSaveState(args); };
+        // command_map["CETAK_LOG"] = [this](const std::string& args) { this->printLog(args); };
         command_map["GUNAKAN_KEMAMPUAN"] = [this](const std::string& args) { this->useAbility(args); };
 }
 
 void GameManager::startGame() {
+    ViewGame::displayMessage("config dir: ");
+    loadConfig(ViewGame::getUserInput());
+    std::cout<<"apakah ingin new game: (y or n)";
+    if(!ViewGame::getYesNo()){
+        std::cout<<"path directory save/load: ";
+        std::string dir =ViewGame::getUserInput();
+        loadSaveState(dir);
+    } else{
+        int N;
+        std::cout<<"jumlah player: ";
+        std::cin>>N;
+        for (size_t i = 0; i < N; i++)
+        {
+            players.push_back(std::make_shared<Player>("Pemain"+std::to_string(i), start_money, 0, PlayerState::FREE));
+        }
+    }
+   
     while (current_turn_count <= max_turns) {
         int alive_count = 0;
         for (const auto& p : players) {
@@ -336,18 +348,6 @@ void GameManager::getPlayerInJail(Player& player) {
 
 
  
-
-
-//VisitTilesFunctions are below
-
-
-
-std::unique_ptr<CardManager> GameManager::card_manager=nullptr;
-std::unique_ptr<PropertyManager> GameManager::property_manager=nullptr;
-std::unique_ptr<EconomyManager> GameManager::economy_manager=nullptr;
-std::unique_ptr<TransactionLog> GameManager::logger=nullptr;
-std::vector<std::shared_ptr<Player>> GameManager::players={};
-
 void GameManager::visitCardTile(CardTile* tile, Player& player) {
     if(tile->getType() == CHANCE){
         card_manager->drawKesempatan(player);
@@ -453,7 +453,7 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
-            bool success = economy_manager->transferMoney(player, *current_owner, rent);
+            bool success = economy_manager->transferMoney(player, current_owner, rent);
         }
     } else if (status == PropertyStatus::MORTGAGED) {
         ViewGame::displayMortgagedRent(*tile, player);
@@ -470,7 +470,7 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
-            bool success = economy_manager->transferMoney(player, *current_owner, rent);
+            bool success = economy_manager->transferMoney(player, current_owner, rent);
         }
     }
 }
@@ -486,7 +486,7 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
-            bool success = economy_manager->transferMoney(player, *current_owner, rent);
+            bool success = economy_manager->transferMoney(player, current_owner, rent);
         }
     }
 }
@@ -539,22 +539,15 @@ void GameManager::loadConfig(const std::string& args){
     max_turns = config.max_turn;
     const float initialBalance = static_cast<float>(config.initial_balance);
 
-    for (auto& p : players) {
-        const float current = p->getmoney();
-        if (current < initialBalance) {
-            *p += (initialBalance - current);
-        } else if (current > initialBalance) {
-            *p -= (current - initialBalance);
-        }
-    }
+    start_money=initialBalance;
 
     if (property_manager) {
         property_manager->InitializeBoard(std::move(config));
     }
 }
 
-void GameManager::loadSaveState(std::string& args){
-    std::string& filename = args;
+void GameManager::loadSaveState(const std::string& args){
+    const std::string& filename = args;
     GameSaveData data = IOManager::loadGameData(filename);
 
     current_turn_count = data.current_turn;
@@ -669,7 +662,8 @@ int GameManager::getCurrentTurn(){
     return current_player_index;
 }
 
-void GameManager::save(const std::string& filedir) {
+void GameManager::save(const std::string& args) {
+    const std::string &filedir=args;
     SaveLoadManager slm;
     slm.save(*this, filedir); 
 }
@@ -677,7 +671,7 @@ void GameManager::save(const std::string& filedir) {
 void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::shared_ptr<Player> creditor, float amount) {
     
     if (payer->canPay(amount)) {
-        if (creditor) economy_manager->transferMoney(*payer, *creditor, amount);
+        if (creditor) economy_manager->transferMoney(*payer, creditor, amount);
         else economy_manager->deductMoney(*payer, amount);
     } 
     else if (!economy_manager->isBankruptcyInevitable(*payer, amount)) {
@@ -691,7 +685,7 @@ void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::sha
     else {
         // DEATH
         std::cout << payer->getName() << " HAS GONE BANKRUPT!\n";
-        economy_manager->executeBankruptcy(payer, creditor, amount);
+        economy_manager->executeBankruptcy(*payer, creditor, amount);
         
         logger->recordEvent(LogEntry(current_turn_count, payer->getName(), BANKRUPT, "Went Bankrupt"));
         checkGameOver();

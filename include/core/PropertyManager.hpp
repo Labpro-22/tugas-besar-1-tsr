@@ -37,22 +37,17 @@ public:
     // Mengecek: Tidak boleh digadai jika masih ada bangunan di color group tersebut
     bool tryMortgage(std::shared_ptr<Player> player, PropertyTile* tile);
     bool tryUnmortgage(std::shared_ptr<Player> player, PropertyTile* tile);
-    bool canMortgaged(PropertyTile* tile);
     // Membungkus panggilan tile->calculateRent(), misal tambahan untuk kasus khusus UtilityTile yang membutuhkan nilai dadu
     float getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const;
 
     // Memulai festival di suatu PropertyTile
     void startFestival(PropertyTile* tile);
 
-    std::vector<PropertyTile*> findPropertiesOwnedByPlayer(std::shared_ptr<Player> player) const;
-
+    std::vector<PropertyTile*> findPropertiesOwnedByPlayer(Player* player) const;
     void doMortgage(std::shared_ptr<Player> player);
 
     void doUnmortgage(std::shared_ptr<Player> player);
 
     void InitializeBoard(FullConfigData&& config);
     void loadBoardState(std::vector<PropertySaveData> data);
-
-
-    std::string toSaveFormat() const;
 };
