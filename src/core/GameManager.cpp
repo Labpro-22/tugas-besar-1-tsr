@@ -430,6 +430,7 @@ std::string GameManager::toSaveFormat() const{
     out << players[players.size()%current_turn_count]->getname() << "\n";
 
     //<STATE_PROPERTI>
+    out << property_manager->toSaveFormat();
     //<STATE_DECK>
     out << card_manager->toSaveFormat();
     //<STATE_LOG>

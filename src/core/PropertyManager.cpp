@@ -248,7 +248,7 @@ void PropertyManager::doMortgage(std::shared_ptr<Player> player){
     std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
 
     ViewGame v;
-    std::string input = v.getInput();
+    std::string input = v.getUserInput();
 
     if(owned.empty()) return;
     
@@ -271,7 +271,7 @@ void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
     std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
 
     ViewGame v;
-    std::string input = v.getInput();
+    std::string input = v.getUserInput();
 
     if(owned.empty()) return;
     
