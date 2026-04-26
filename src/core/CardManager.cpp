@@ -1,7 +1,65 @@
 #include "../../include/core/CardManager.hpp"
-#include "ActionCard.hpp"
-#include "SkillCard.hpp"
+#include "../../include/core/GameManager.hpp"
+#include "../../include/models/ActionCard.hpp"
+#include "../../include/models/SkillCard.hpp"
+#include <algorithm>
 #include <sstream>
+
+std::unique_ptr<SkillCard> CardManager::createSkillCardFromSave(const CardSaveData& cardData) const {
+    if (cardData.card_type == "move") {
+        auto card = std::make_unique<MoveSkillCard>(cardData.card_type);
+        card->loadFromSave(cardData.value, cardData.remaining_duration);
+        return card;
+    }
+    if (cardData.card_type == "discount") {
+        auto card = std::make_unique<DiscountSkillCard>(cardData.card_type);
+        card->loadFromSave(cardData.value, cardData.remaining_duration);
+        return card;
+    }
+    if (cardData.card_type == "shield") {
+        auto card = std::make_unique<ShieldSkillCard>(cardData.card_type);
+        card->loadFromSave(cardData.value, cardData.remaining_duration);
+        return card;
+    }
+    if (cardData.card_type == "teleport") {
+        auto card = std::make_unique<TeleportSkillCard>(cardData.card_type);
+        card->loadFromSave(cardData.value, cardData.remaining_duration);
+        return card;
+    }
+    if (cardData.card_type == "lasso") {
+        auto card = std::make_unique<LassoSkillCard>(cardData.card_type);
+        card->loadFromSave(cardData.value, cardData.remaining_duration);
+        return card;
+    }
+    if (cardData.card_type == "demolition") {
+        auto card = std::make_unique<DemolitionSkillCard>(cardData.card_type);
+        card->loadFromSave(cardData.value, cardData.remaining_duration);
+        return card;
+    }
+    return nullptr;
+}
+
+std::unique_ptr<Card> CardManager::createSkillDeckCard(const std::string& cardName) const {
+    if (cardName == "move") {
+        return std::make_unique<MoveSkillCard>(cardName);
+    }
+    if (cardName == "discount") {
+        return std::make_unique<DiscountSkillCard>(cardName);
+    }
+    if (cardName == "shield") {
+        return std::make_unique<ShieldSkillCard>(cardName);
+    }
+    if (cardName == "teleport") {
+        return std::make_unique<TeleportSkillCard>(cardName);
+    }
+    if (cardName == "lasso") {
+        return std::make_unique<LassoSkillCard>(cardName);
+    }
+    if (cardName == "demolition") {
+        return std::make_unique<DemolitionSkillCard>(cardName);
+    }
+    return nullptr;
+}
 
 // Membaca file konfigurasi dan mengisi ketiga deck di atas
 void CardManager::initializeDecks(){}
@@ -32,6 +90,37 @@ void CardManager::takeSkillCardFromPlayer(Player& player, int index){
 void CardManager::discardCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck){
        deck.addToDiscard(std::move(usedCard));
 }
+
+void CardManager::loadCardState(const GameSaveData& data){
+    std::vector<std::unique_ptr<Card>> skillCards;
+    skillCards.reserve(data.skill_card_deck.size());
+    for (const auto& cardName : data.skill_card_deck) {
+        auto card = createSkillDeckCard(cardName);
+        if (card) {
+            skillCards.push_back(std::move(card));
+        }
+    }
+    skill_deck.setCards(std::move(skillCards));
+    skill_deck.clearDiscard();
+
+    for (const auto& savedPlayer : data.players) {
+        auto playerIt = std::find_if(GameManager::players.begin(), GameManager::players.end(), [&savedPlayer](const std::shared_ptr<Player>& player) {
+            return player && player->getname() == savedPlayer.username;
+        });
+
+        if (playerIt == GameManager::players.end()) {
+            continue;
+        }
+
+        for (const auto& savedCard : savedPlayer.hand_cards) {
+            auto card = createSkillCardFromSave(savedCard);
+            if (card) {
+                (*playerIt)->addSkillCard(std::move(card));
+            }
+        }
+    }
+}
+
 std::string CardManager::toSaveFormat() const{
     std::ostringstream out;
     out << chance_deck.toSaveFormat();

@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include "../../include/models/Saveable.hpp"
+#include "../../include/utils/SaveData.hpp"
 
 enum actions{
     DADU, // roll dadu 
@@ -64,6 +65,7 @@ public:
     std::string getAllLogs()const;
     std::string getRecentLogs(int n)const;
     void clearLogs();
+    void loadLogState(const std::vector<LogSaveData>& data);
     std::string toSaveFormat() const override;
 
     ~TransactionLog(){}

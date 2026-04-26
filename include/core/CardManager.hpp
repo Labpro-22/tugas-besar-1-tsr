@@ -1,10 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "../../include/models/Deck.hpp"
 #include "../../include/models/Card.hpp"
 #include "../../include/models/Player.hpp" 
 #include "../../include/models/Saveable.hpp"
+#include "../../include/utils/SaveData.hpp"
 
 class CardManager : Saveable {
 private:
@@ -12,8 +14,11 @@ private:
     Deck<std::unique_ptr<Card>> community_chest_deck;
     Deck<std::unique_ptr<Card>> skill_deck;
 
+    std::unique_ptr<SkillCard> createSkillCardFromSave(const CardSaveData& cardData) const;
+    std::unique_ptr<Card> createSkillDeckCard(const std::string& cardName) const;
+
 public:
-    CardManager();
+    CardManager()=default;
     ~CardManager() = default;
 
     // Membaca file konfigurasi dan mengisi ketiga deck di atas
@@ -33,5 +38,6 @@ public:
 
     // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
     void discardCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck);
+    void loadCardState(const GameSaveData& data);
     std::string toSaveFormat() const override;
 };

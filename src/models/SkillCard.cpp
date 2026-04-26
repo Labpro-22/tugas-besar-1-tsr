@@ -12,6 +12,10 @@
 SkillCard::SkillCard(std::string name):Card(name){};
 void SkillCard::onDraw(Player& p) {
 }
+void SkillCard::loadFromSave(float value, int remainingDuration) {
+    (void)value;
+    (void)remainingDuration;
+}
 std::string SkillCard::toSaveFormat() const{
     std::ostringstream out;
     out << name << "\n";
@@ -26,6 +30,10 @@ void MoveSkillCard::onDraw(Player& p) {
 }
 void MoveSkillCard::useEffect(Player& p) {
     p.movePlayer(this->step);
+}
+void MoveSkillCard::loadFromSave(float value, int remainingDuration) {
+    (void)remainingDuration;
+    step = static_cast<int>(value);
 }
 std::string MoveSkillCard::toSaveFormat() const{
     std::ostringstream out;
@@ -42,6 +50,10 @@ void DiscountSkillCard::onDraw(Player& p) {
 
 void DiscountSkillCard::useEffect(Player& p) {
     p.addEffect(std::unique_ptr<Effect>(new DiscountEffect(this->percentage)));
+}
+void DiscountSkillCard::loadFromSave(float value, int remainingDuration) {
+    (void)remainingDuration;
+    percentage = value;
 }
 std::string DiscountSkillCard::toSaveFormat() const{
     std::ostringstream out;

@@ -4,7 +4,20 @@
 #include "../../include/views/ViewGame.hpp"
 #include <algorithm>
 #include <iostream>
+#include <unordered_map>
 
+std::unique_ptr<Board> PropertyManager::board = nullptr;
+
+PropertyManager::PropertyManager(std::unique_ptr<Board> gameBoard) {
+board = std::move(gameBoard);
+}
+
+Board& PropertyManager::getBoard() {
+if (!board) {
+board = std::make_unique<Board>();
+}
+return *board;
+}
 
 Tile& PropertyManager::getTileAt(int position) const{
     return board->getTile(position);
@@ -208,7 +221,7 @@ bool PropertyManager::tryUnmortgage(std::shared_ptr<Player> player, PropertyTile
     return true;
 }
 
-float PropertyManager::getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const{
+float PropertyManager::getFinalRentPrice(PropertyTile* tile, int diceRoll) const{
     if(diceRoll == 0){
         return tile->calculateRent();
     }
@@ -252,7 +265,7 @@ void PropertyManager::doMortgage(std::shared_ptr<Player> player){
     if(owned.empty()) return;
     
     auto p = std::find_if(owned.begin(), owned.end(), [input](PropertyTile* n){
-        return n->getCode() = input;
+        return n->getCode() == input;
     });
 
     if(p != owned.end()){
@@ -275,7 +288,7 @@ void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
     if(owned.empty()) return;
     
     auto p = std::find_if(owned.begin(), owned.end(), [input](PropertyTile* n){
-        return n->getCode() = input;
+        return n->getCode() == input;
     });
 
     if(p != owned.end()){
@@ -287,4 +300,96 @@ void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
         }
     }
     throw "you dont have any property";
+}
+
+void PropertyManager::InitializeBoard(FullConfigData&& config){
+    board = std::make_unique<Board>();
+
+    std::vector<std::unique_ptr<Tile>> allTiles;
+    allTiles.reserve(config.streets.size() + config.action_tiles.size());
+
+    for (auto& t : config.streets) {
+        allTiles.push_back(std::move(t));
+    }
+    for (auto& t : config.action_tiles) {
+        allTiles.push_back(std::move(t));
+    }
+
+    std::sort(allTiles.begin(), allTiles.end(), [](const std::unique_ptr<Tile>& a, const std::unique_ptr<Tile>& b) {
+        return a->getIndex() < b->getIndex();
+    });
+
+    for (auto& t : allTiles) {
+        board->addTile(std::move(t));
+    }
+
+    railroad_rent_map = std::move(config.railroad_rent_map);
+    utility_multiplier_map = std::move(config.utility_multiplier_map);
+    RailroadTile::setMult(railroad_rent_map);
+    UtilityTile::setMult(utility_multiplier_map);
+}
+
+void PropertyManager::loadBoardState(std::vector<PropertySaveData> data){
+    if (!board) {
+        return;
+    }
+
+    for (auto& player : GameManager::players) {
+        player->owned_properties.clear();
+    }
+
+    std::unordered_map<std::string, std::shared_ptr<Player>> playersByName;
+    for (const auto& player : GameManager::players) {
+        playersByName[player->getname()] = player;
+    }
+
+    for (const auto& savedProperty : data) {
+        PropertyTile* property = nullptr;
+        for (int i = 0; i < board->getSize(); ++i) {
+            Tile& tile = board->getTile(i);
+            if (tile.getCode() == savedProperty.tile_code) {
+                property = dynamic_cast<PropertyTile*>(&tile);
+                break;
+            }
+        }
+
+        if (!property) {
+            continue;
+        }
+
+        property->setFestivalState(savedProperty.festival_multiplier, savedProperty.festival_duration);
+
+        if (savedProperty.status == "OWNED" || savedProperty.status == "MORTGAGED") {
+            auto ownerIt = playersByName.find(savedProperty.owner_name);
+            if (ownerIt != playersByName.end() && ownerIt->second) {
+                property->setPropertyOwner(ownerIt->second);
+                ownerIt->second->addProperty(property);
+            } else {
+                property->setPropertyOwner(nullptr);
+            }
+        } else {
+            property->setPropertyOwner(nullptr);
+        }
+
+        if (savedProperty.status == "BANK") {
+            property->setPropertyStatus(BANK);
+        } else if (savedProperty.status == "OWNED") {
+            property->setPropertyStatus(OWNED);
+        } else if (savedProperty.status == "MORTGAGED") {
+            property->setPropertyStatus(MORTGAGED);
+        }
+
+        if (auto* street = dynamic_cast<StreetTile*>(property)) {
+            const int desiredLevel = std::max(0, savedProperty.build_level);
+            while (street->getBuildingLevel() < desiredLevel && street->canBuildHouse()) {
+                street->buildHouse();
+            }
+            while (street->getBuildingLevel() < desiredLevel && street->canBuildHotel()) {
+                street->buildHotel();
+            }
+            while (street->getBuildingLevel() > desiredLevel && street->canSellBuilding()) {
+                street->sellBuilding();
+            }
+        }
+    }
 }

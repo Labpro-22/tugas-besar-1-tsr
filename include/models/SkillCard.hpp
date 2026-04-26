@@ -13,6 +13,7 @@ public:
     SkillCard(std::string name);
     void onDraw(Player& p) override;
     virtual void useEffect(Player& p) = 0;
+    virtual void loadFromSave(float value, int remainingDuration);
 
     virtual std::string toSaveFormat() const;
 };
@@ -25,6 +26,7 @@ public:
     MoveSkillCard(std::string name);
     void onDraw(Player& p) override;
     void useEffect(Player& p) override;
+    void loadFromSave(float value, int remainingDuration) override;
     std::string toSaveFormat() const override;
 };
 
@@ -36,6 +38,7 @@ public:
     DiscountSkillCard(std::string name);
     void onDraw(Player& p) override;
     void useEffect(Player& p) override;
+    void loadFromSave(float value, int remainingDuration) override;
     std::string toSaveFormat() const override;
 };
 
