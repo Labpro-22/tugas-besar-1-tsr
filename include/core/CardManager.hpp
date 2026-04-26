@@ -22,7 +22,7 @@ public:
     void giveSkillCardToPlayer(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor);
     
 
-    void discardSkillCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck); 
+    void discardCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck); 
     
     std::string toSaveFormat() const override;
 };
