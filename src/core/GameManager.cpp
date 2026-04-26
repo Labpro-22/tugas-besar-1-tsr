@@ -4,7 +4,11 @@
 
 
 
-
+std::unique_ptr<CardManager> GameManager::card_manager=nullptr;
+std::unique_ptr<PropertyManager> GameManager::property_manager=nullptr;
+std::unique_ptr<EconomyManager> GameManager::economy_manager=nullptr;
+std::unique_ptr<TransactionLog> GameManager::logger=nullptr;
+std::vector<std::shared_ptr<Player>> GameManager::players={};
 
 void GameManager::visitCardTile(CardTile* tile, Player& player) {
     if(tile->getType() == CHANCE){
