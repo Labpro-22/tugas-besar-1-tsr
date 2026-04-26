@@ -17,6 +17,9 @@ public:
     std::string getCode() const;
     std::string getColor() const;
     virtual void onLand(Player& p) = 0;
+    virtual std::string getStatusString() const { return ""; }
+    virtual bool isProperty() const { return false; }
+    virtual bool isStreet() const { return false; }
 };
 
 enum CardType {
@@ -47,6 +50,7 @@ private:
 public:
     TaxTile(int index, std::string name, std::string code, std::string color, TaxType tax_type, float tax_amount);
     float getTaxAmount();
+    TaxType getTaxType();
     void onLand(Player& p) override;
 };
 

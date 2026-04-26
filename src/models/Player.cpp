@@ -5,8 +5,11 @@
 #include "../../include/models/Player.hpp"
 #include "../../include/models/PropertyTile.hpp"
 #include "../../include/models/SkillCard.hpp"
+#include "../../include/models/Tile.hpp"
 #include "../../include/models/Board.hpp"
 #include "../../include/core/PropertyManager.hpp"
+#include "../../include/core/GameManager.hpp"
+
 
 std::random_device Player::rd;
 std::mt19937 Player::gen(Player::rd());
@@ -77,7 +80,12 @@ void Player::useSkillCard(int index){
     this->saved_cards[index]->useEffect(*this);
 }
 std::unique_ptr<SkillCard> Player::removeSkillCard(int index){
-    return std::move(saved_cards[index]);
+    if (index < 0 || index >= static_cast<int>(saved_cards.size())) {
+        return nullptr;
+    }
+    std::unique_ptr<SkillCard> selected = std::move(saved_cards[index]);
+    saved_cards.erase(saved_cards.begin() + index);
+    return selected;
 }
 
 void Player::addEffect(std::unique_ptr<Effect> effect){
@@ -217,4 +225,30 @@ int Player::countOwnedUtility() const {
         [](PropertyTile* prop) {
             return prop->getPropertyType() == PropertyType::UTILITY;
         });
+}
+
+std::string Player::getName() const{
+    return name;
+}
+
+int Player::getBalance() const{
+    return balance;
+}
+const std::vector<Tile*>& Player::getPropertiesByGroup(const std::string& color) const {
+    auto colorTileMap=GameManager::property_manager->getBoard().getcolorTileMap();
+    auto it =colorTileMap.find(color);
+    
+    if (it != colorTileMap.end()) {
+        return it->second;
+    }
+
+    static const std::vector<Tile*> empty_vector;
+    return empty_vector;
+}
+const std::vector<std::unique_ptr<SkillCard>>& Player::getAllskillCard() const {
+    return saved_cards;
+}
+
+void Player::setPosition(int index) {
+    position = index;
 }

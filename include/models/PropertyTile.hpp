@@ -45,6 +45,7 @@ public:
 
     int getFestivalLevel() const { return festival_level; }
     int getFestivalTurnsLeft() const { return festival_turns_left; }
+    bool isProperty() const override { return true; }
 };
 
 class RailroadTile : public PropertyTile {
@@ -55,6 +56,8 @@ public:
     float calculateRent() const override;
     void onLand(Player& p) override;
     PropertyType getPropertyType() const override;
+
+    std::string getStatusString() const override;
 };
 
 class UtilityTile : public PropertyTile {
@@ -65,4 +68,6 @@ public:
     float calculateRent() const override;
     void onLand(Player& p) override;  
     PropertyType getPropertyType() const override;
+
+    std::string getStatusString() const override;
 };

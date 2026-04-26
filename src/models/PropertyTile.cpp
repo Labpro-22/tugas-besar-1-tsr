@@ -75,6 +75,16 @@ PropertyType RailroadTile::getPropertyType() const{
     return type;
 };
 
+std::string RailroadTile::getStatusString() const {
+    std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();
+    
+    if (!current_owner) {
+        return ""; 
+    }
+
+    return current_owner->getname();
+}
+
 // UtilityTile
 UtilityTile::UtilityTile(int index, std::string name, std::string code, std::string color, float buy_price, float mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status) 
     : PropertyTile(index, name, code, color, buy_price, mortgage_price, owner, festival_level, festival_turns_left, property_status) {}
@@ -104,3 +114,13 @@ void UtilityTile::onLand(Player& p) {
 PropertyType UtilityTile::getPropertyType() const{
     return type;
 };
+
+std::string UtilityTile::getStatusString() const {
+    std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();
+    
+    if (!current_owner) {
+        return ""; 
+    }
+
+    return current_owner->getname();
+}

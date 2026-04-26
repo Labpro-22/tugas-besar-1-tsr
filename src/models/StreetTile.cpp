@@ -73,3 +73,28 @@ float StreetTile::getHousePrice() const {
 float StreetTile::getHotelPrice() const {
     return hotel_price;
 }
+
+std::string StreetTile::getStatusString() const {
+    std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();
+
+    if (!current_owner) {
+        return ""; 
+    }
+
+    std::string status = current_owner->getName();
+
+    if (building_level == 4) {
+        status += " *";
+    } else if (building_level > 0 && building_level < 4) {
+        status += " "; 
+        for (int i = 0; i < building_level; i++) {
+            status += "^"; 
+        }
+    }
+
+    return status;
+}
+
+std::vector<float> StreetTile::getRentList() const {
+    return rent_list;
+}
