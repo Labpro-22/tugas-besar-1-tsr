@@ -239,7 +239,7 @@ void GameManager::useAbility(const std::string& args){
     }
 
     player->useSkillCard(index);
-    GameManager::card_manager->discardSkillCard(std::move(player->takeSkillCard(index)));
+    GameManager::card_manager->takeSkillCardFromPlayer(*player,index);
     ViewGame::displaySkillCardActivated(selected_card->getName(), effect_desc);
 }
 
