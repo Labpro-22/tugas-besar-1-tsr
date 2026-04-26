@@ -28,7 +28,10 @@ public:
     // Memberikan Skill Card ke pemain
     void giveSkillCardToPlayer(Player& player);
 
+    // Mengambil Skill Card dari pemain setelah digunakan
+    void takeSkillCardFromPlayer(Player& player, int index);
+
     // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
-    void discardSkillCard(std::unique_ptr<SkillCard> usedCard);
+    void discardCard(std::unique_ptr<ActionCard> usedCard, Deck<std::unique_ptr<ActionCard>>& deck);
     std::string toSaveFormat() const override;
 };

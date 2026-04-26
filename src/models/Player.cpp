@@ -79,15 +79,15 @@ void Player::addSkillCard(std::unique_ptr<SkillCard> card){
 void Player::useSkillCard(int index){
     this->saved_cards[index]->useEffect(*this);
 }
-std::unique_ptr<SkillCard> Player::takeSkillCard(int index) {
+std::unique_ptr<SkillCard> Player::removeSkillCard(int index){
     if (index < 0 || index >= static_cast<int>(saved_cards.size())) {
         return nullptr;
     }
-
     std::unique_ptr<SkillCard> selected = std::move(saved_cards[index]);
     saved_cards.erase(saved_cards.begin() + index);
     return selected;
 }
+
 void Player::addEffect(std::unique_ptr<Effect> effect){
     this->active_effects.push_back(std::move(effect));
 }
@@ -140,7 +140,7 @@ float Player::liquidateAsset(float required){
         balance += sell_value;
         removeProperty(property);
         property->setPropertyStatus(BANK);
-        property->setPropertyOwner(std::shared_ptr<Player>());
+        property->setPropertyOwner(shared_from_this());
     }
 
     return liquidated;
@@ -157,16 +157,16 @@ std::string Player::toSaveFormat() const {
         out<<"INJAIL\n";
         break;
     case PlayerState::BANKCRUPT:
-        out<<"BANKCRUPT\n";
+        out<<"BANKRUPT\n";
         break;
     }
 
     out << saved_cards.size() << "\n";
 
     
-    // for(const std::unique_ptr<SkillCard>& card : saved_cards){
-    //     card->
-    // }
+    for(const std::unique_ptr<SkillCard>& card : saved_cards){
+        out << card->toSaveFormat();
+    }
 
 
     return out.str();

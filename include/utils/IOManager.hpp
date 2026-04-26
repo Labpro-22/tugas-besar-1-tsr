@@ -16,7 +16,7 @@ public:
     IOManager() = default;
     ~IOManager() = default;
 
-    GameSaveData loadGameData(const std::string& filepath);
+    static GameSaveData loadGameData(const std::string& filepath);
     void saveGameData(const GameSaveData& data, const std::string& filepath);
     static FullConfigData loadAllConfigs(const std::string& configDirectoryPath);
     
