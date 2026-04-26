@@ -2,9 +2,9 @@
 #include "../../include/models/Player.hpp"
 #include "../../include/core/GameManager.hpp"
 
-const std::map<int, int> RailroadTile::railroad_multiplier;
+std::map<int, int> RailroadTile::railroad_multiplier{};
 
-const std::map<int, int> UtilityTile::utility_multiplier;
+std::map<int, int> UtilityTile::utility_multiplier{};
 
 // PropertyTile
 PropertyTile::PropertyTile(int index, std::string name, std::string code, std::string color, float buy_price, float mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status)
@@ -19,6 +19,11 @@ void PropertyTile::applyFestival() {
 
 void PropertyTile::decreaseFestival() {
     if (festival_turns_left > 0) festival_turns_left--;
+}
+
+void PropertyTile::setFestivalState(int level, int turns_left) {
+    festival_level = level;
+    festival_turns_left = turns_left;
 }
 
 float PropertyTile::getMortgageValue() const {
@@ -73,7 +78,10 @@ void RailroadTile::onLand(Player& p) {
 }
 PropertyType RailroadTile::getPropertyType() const{
     return type;
-};
+}
+void RailroadTile::setMult(const std::map<int,int>& mult){
+    railroad_multiplier=mult;
+}
 
 std::string RailroadTile::getStatusString() const {
     std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();
@@ -114,6 +122,8 @@ void UtilityTile::onLand(Player& p) {
 PropertyType UtilityTile::getPropertyType() const{
     return type;
 };
+void UtilityTile::setMult(const std::map<int,int>& mult){
+    utility_multiplier=mult;
 
 std::string UtilityTile::getStatusString() const {
     std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();

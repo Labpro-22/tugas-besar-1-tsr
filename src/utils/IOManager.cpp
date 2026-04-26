@@ -32,7 +32,13 @@ GameSaveData IOManager::loadGameData(const std::string& filepath){
                     std::getline(file,line);
                     std::istringstream playerCards(line);
                     CardSaveData card;
-                    if(playerCards >> card.card_type >> card.value >> card.remaining_duration){
+                    if(playerCards >> card.card_type){
+                        if (!(playerCards >> card.value)) {
+                            card.value = 0;
+                        }
+                        if (!(playerCards >> card.remaining_duration)) {
+                            card.remaining_duration = 0;
+                        }
                         player.hand_cards.push_back(card);
                     }
                 }

@@ -17,6 +17,7 @@ public:
     PropertyType getPropertyType() const override;
 
     int getBuildingLevel() const;
+    void setBuildingLevel(int level);
     bool canBuildHouse() const;
     bool canBuildHotel() const;
     

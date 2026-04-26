@@ -1,16 +1,21 @@
 #pragma once
 
 #include <memory>
+#include <map>
 #include <string>
 #include <vector>
 #include "../../include/models/Board.hpp"
 #include "../../include/models/PropertyTile.hpp"
 #include "../../include/models/StreetTile.hpp"
 #include "../../include/models/Player.hpp"
+#include "../utils/ConfigData.hpp"
+#include "../utils/SaveData.hpp"
 
 class PropertyManager {
 private:
     static std::unique_ptr<Board> board;
+    std::map<int, int> railroad_rent_map;
+    std::map<int, int> utility_multiplier_map;
     bool sellAllBuildingsOnColorGroup(std::shared_ptr<Player> player, const std::string& color);
 
 public:
@@ -44,6 +49,8 @@ public:
 
     void doUnmortgage(std::shared_ptr<Player> player);
 
+    void InitializeBoard(FullConfigData&& config);
+    void loadBoardState(std::vector<PropertySaveData> data);
 
 
     std::string toSaveFormat() const;

@@ -10,6 +10,7 @@
 #include "../../include/core/EconomyManager.hpp"
 #include "../../include/models/Player.hpp"
 #include "../../include/core/TransactionLog.hpp"
+#include "../utils/IOManager.hpp"
 
 // State Machine
 enum class GameState {
@@ -40,7 +41,7 @@ private:
     // Map yang menghubungkan command dengan fungsi. Parameter string di dalamnya digunakan untuk menampung argumen tambahan (contoh: "500" dari "BID 500")
     static std::unordered_map<std::string, std::function<void(const std::string&)>> command_map;
 
-    // void setupCommands(); // Fungsi mendaftarkan isi commandMap
+    void setupCommands(); // Fungsi mendaftarkan isi commandMap
 
     // Handler tiap command
     void printBoard(const std::string& args);
@@ -71,7 +72,7 @@ public:
     static std::unique_ptr<PropertyManager> property_manager;
     static std::unique_ptr<EconomyManager> economy_manager;
     static std::unique_ptr<TransactionLog> logger;
-
+    
     // Data pemain dan turn
     static std::vector<std::shared_ptr<Player>> players;
     GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> initialPlayers, 

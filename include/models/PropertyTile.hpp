@@ -32,6 +32,7 @@ public:
     void applyFestival();
     void decreaseFestival();
 ;
+    void setFestivalState(int level, int turns_left);
     float getMortgageValue() const;
     float getBuyPrice() const;
     PropertyStatus getPropertyStatus() const;
@@ -50,24 +51,26 @@ public:
 
 class RailroadTile : public PropertyTile {
 private:
-    static const std::map<int, int> railroad_multiplier;
+    static std::map<int, int> railroad_multiplier;
 public:
     RailroadTile(int index, std::string name, std::string code, std::string color, float buy_price, float mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status);
     float calculateRent() const override;
     void onLand(Player& p) override;
     PropertyType getPropertyType() const override;
+    static void setMult(const std::map<int,int>& mult);
 
     std::string getStatusString() const override;
 };
 
 class UtilityTile : public PropertyTile {
 private:
-    static const std::map<int, int> utility_multiplier;
+    static std::map<int, int> utility_multiplier;
 public:
     UtilityTile(int index, std::string name, std::string code, std::string color, float buy_price, float mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status);
     float calculateRent() const override;
     void onLand(Player& p) override;  
     PropertyType getPropertyType() const override;
+    static void setMult(const std::map<int,int>& mult);
 
     std::string getStatusString() const override;
 };
