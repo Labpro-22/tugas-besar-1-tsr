@@ -10,19 +10,19 @@ void CardManager::initializeDecks(){}
 // Ketika pemain mendarat di petak Kesempatan
 void CardManager::drawKesempatan(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
     std::unique_ptr<Card> card = chance_deck.drawCard();
-    card->onDraw(player,b,all,visitor);
+    card->onDraw(player);
     discardCard(std::move(card),chance_deck);
 }
 // Ketika pemain mendarat di petak Dana Umum
 void CardManager::drawDanaUmum(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
     std::unique_ptr<Card> card = chance_deck.drawCard();
-    card->onDraw(player,b,all,visitor);
+    card->onDraw(player);
     discardCard(std::move(card),chance_deck);
 }
 // Memberikan Skill Card ke pemain
 void CardManager::giveSkillCardToPlayer(Player& player, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor){
     std::unique_ptr<Card> card = chance_deck.drawCard();
-    card->onDraw(player,b,all,visitor);
+    card->onDraw(player);
 }
 
 void CardManager::discardCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck){
