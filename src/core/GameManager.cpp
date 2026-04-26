@@ -351,6 +351,7 @@ std::vector<std::shared_ptr<Player>> GameManager::players={};
 void GameManager::visitCardTile(CardTile* tile, Player& player) {
     if(tile->getType() == CHANCE){
         card_manager->drawKesempatan(player);
+
     }
     else{
         card_manager->drawDanaUmum(player);

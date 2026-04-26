@@ -53,6 +53,9 @@ void Player::transferTo(Player& player, float amount){
             paid_amount= 0;
         }
     }
+    if (!this->canPay(paid_amount)){
+       throw MoneyNotEnough("Uang tidak cukup untuk membayar M",paid_amount);
+    };
     balance -= paid_amount;
     player+=paid_amount;
 

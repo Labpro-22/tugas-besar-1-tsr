@@ -30,3 +30,7 @@ class GameplayException : public GameException {
 public:
     explicit GameplayException(const std::string& msg);
 };
+class MoneyNotEnough : public GameException {
+public:
+    explicit MoneyNotEnough(const std::string& msg, int amount);
+};

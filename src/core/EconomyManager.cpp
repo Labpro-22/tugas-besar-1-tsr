@@ -18,8 +18,11 @@ bool EconomyManager::deductMoney(Player& player, float amount){
     player-=amount;
     return true;
 }
-bool EconomyManager::transferMoney(Player& payer, Player& receiver, float amount){
-    payer.transferTo(receiver,amount);
+bool EconomyManager::transferMoney(std::shared_ptr<Player> payer, std::shared_ptr<Player> receiver, float amount){
+    try{payer->transferTo(*receiver,amount);
+    } catch(MoneyNotEnough e){
+        executeBankruptcy(payer,receiver,amount);
+    }
     return true;
 }
 // Pemrosesan pajak
