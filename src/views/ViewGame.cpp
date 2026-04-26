@@ -86,7 +86,8 @@ std::string ViewGame::getPropertyName() {
     return input;
 }
 
-int ViewGame::getInt(int max_int) {
+float ViewGame::getInt(float max_int) {
+    std::cout << "Pilihan (1\\" << max_int << ")\n"; 
     int value;
     while (true) {
         if (std::cin >> value) {
@@ -241,7 +242,7 @@ void ViewGame::displayBoard() {
     std::cout << "\n";
 }
 
-void ViewGame::displayDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile) {
+void ViewGame::displayDiceRollResult(const std::string& playerName, float dice1, float dice2, const std::string& destTile) {
     int total_dice = dice1 + dice2;
     
     std::cout << "Mengocok dadu...\n";
@@ -250,7 +251,7 @@ void ViewGame::displayDiceRollResult(const std::string& playerName, int dice1, i
     std::cout << "Bidak mendarat di: " << destTile << ".\n";
 }
 
-void ViewGame::displayManualDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile) {
+void ViewGame::displayManualDiceRollResult(const std::string& playerName, float dice1, float dice2, const std::string& destTile) {
     int total_dice = dice1 + dice2;
     
     std::cout << "Dadu diatur secara manual.\n";
@@ -385,7 +386,7 @@ void ViewGame::displayPlayerProperties(const std::string& playerName) {
     std::cout << "====================================\n";
 }
 
-void ViewGame::displayRentPayment(const PropertyTile& property, const Player& victim, const Player& owner, int rent_amount) {
+void ViewGame::displayRentPayment(const PropertyTile& property, const Player& victim, const Player& owner, float rent_amount) {
     int victim_after = victim.getBalance();
     int victim_before = victim_after - rent_amount;
     int owner_after = owner.getBalance();
@@ -411,52 +412,19 @@ void ViewGame::displayMortgagedRent(const PropertyTile& property, const Player& 
     std::cout << "Properti ini sedang digadaikan [M]. Tidak ada sewa yang dikenakan.\n";
 }
 
-void ViewGame::displayRentBankruptcyWarning(int rent_amount, int current_money) {
+void ViewGame::displayRentBankruptcyWarning(float rent_amount, float current_money) {
     std::cout << ANSI_RED << "Kamu tidak mampu membayar sewa penuh! (M" << rent_amount << ")" << ANSI_RESET << "\n";
     std::cout << "Uang kamu saat ini: M" << current_money << "\n";
 }
 
-void ViewGame::displayPphPrompt() {
-    std::cout << "Kamu mendarat di Pajak Penghasilan (PPH)!\n";
-    std::cout << "Pilih opsi pembayaran pajak:\n";
-    std::cout << "1. Bayar flat M150\n";
-    std::cout << "2. Bayar 10\% dari total kekayaan\n";
-    std::cout << "(Pilih sebelum menghitung kekayaan!)\n";
-}
+void ViewGame::displayPPH(TaxTile* tile) {
+    std::cout << "Kamu mendarat di Pajak Penghasilan (PPH)!" << "\n" << "Pilih opsi pembayaran pajak:" << "\n";
+    std::cout << "1. Bayar flat M" << tile->getTaxAmount() << "\n";
+    std::cout << "2. Bayar 10\% dari kekayaan\n";
+}   
 
-void ViewGame::displayPphPercentageResult(const Player& player, int prop_value, int build_value, int tax_amount) {
-    int money_after = player.getBalance();
-    int money_before = money_after + tax_amount;
-    int total_wealth = money_before + prop_value + build_value;
-    
-    std::cout << "\nTotal kekayaan kamu:\n";
-    std::cout << "- Uang tunai          : M" << money_before << "\n";
-    std::cout << "- Harga beli properti : M" << prop_value << " (termasuk yang digadaikan)\n";
-    std::cout << "- Harga beli bangunan : M" << build_value << "\n";
-    std::cout << "Total                 : M" << total_wealth << "\n";
-    std::cout << "Pajak 10%             : M" << tax_amount << "\n";
-    std::cout << "Uang kamu: M" << money_before << " -> M" << money_after << "\n";
-}
-
-void ViewGame::displayTaxSuccess(const std::string& tax_name, const Player& player, int tax_amount) {
-    int money_after = player.getBalance();
-    int money_before = money_after + tax_amount;
-
-    if (tax_name == "PBM") {
-        std::cout << "Kamu mendarat di Pajak Barang Mewah (PBM)!\n";
-        std::cout << "Pajak sebesar M" << tax_amount << " langsung dipotong.\n";
-    }
-    std::cout << "Uang kamu: M" << money_before << " -> M" << money_after << "\n";
-}
-
-void ViewGame::displayTaxBankruptcyWarning(const std::string& tax_name, int tax_amount, int current_money) {
-    if (tax_name == "PBM") {
-        std::cout << "Kamu mendarat di Pajak Barang Mewah (PBM)!\n";
-        std::cout << "Pajak sebesar M" << tax_amount << " langsung dipotong.\n";
-    }
-    std::string flat_text = (tax_name == "PPH") ? " flat M" + std::to_string(tax_amount) : "";
-    std::cout << ANSI_RED << "Kamu tidak mampu membayar pajak" << flat_text << "!" << ANSI_RESET << "\n";
-    std::cout << "Uang kamu saat ini: M" << current_money << "\n";
+void ViewGame::displayPBM(TaxTile* tile) {
+    std::cout << "Kamu mendarat di Pajak Barang Mewah (PBM)!\nPajak sebesar M" << tile->getTaxAmount() << "langsung dipotong\n";
 }
 
 void ViewGame::displayMortgageList(const std::vector<PropertyTile*>& properties) {
@@ -493,11 +461,11 @@ void ViewGame::displayBuildingSellList(const std::string& color_group, const std
     std::cout << "\n";
 }
 
-void ViewGame::displayBuildingSellSuccess(const std::string& prop_name, int sell_gain) {
+void ViewGame::displayBuildingSellSuccess(const std::string& prop_name, float sell_gain) {
     std::cout << "Bangunan " << prop_name << " terjual. Kamu menerima M" << sell_gain << ".\n";
 }
 
-void ViewGame::displayMortgageSuccess(const std::string& prop_name, int gain_amount, int current_balance) {
+void ViewGame::displayMortgageSuccess(const std::string& prop_name, float gain_amount, float current_balance) {
     std::cout << ANSI_GREEN << prop_name << " berhasil digadaikan." << ANSI_RESET << "\n";
     std::cout << "Kamu menerima M" << gain_amount << " dari Bank.\n";
     std::cout << "Uang kamu sekarang: M" << current_balance << "\n";
@@ -508,7 +476,7 @@ void ViewGame::displayNoMortgageableError() {
     std::cout << "Tidak ada properti yang dapat digadaikan saat ini.\n";
 }
 
-void ViewGame::displayUnmortgageList(const std::vector<PropertyTile*>& properties, int currentBalance) {
+void ViewGame::displayUnmortgageList(const std::vector<PropertyTile*>& properties, float currentBalance) {
     if (properties.empty()) {
         displayNoMortgagedProperties();
         return;
@@ -525,13 +493,13 @@ void ViewGame::displayUnmortgageList(const std::vector<PropertyTile*>& propertie
     std::cout << "\nUang kamu saat ini: M" << currentBalance << "\n";
 }
 
-void ViewGame::displayUnmortgageSuccess(const std::string& prop_name, int cost, int current_balance) {
+void ViewGame::displayUnmortgageSuccess(const std::string& prop_name, float cost, float current_balance) {
     std::cout << "\n" << ANSI_GREEN << prop_name << " berhasil ditebus!" << ANSI_RESET << "\n";
     std::cout << "Kamu membayar M" << cost << " ke Bank.\n";
     std::cout << "Uang kamu sekarang: M" << current_balance << "\n";
 }
 
-void ViewGame::displayUnmortgageFailure(const std::string& prop_name, int cost, int current_balance) {
+void ViewGame::displayUnmortgageFailure(const std::string& prop_name, float cost, float current_balance) {
     std::cout << "\n" << ANSI_RED << "Uang kamu tidak cukup untuk menebus " << prop_name << "." << ANSI_RESET << "\n";
     std::cout << "Harga tebus: M" << cost << " | Uang kamu: M" << current_balance << "\n";
 }
@@ -540,18 +508,24 @@ void ViewGame::displayNoMortgagedProperties() {
     std::cout << "\nTidak ada properti yang sedang digadaikan.\n";
 }
 
-void ViewGame::displayBuyPromptStreet(const std::string& prop_name, const std::string& prop_code, const std::string& color, int price, int rent, int current_money) {
+void ViewGame::displayBuyPromptStreet(const std::string& prop_name, const std::string& prop_code, const std::string& color, float price, const std::vector<float>& rent, float current_money) {
     std::cout << "\nKamu mendarat di " << prop_name << " (" << prop_code << ")!\n";
     std::cout << "+================================+\n";
     std::cout << "| [" << color << "] " << prop_name << " (" << prop_code << ")\n";
     std::cout << "| Harga Beli    : M" << price << "\n";
-    std::cout << "| Sewa dasar    : M" << rent << "\n";
-    std::cout << "| ...                            |\n";
+
+    if (!rent.empty()) {
+        std::cout << "| Sewa dasar    : M" << rent[0] << "\n";
+        for (size_t i = 1; i < rent.size(); ++i) {
+            std::cout << "| Sewa " << i << "        : M" << rent[i] << "\n";
+        }
+    }
+    
     std::cout << "+================================+\n";
     std::cout << "Uang kamu saat ini: M" << current_money << "\n";
 }
 
-void ViewGame::displayBuySuccess(const std::string& prop_name, int remaining_money) {
+void ViewGame::displayBuySuccess(const std::string& prop_name, float remaining_money) {
     std::cout << ANSI_GREEN << prop_name << " kini menjadi milikmu!" << ANSI_RESET << "\n";
     std::cout << "Uang tersisa: M" << remaining_money << "\n";
 }
@@ -565,7 +539,7 @@ void ViewGame::displayBuyAutoSuccess(const std::string& type, const std::string&
     std::cout << ANSI_GREEN << "Belum ada yang menginjaknya duluan, " << type << " ini kini menjadi milikmu!" << ANSI_RESET << "\n";
 }
 
-void ViewGame::displayBuildableGroups(const std::map<std::string, std::vector<StreetTile*>>& groups, int current_money) {
+void ViewGame::displayBuildableGroups(const std::map<std::string, std::vector<StreetTile*>>& groups, float current_money) {
     std::cout << "\n=== Color Group yang Memenuhi Syarat ===\n";
     int index = 1;
     for (auto const& pair : groups) {
@@ -607,7 +581,7 @@ void ViewGame::displayBuildableTilesInGroup(const std::string& color_group, cons
     }
 }
 
-void ViewGame::displayBuildSuccess(const std::string& prop_name, int cost, int remaining_money) {
+void ViewGame::displayBuildSuccess(const std::string& prop_name, float cost, float remaining_money) {
     std::cout << "Kamu membangun 1 rumah di " << prop_name << ". Biaya: M" << cost << "\n";
     std::cout << "Uang tersisa: M" << remaining_money << "\n";
 }
@@ -616,7 +590,7 @@ void ViewGame::displayUpgradeHotelPrompt(const std::string& color_group, const s
     std::cout << "\nSeluruh color group [" << color_group << "] sudah memiliki 4 rumah. Siap di-upgrade ke hotel!\n";
 }
 
-void ViewGame::displayUpgradeHotelSuccess(const std::string& prop_name, int cost, int remaining_money) {
+void ViewGame::displayUpgradeHotelSuccess(const std::string& prop_name, float cost, float remaining_money) {
     std::cout << ANSI_GREEN << prop_name << " di-upgrade ke Hotel!" << ANSI_RESET << "\n";
     std::cout << "Uang tersisa: M" << remaining_money << "\n";
 }
@@ -635,14 +609,14 @@ void ViewGame::displayAuctionStart(const std::string& prop_name, const std::stri
     std::cout << "Urutan lelang dimulai dari pemain setelah " << next_player_name << ".\n";
 }
 
-void ViewGame::displayAuctionTurn(const std::string& player_name, int highest_bid, const std::string& highest_bidder) {
+void ViewGame::displayAuctionTurn(const std::string& player_name, float highest_bid, const std::string& highest_bidder) {
     std::cout << "\nGiliran: " << player_name << "\n";
     if (highest_bid > 0) {
         std::cout << "Penawaran tertinggi: M" << highest_bid << " (" << highest_bidder << ")\n";
     }
 }
 
-void ViewGame::displayAuctionEnd(const std::string& prop_name, const std::string& winner_name, int final_price) {
+void ViewGame::displayAuctionEnd(const std::string& prop_name, const std::string& winner_name, float final_price) {
     std::cout << "\nLelang selesai!\n";
     std::cout << "Pemenang: " << winner_name << "\n";
     std::cout << "Harga akhir: M" << final_price << "\n\n";
@@ -657,21 +631,21 @@ void ViewGame::displayFestivalStart(const std::vector<PropertyTile*>& owned_prop
     }
 }
 
-void ViewGame::displayFestivalEffect(int old_rent, int new_rent, int duration) {
+void ViewGame::displayFestivalEffect(float old_rent, float new_rent, float duration) {
     std::cout << "\nEfek festival aktif!\n\n";
     std::cout << "Sewa awal: M" << old_rent << "\n";
     std::cout << "Sewa sekarang: M" << new_rent << "\n";
     std::cout << "Durasi: " << duration << " giliran\n";
 }
 
-void ViewGame::displayFestivalEnhanced(int old_rent, int new_rent, int duration) {
+void ViewGame::displayFestivalEnhanced(float old_rent, float new_rent, float duration) {
     std::cout << "\nEfek diperkuat!\n\n";
     std::cout << "Sewa sebelumnya: M" << old_rent << "\n";
     std::cout << "Sewa sekarang: M" << new_rent << "\n";
     std::cout << "Durasi di-reset menjadi: " << duration << " giliran\n";
 }
 
-void ViewGame::displayFestivalMaxed(int duration) {
+void ViewGame::displayFestivalMaxed(float duration) {
     std::cout << "\nEfek sudah maksimum (harga sewa sudah digandakan tiga kali)\n\n";
     std::cout << "Durasi di-reset menjadi: " << duration << " giliran\n";
 }
@@ -684,7 +658,7 @@ void ViewGame::displayFestivalErrorNotOwned() {
     std::cout << ANSI_RED << "-> Properti bukan milikmu!" << ANSI_RESET << "\n";
 }
 
-void ViewGame::displayLiquidationWarning(int current_money, int total_debt, int deficit, int max_potential, const std::string& creditor_name) {
+void ViewGame::displayLiquidationWarning(float current_money, float total_debt, float deficit, float max_potential, const std::string& creditor_name) {
     std::cout << "\nKamu tidak dapat membayar kewajiban M" << total_debt << " kepada " << creditor_name << "!\n\n";
     std::cout << "Uang kamu       : M" << current_money << "\n";
     std::cout << "Total kewajiban : M" << total_debt << "\n";
@@ -692,7 +666,7 @@ void ViewGame::displayLiquidationWarning(int current_money, int total_debt, int 
     std::cout << "Estimasi dana maksimum dari likuidasi: M" << max_potential << "\n";
 }
 
-void ViewGame::displayLiquidationPanel(int current_money, int debt, const std::vector<StreetTile*>& sellable_buildings, const std::vector<PropertyTile*>& mortgageables) {
+void ViewGame::displayLiquidationPanel(float current_money, float debt, const std::vector<StreetTile*>& sellable_buildings, const std::vector<PropertyTile*>& mortgageables) {
     std::cout << "\n=== Panel Likuidasi ===\n";
     std::cout << "Uang kamu saat ini: M" << current_money << "  |  Kewajiban: M" << debt << "\n\n";
     
@@ -720,18 +694,18 @@ void ViewGame::displayLiquidationPanel(int current_money, int debt, const std::v
     }
 }
 
-void ViewGame::displayLiquidationSellSuccess(const std::string& prop_name, int gain, int current_money) {
+void ViewGame::displayLiquidationSellSuccess(const std::string& prop_name, float gain, float current_money) {
     std::cout << prop_name << " dilikuidasi. Kamu menerima M" << gain << ".\n";
     std::cout << "Uang kamu sekarang: M" << current_money << "\n";
 }
 
-void ViewGame::displayLiquidationDebtCleared(int debt, const std::string& creditor_name, int remaining_money, int creditor_before, int creditor_after) {
+void ViewGame::displayLiquidationDebtCleared(float debt, const std::string& creditor_name, float remaining_money, float creditor_before, float creditor_after) {
     std::cout << "\n" << ANSI_GREEN << "Kewajiban M" << debt << " terpenuhi. Membayar ke " << creditor_name << "..." << ANSI_RESET << "\n";
     std::cout << "Uang kamu : M" << remaining_money + debt << " -> M" << remaining_money << "\n";
     std::cout << "Uang " << creditor_name << ": M" << creditor_before << " -> M" << creditor_after << "\n";
 }
 
-void ViewGame::displayBankruptcyToPlayer(const std::string& bankrupt_player, const std::string& creditor, int remaining_money, int total_assets, int debt) {
+void ViewGame::displayBankruptcyToPlayer(const std::string& bankrupt_player, const std::string& creditor, float remaining_money, float total_assets, float debt) {
     std::cout << "\nTotal aset + uang tunai : M" << total_assets << "\n";
     std::cout << "Tidak cukup untuk menutup kewajiban M" << debt << ".\n\n";
     std::cout << ANSI_RED << bankrupt_player << " dinyatakan BANGKRUT!" << ANSI_RESET << "\n";
@@ -745,7 +719,7 @@ void ViewGame::displayBankruptcyToPlayer(const std::string& bankrupt_player, con
     std::cout << bankrupt_player << " telah keluar dari permainan.\n";
 }
 
-void ViewGame::displayBankruptcyToBank(const std::string& bankrupt_player, int remaining_money, int total_assets, int debt) {
+void ViewGame::displayBankruptcyToBank(const std::string& bankrupt_player, float remaining_money, float total_assets, float debt) {
     std::cout << "\nTotal aset + uang tunai : M" << total_assets << "\n";
     std::cout << "Tidak cukup untuk menutup kewajiban M" << debt << ".\n\n";
     std::cout << ANSI_RED << bankrupt_player << " dinyatakan BANGKRUT!" << ANSI_RESET << "\n";
@@ -784,7 +758,7 @@ void ViewGame::displayLoadErrorCorrupted() {
     std::cout << ANSI_RED << "Gagal memuat file! File rusak atau format tidak dikenali." << ANSI_RESET << "\n";
 }
 
-void ViewGame::displayLogHeader(int count) {
+void ViewGame::displayLogHeader(float count) {
     if (count == 0) {
         std::cout << "\n=== Log Transaksi Penuh ===\n\n";
     } else {
@@ -834,7 +808,7 @@ void ViewGame::displayCardDraw(const std::string& petak_type, const std::string&
     std::cout << "Kartu: \"" << card_text << "\"\n";
 }
 
-void ViewGame::displayCardEffectMoney(int amount, int remaining_money, bool is_paying) {
+void ViewGame::displayCardEffectMoney(float amount, float remaining_money, bool is_paying) {
     if (is_paying) {
         std::cout << "Kamu membayar M" << amount << " ke Bank. Sisa Uang = M" << remaining_money << ".\n";
     } else {
@@ -846,7 +820,7 @@ void ViewGame::displayCardEffectMove(const std::string& target_petak) {
     std::cout << "Bidak dipindahkan ke " << target_petak << ".\n";
 }
 
-void ViewGame::displayCardBankruptcyWarning(int amount, int current_money) {
+void ViewGame::displayCardBankruptcyWarning(float amount, float current_money) {
     std::cout << ANSI_RED << "Kamu tidak mampu membayar denda/biaya kartu! (M" << amount << ")" << ANSI_RESET << "\n";
     std::cout << "Uang kamu saat ini: M" << current_money << "\n";
 }
@@ -881,7 +855,7 @@ void ViewGame::displaySkillCardActivated(const std::string& card_name, const std
     std::cout << ANSI_CYAN << "\n" << card_name << " diaktifkan!" << ANSI_RESET << " " << effect_desc << "\n";
 }
 
-void ViewGame::displaySkillCardShieldActive(int canceled_amount, int current_money) {
+void ViewGame::displaySkillCardShieldActive(float canceled_amount, float current_money) {
     std::cout << ANSI_CYAN << "[SHIELD ACTIVE]: Efek ShieldCard melindungi Anda!" << ANSI_RESET << "\n";
     std::cout << "Tagihan M" << canceled_amount << " dibatalkan. Uang Anda tetap: M" << current_money << ".\n";
 }

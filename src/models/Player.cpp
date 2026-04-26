@@ -243,3 +243,7 @@ const std::vector<Tile*>& Player::getPropertiesByGroup(const std::string& color)
 const std::vector<std::unique_ptr<SkillCard>>& Player::getAllskillCard() const {
     return saved_cards;
 }
+
+void Player::setPosition(int index) {
+    position = index;
+}

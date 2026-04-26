@@ -22,88 +22,86 @@ public:
 
     static std::string getPropertyName();
 
-    static int getInt(int max_int);
+    static float getInt(float max_int);
 
     static bool getYesNo();
-
-    static void displayMessage(const std::string& message);
 
     static std::string getUserInput();
 
     // ------ OUTPUT --------
 
+    static void displayMessage(const std::string& message);
+
     // CETAK_PAPAN
     static void displayBoard();
     
     // DADU
-    static void displayDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile);
-    static void displayManualDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile);
+    static void displayDiceRollResult(const std::string& player_name, float dice1, float dice2, const std::string& dest_tile);
+    static void displayManualDiceRollResult(const std::string& player_name, float dice1, float dice2, const std::string& dest_tile);
 
     // CETAK_AKTA
-    static void displayPropertyDeed(const std::string& propertyCode);
+    static void displayPropertyDeed(const std::string& property_code);
 
     // CETAK_PROPERTI
-    static void displayPlayerProperties(const std::string& playerName);
+    static void displayPlayerProperties(const std::string& player_name);
 
     // Buy
-    static void displayBuyPromptStreet(const std::string& prop_name, const std::string& prop_code, const std::string& color, int price, int rent, int current_money);
-    static void displayBuySuccess(const std::string& prop_name, int remaining_money);
+    static void displayBuyPromptStreet(const std::string& prop_name, const std::string& prop_code, const std::string& color, float price, const std::vector<float>& rent, float current_money);
+    static void displayBuySuccess(const std::string& prop_name, float remaining_money);
     static void displayBuyAuctionWarning();
     static void displayBuyAutoSuccess(const std::string& type, const std::string& prop_name);
 
     // Rent
-    static void displayRentPayment(const PropertyTile& property, const Player& victim, const Player& owner, int rentAmount);
+    static void displayRentPayment(const PropertyTile& property, const Player& victim, const Player& owner, float rent_amount);
     static void displayMortgagedRent(const PropertyTile& property, const Player& owner);
-    static void displayRentBankruptcyWarning(int rentAmount, int currentMoney);
+    static void displayRentBankruptcyWarning(float rent_amount, float current_money);
 
     // Tax
-    static void displayPphPrompt();
-    static void displayPphPercentageResult(const Player& player, int propValue, int buildValue, int taxAmount);
-    static void displayTaxSuccess(const std::string& taxName, const Player& player, int taxAmount);
-    static void displayTaxBankruptcyWarning(const std::string& taxName, int taxAmount, int currentMoney);
+    static void displayPPH(TaxTile* tile);
+    static void displayPBM(TaxTile* tile);
 
     // Mortgage
     static void displayMortgageList(const std::vector<PropertyTile*>& properties);
     static void displayBuildingSellList(const std::string& color_group, const std::vector<StreetTile*>& streets);
-    static void displayBuildingSellSuccess(const std::string& prop_name, int sell_gain);
-    static void displayMortgageSuccess(const std::string& prop_name, int gain_amount, int current_balance);
+    static void displayBuildingSellSuccess(const std::string& prop_name, float sell_gain);
+    static void displayMortgageSuccess(const std::string& prop_name, float gain_amount, float current_balance);
     static void displayNoMortgageableError();
 
     // Unmortgage
-    static void displayUnmortgageList(const std::vector<PropertyTile*>& properties, int currentBalance);
-    static void displayUnmortgageSuccess(const std::string& propName, int cost, int currentBalance);
-    static void displayUnmortgageFailure(const std::string& propName, int cost, int currentBalance);
+    static void displayUnmortgageList(const std::vector<PropertyTile*>& properties, float current_balance);
+    static void displayUnmortgageSuccess(const std::string& prop_name, float cost, float current_balance);
+    static void displayUnmortgageFailure(const std::string& prop_name, float cost, float current_balance);
     static void displayNoMortgagedProperties();
 
     // Build
-    static void displayBuildableGroups(const std::map<std::string, std::vector<StreetTile*>>& groups, int current_money);
+    static void displayBuildableGroups(const std::map<std::string, std::vector<StreetTile*>>& groups, float current_money);
     static void displayBuildableTilesInGroup(const std::string& color_group, const std::vector<StreetTile*>& group_streets, const std::vector<StreetTile*>& eligible_streets);
-    static void displayBuildSuccess(const std::string& prop_name, int cost, int remaining_money);
+    static void displayBuildSuccess(const std::string& prop_name, float cost, float remaining_money);
     static void displayUpgradeHotelPrompt(const std::string& color_group, const std::vector<StreetTile*>& group_streets);
-    static void displayUpgradeHotelSuccess(const std::string& prop_name, int cost, int remaining_money);
+    static void displayUpgradeHotelSuccess(const std::string& prop_name, float cost, float remaining_money);
     static void displayHotelMaxError(const std::string& prop_name);
     static void displayNoBuildableError();
 
     // Auction
     static void displayAuctionStart(const std::string& prop_name, const std::string& next_player_name);
-    static void displayAuctionTurn(const std::string& player_name, int highest_bid, const std::string& highest_bidder);
-    static void displayAuctionEnd(const std::string& prop_name, const std::string& winner_name, int final_price);
+    static void displayAuctionTurn(const std::string& player_name, float highest_bid, const std::string& highest_bidder);
+    static void displayAuctionEnd(const std::string& prop_name, const std::string& winner_name, float final_price);
 
     // Festival
     static void displayFestivalStart(const std::vector<PropertyTile*>& owned_props);
-    static void displayFestivalEffect(int old_rent, int new_rent, int duration);
-    static void displayFestivalEnhanced(int old_rent, int new_rent, int duration);
-    static void displayFestivalMaxed(int duration);
+    static void displayFestivalEffect(float old_rent, float new_rent, float duration);
+    static void displayFestivalEnhanced(float old_rent, float new_rent, float duration);
+    static void displayFestivalMaxed(float duration);
     static void displayFestivalErrorInvalidCode();
     static void displayFestivalErrorNotOwned();
 
     // Liquidation and Bankruptcy
-    static void displayLiquidationWarning(int current_money, int total_debt, int deficit, int max_potential, const std::string& creditor_name);
-    static void displayLiquidationPanel(int current_money, int debt, const std::vector<StreetTile*>& sellable_buildings, const std::vector<PropertyTile*>& mortgageables);
-    static void displayLiquidationSellSuccess(const std::string& prop_name, int gain, int current_money);
-    static void displayLiquidationDebtCleared(int debt, const std::string& creditor_name, int remaining_money, int creditor_before, int creditor_after);
-    static void displayBankruptcyToPlayer(const std::string& bankrupt_player, const std::string& creditor, int remaining_money, int total_assets, int debt);
-    static void displayBankruptcyToBank(const std::string& bankrupt_player, int remaining_money, int total_assets, int debt);
+    static void displayLiquidationWarning(float current_money, float total_debt, float deficit, float max_potential, const std::string& creditor_name);
+    static void displayLiquidationPanel(float current_money, float debt, const std::vector<StreetTile*>& sellable_buildings, const std::vector<PropertyTile*>& mortgageables);
+    static void displayLiquidationSellSuccess(const std::string& prop_name, float gain, float current_money);
+    static void displayLiquidationDebtCleared(float debt, const std::string& creditor_name, float remaining_money, float creditor_before, float creditor_after);
+    static void displayBankruptcyToPlayer(const std::string& bankrupt_player, const std::string& creditor, float remaining_money, float total_assets, float debt);
+    static void displayBankruptcyToBank(const std::string& bankrupt_player, float remaining_money, float total_assets, float debt);
 
     // Save and Load
     static void displaySaveSuccess(const std::string& filename);
@@ -114,7 +112,7 @@ public:
     static void displayLoadErrorCorrupted();
 
     // Log
-    static void displayLogHeader(int count = 0);
+    static void displayLogHeader(float count = 0.0f);
     static void displayLogEntry(const std::vector<LogEntry>& logs);
 
     // Win
@@ -123,14 +121,14 @@ public:
 
     // Chance and Community Chest
     static void displayCardDraw(const std::string& petak_type, const std::string& card_text);
-    static void displayCardEffectMoney(int amount, int remaining_money, bool is_paying);
+    static void displayCardEffectMoney(float amount, float remaining_money, bool is_paying);
     static void displayCardEffectMove(const std::string& target_petak);
-    static void displayCardBankruptcyWarning(int amount, int current_money);
+    static void displayCardBankruptcyWarning(float amount, float current_money);
 
     // Skill Card
     static void displaySkillCardList(const std::vector<std::unique_ptr<SkillCard>>& cards);
     static void displaySkillCardActivated(const std::string& card_name, const std::string& effect_desc);
-    static void displaySkillCardShieldActive(int canceled_amount, int current_money);
+    static void displaySkillCardShieldActive(float canceled_amount, float current_money);
     static void displaySkillCardErrorAlreadyUsed();
     static void displaySkillCardErrorAfterDice();
 

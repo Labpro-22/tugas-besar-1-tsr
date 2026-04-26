@@ -64,6 +64,7 @@ void GameManager::startGame(){
         }
         current_player->endTurn();
         current_player_index = (current_player_index + 1) % players.size();
+
         if (current_player_index == 0) {
             current_turn_count++;
         }
@@ -261,43 +262,75 @@ void GameManager::visitCardTile(CardTile* tile, Player& player) {
 }
 
 void GameManager::visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) {
-    bool trying = economy_manager->processTax(player, tile->getTaxType(), tile->getTaxAmount());;
+    int amount = 0;
+
+    if (tile->getTaxType() == TaxType::PPH) {
+        ViewGame::displayPPH(tile);
+        int choice = ViewGame::getInt(2);
+        if (choice == 1) {
+            amount = tile->getTaxAmount();
+        } else {
+            amount = player->getTotalAssetValue()*0.1;
+        }
+
+    } else if (tile->getTaxType() == TaxType::PPH) {
+        ViewGame::displayPBM(tile);
+    }
+
+    bool trying = economy_manager->processTax(player, tile->getTaxType(), amount);
+    if (trying) {
+        std::cout << "Kamu berhasil membayar\n";
+    }
 }
 
-// void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
-//     ViewGame v;
-//     std::string input = v.getInput();
-
-//     //Someone help with handling inputs please like parsing it
-    
-//     //Zek make a player set festival so i could call it
-
-// }
+void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
+    ViewGame::
+}
 
 void GameManager::visitGoTile(GoTile* tile, Player& player) {
+    ViewGame::displayMessage("Kamu mengunjungi Petak Go\n");
     economy_manager->addMoney(player, tile->getReward());
 }
 
 void GameManager::visitGoToJailTile(GoToJailTile* tile, Player& player) {
+    ViewGame::displayMessage("Kamu mengunjungi Petak Masuk ke Penjara, kamu DIPENJARA!\n");
     player.setInJail();
+    Board& board = property_manager->getBoard();
+    
+    int pen_index = 0;
+
+    for (size_t i = 0; i < board.getSize(); ++i) {
+        Tile& tile = board.getTile(i);
+        if (tile.getCode() == "PEN") {
+            pen_index = i;
+            break; 
+        }
+    }
+
+    player.setPosition(pen_index);
 }
 
 void GameManager::visitFreeParkingTile(FreeParkingTile* tile, Player& player) {
-    //do nothing
+    ViewGame::displayMessage("Kamu mengunjungi Petak FreeParking\n");
 }
 
 void GameManager::visitJailTile(JailTile* tile, Player& player) {
-    //do nothing
+    ViewGame::displayMessage("Kamu mengunjungi petak Penjara\n");
 }
 
 void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
     PropertyStatus status = tile->getPropertyStatus();
     if (status == PropertyStatus::BANK) {
-        int nak;
-        std::cin>>nak;
-        if (player.canPay(tile->getBuyPrice())&&nak==1) {
+        ViewGame::displayBuyPromptStreet(tile->getName(), tile->getCode(), tile->getColor(), tile->getBuyPrice(), tile->getRentList(), player.getBalance());
+        ViewGame::displayMessage("Apakah kamu ingin membeli properti ini seharga M400? (y/n):");
+        bool nak = ViewGame::getYesNo();
+        if (player.canPay(tile->getBuyPrice()) && nak) {
+            /*Jakarta kini menjadi milikmu!
+            Uang tersisa: M1.100*/
+            std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M1." << player.getBalance() << "\n"; 
             player.buyProperty(*tile);
         } else{
+            ViewGame::displayMessage("Properti ini akan masuk ke sistem lelang...");
             economy_manager->startAuction(tile);
         }
     } else if (status == PropertyStatus::OWNED) {
@@ -306,19 +339,16 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
             float rent = tile->calculateRent();
             bool success = economy_manager->transferMoney(player, *current_owner, rent);
         }
+    } else if (status == PropertyStatus::MORTGAGED) {
+        ViewGame::displayMortgagedRent(*tile, player);
     }
-    // Jika MORTGAGED, tidak ada aksi
 }
 
 void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
     PropertyStatus status = tile->getPropertyStatus();
     if (status == PropertyStatus::BANK) {
-        int nak;
-        if (player.canPay(tile->getBuyPrice())&&nak==1) {
-            player.buyProperty(*tile);
-        } else{
-            economy_manager->startAuction(tile);
-        }
+        ViewGame::displayBuyAutoSuccess("Stasiun", tile->getName());
+        player.addProperty(tile);
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
@@ -333,13 +363,8 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
 void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
     PropertyStatus status = tile->getPropertyStatus();
     if (status == PropertyStatus::BANK) {
-        int nak;
-        std::cin>>nak;
-        if (player.canPay(tile->getBuyPrice())&&nak==1) {
-            player.buyProperty(*tile);
-        } else{
-            economy_manager->startAuction(tile);
-        }
+        ViewGame::displayBuyAutoSuccess("Stasiun", tile->getName());
+        player.addProperty(tile);
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){

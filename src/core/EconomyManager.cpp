@@ -39,6 +39,7 @@ bool EconomyManager::processTax(std::shared_ptr<Player> player, TaxType type, fl
         logger->recordEvent(LogEntry(0,player->getname(),actions::PAJAK,"bayar pajak sebanyak "));
         return true;
     } else{
+        std::cout << "Kamu gagal membayar pajak!\n";
         executeBankruptcy(player,nullptr,tax);
         return false;
     }

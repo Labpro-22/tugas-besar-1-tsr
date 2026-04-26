@@ -70,4 +70,6 @@ const std::vector<std::unique_ptr<SkillCard>>& getAllskillCard() const;
     std::string getName() const;
 
     int getBalance() const;
+
+    void setPosition(int index);
 };
