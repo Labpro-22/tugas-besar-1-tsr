@@ -252,3 +252,7 @@ const std::vector<std::unique_ptr<SkillCard>>& Player::getAllskillCard() const {
 void Player::setPosition(int index) {
     position = index;
 }
+
+PlayerState Player::getPlayerState() const {
+    return player_state;
+}

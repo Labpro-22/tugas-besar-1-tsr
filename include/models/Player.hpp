@@ -72,4 +72,6 @@ public:
     int getBalance() const;
 
     void setPosition(int index);
+
+    PlayerState getPlayerState() const;
 };

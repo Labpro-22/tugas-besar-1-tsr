@@ -24,11 +24,12 @@ bool EconomyManager::transferMoney(Player& payer, Player& receiver, float amount
 }
 // Pemrosesan pajak
 bool EconomyManager::processTax(std::shared_ptr<Player> player, TaxType type, float baseTaxAmount){
+
     auto &logger=GameManager::logger;
     float tax;
     if (type==TaxType::PPH){
-        int pilihan;
-        std::cin>>pilihan;
+        int pilihan = 2;
+        ViewGame::getInt(pilihan);
         if( pilihan==1){
             tax=baseTaxAmount;
         }

@@ -38,38 +38,108 @@ GameManager::GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> init
         command_map["CETAK_LOG"] = [this](const std::string& args) { this->printLog(args); };
         command_map["GUNAKAN_KEMAMPUAN"] = [this](const std::string& args) { this->useAbility(args); };
 }
-void GameManager::startGame(){
+
+void GameManager::startGame() {
     while (current_turn_count <= max_turns) {
+        int alive_count = 0;
+        for (const auto& p : players) {
+            if (p->getPlayerState() != PlayerState::BANKCRUPT) alive_count++;
+        }
+        if (alive_count <= 1) {
+            std::vector<Player*> raw_players;
+            for (const auto& p : players) raw_players.push_back(p.get());
+            ViewGame::displayWinBankruptcy(raw_players);
+            return;
+        }
+
+        if (current_turn_count > max_turns) {
+            std::vector<Player*> raw_players;
+            for (const auto& p : players) raw_players.push_back(p.get());
+            ViewGame::displayWinMaxTurn(raw_players);
+            return;
+        }
+
         auto current_player = players[current_player_index];
+
+        if (current_player->getPlayerState() == PlayerState::BANKCRUPT) {
+            current_player_index = (current_player_index + 1) % players.size();
+            if (current_player_index == 0) current_turn_count++;
+            continue;
+        }
+
+        int roll_count = 0;
         bool turn_finished = false;
+
         while (!turn_finished) {
-            std::string raw_command = ViewGame::getUserCommand();
-            std::stringstream ss(raw_command);
-            std::string command;
-            ss >> command;
-            std::string args;
-            std::getline(ss, args);
-            if (!args.empty() && args[0] == ' ') {
-                args.erase(0, 1);
+            if (current_player->getPlayerState() == PlayerState::INJAIL) {
+                ViewGame::displayMessage("Kamu di penjara. Lempar dadu dan dapatkan double untuk keluar.");
             }
-            auto it = command_map.find(command);
-            if (it == command_map.end()) {
-                ViewGame::displayMessage("Command tidak dikenal.");
-                continue;
+
+            while (true) {
+                std::string raw_command = ViewGame::getUserCommand();
+                std::stringstream ss(raw_command);
+                std::string command;
+                ss >> command;
+                std::string args;
+                std::getline(ss, args);
+                if (!args.empty() && args[0] == ' ') args.erase(0, 1);
+
+                if (current_player->getPlayerState() == PlayerState::INJAIL) {
+                    if (command != "LEMPAR_DADU" && command != "ATUR_DADU") {
+                        ViewGame::displayMessage("Kamu di penjara. Hanya bisa melempar dadu.");
+                        continue;
+                    }
+                }
+
+                auto it = command_map.find(command);
+                if (it == command_map.end()) {
+                    ViewGame::displayMessage("Command tidak dikenal.");
+                    continue;
+                }
+
+                it->second(args);
+
+                if (command == "LEMPAR_DADU" || command == "ATUR_DADU") {
+                    roll_count++;
+                    break;
+                }
             }
-            it->second(args);
-            if (command == "LEMPAR_DADU" || command == "ATUR_DADU") {
+
+            if (current_player->getPlayerState() == PlayerState::INJAIL) {
+                if (die1 == die2) {
+                    current_player->setFree();
+                    current_player->movePlayer(die1 + die2);
+                    ViewGame::displayMessage("Double! Kamu bebas dari penjara.");
+                } else {
+                    ViewGame::displayMessage("Bukan double. Kamu tetap di penjara.");
+                }
                 turn_finished = true;
+            } else {
+                if (die1 == die2) {
+                    if (roll_count >= 3) {
+                        ViewGame::displayMessage("3 kali double berturut-turut! Kamu masuk penjara.");
+                        getPlayerInJail(*current_player);
+                        turn_finished = true;
+                    } else {
+                        ViewGame::displayMessage("Double! Kamu boleh lempar dadu lagi. (" +
+                            std::to_string(roll_count) + "/3)");
+                    }
+                } else {
+                    turn_finished = true;
+                }
             }
         }
+
         current_player->endTurn();
         current_player_index = (current_player_index + 1) % players.size();
-
-        if (current_player_index == 0) {
-            current_turn_count++;
-        }
+        if (current_player_index == 0) current_turn_count++;
     }
+
+    std::vector<Player*> raw_players;
+    for (const auto& p : players) raw_players.push_back(p.get());
+    ViewGame::displayWinMaxTurn(raw_players);
 }
+
 void GameManager::printBoard(const std::string& args){
     ViewGame::displayBoard();
 }
@@ -96,6 +166,8 @@ void GameManager::setDice(const std::string& args){ //belum
         ViewGame::displayMessage("Nilai dadu harus di antara 1 sampai 6.");
         return;
     }
+    die1 = dice1;
+    die2 = dice2;
     auto player = players[current_player_index];
     player->movePlayer(dice1 + dice2);
     ViewGame::displayManualDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
@@ -108,6 +180,8 @@ void GameManager::rollDice(const std::string& args){
     std::uniform_int_distribution<> distr(1, 6);
     int dice1=distr(gen);
     int dice2=distr(gen);
+    die1=dice1;
+    die2=dice2;
     auto player=players[current_player_index];
     player->movePlayer(dice1+dice2);;
     ViewGame::displayDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
@@ -244,9 +318,19 @@ void GameManager::useAbility(const std::string& args){
     ViewGame::displaySkillCardActivated(selected_card->getName(), effect_desc);
 }
 
-
-
-
+void GameManager::getPlayerInJail(Player& player) {
+    Board& board = property_manager->getBoard();
+    int pen_index = 0;
+    for (size_t i = 0; i < board.getSize(); ++i) {
+        Tile& tile = board.getTile(i);
+        if (tile.getCode() == "PEN") {
+            pen_index = i;
+            break; 
+        }
+    }
+    player.setInJail();
+    player.setPosition(pen_index);
+}
 
 
  
@@ -271,23 +355,14 @@ void GameManager::visitCardTile(CardTile* tile, Player& player) {
     }
 }
 
-void GameManager::visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) {
-    int amount = 0;
-
+void GameManager::visitTaxTile(TaxTile* tile, Player& player) {
     if (tile->getTaxType() == TaxType::PPH) {
         ViewGame::displayPPH(tile);
-        int choice = ViewGame::getInt(2);
-        if (choice == 1) {
-            amount = tile->getTaxAmount();
-        } else {
-            amount = player->getTotalAssetValue()*0.1;
-        }
-
-    } else if (tile->getTaxType() == TaxType::PPH) {
+    } else {
         ViewGame::displayPBM(tile);
     }
 
-    bool trying = economy_manager->processTax(player, tile->getTaxType(), amount);
+    bool trying = economy_manager->processTax(player.shared_from_this(), tile->getTaxType(), tile->getTaxAmount());
     if (trying) {
         std::cout << "Kamu berhasil membayar\n";
     }

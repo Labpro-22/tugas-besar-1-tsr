@@ -29,6 +29,8 @@ private:
     int current_turn_count;   
     int max_turns;
 
+    int die1, die2;
+
     // Status permainan
     GameState current_state;
 
@@ -59,6 +61,8 @@ private:
     void nextPlayer();
     void checkGameOver();
 
+    void getPlayerInJail(Player& player);
+
 public:
     static std::unique_ptr<CardManager> card_manager;
     static std::unique_ptr<PropertyManager> property_manager;
@@ -83,7 +87,7 @@ public:
     // Implementasi visitor tile
 
     static void visitCardTile(CardTile* tile, Player& player) ;
-    static void visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) ;
+    static void visitTaxTile(TaxTile* tile, Player& player) ;
     static void visitFestivalTile(FestivalTile* tile, Player& player) ;
     static void visitGoTile(GoTile* tile, Player& player) ;
     static void visitGoToJailTile(GoToJailTile* tile, Player& player) ;

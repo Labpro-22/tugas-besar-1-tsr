@@ -20,6 +20,7 @@ public:
     virtual std::string getStatusString() const { return ""; }
     virtual bool isProperty() const { return false; }
     virtual bool isStreet() const { return false; }
+    virtual bool isJail() const {return false;}
 };
 
 enum CardType {
@@ -88,5 +89,7 @@ private:
 
 public:
     JailTile(int index, std::string name, std::string code, std::string color, int jail_fine);
+    int getFine() const;
     void onLand(Player& p) override;
+    bool isJail() const override { return true; }
 };

@@ -116,8 +116,8 @@ public:
     static void displayLogEntry(const std::vector<LogEntry>& logs);
 
     // Win
-    static void displayWinMaxTurn(const std::vector<Player*>& players, const std::vector<std::string>& winners);
-    static void displayWinBankruptcy(const std::string& winner, const std::vector<std::string>& remaining_players);
+    static void displayWinMaxTurn(const std::vector<Player*>& players);
+    static void displayWinBankruptcy(const std::vector<Player*>& players);
 
     // Chance and Community Chest
     static void displayCardDraw(const std::string& petak_type, const std::string& card_text);
