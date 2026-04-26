@@ -69,6 +69,7 @@ private:
     void getPlayerInJail(Player& player);
 
 public:
+    static int max_turn_limit;
     static std::unique_ptr<CardManager> card_manager;
     static std::unique_ptr<PropertyManager> property_manager;
     static std::unique_ptr<EconomyManager> economy_manager;

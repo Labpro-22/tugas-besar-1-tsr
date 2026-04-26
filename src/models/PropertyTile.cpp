@@ -124,6 +124,7 @@ PropertyType UtilityTile::getPropertyType() const{
 };
 void UtilityTile::setMult(const std::map<int,int>& mult){
     utility_multiplier=mult;
+}
 
 std::string UtilityTile::getStatusString() const {
     std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();

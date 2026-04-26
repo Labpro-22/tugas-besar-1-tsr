@@ -10,6 +10,10 @@ std::string Board::toSaveFormat() const {
     
 }
 
+std::unordered_map<std::string, std::vector<Tile*>> Board::getcolorTileMap() {
+    return colorTileMap;
+}
+
 Tile& Board::getTile(int index) {
     if (tiles.empty()) {
         throw std::runtime_error("Cannot get tile: Board is empty!");

@@ -2,7 +2,7 @@
 #include "../../include/core/GameManager.hpp" 
 #include <fstream>
 #include <iostream>
-#include "GameException.hpp"
+#include "../../include/core/GameException.hpp"
 
 void SaveLoadManager::save(const GameManager& g, const std::string& filepath) {
     std::ofstream outFile(filepath);

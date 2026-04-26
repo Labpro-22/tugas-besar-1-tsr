@@ -6,6 +6,8 @@
 #include <unordered_set>
 #include <algorithm>
 #include <iterator>
+int GameManager::current_player_index = 0;
+int GameManager::max_turn_limit = 0;
 std::unique_ptr<CardManager> GameManager::card_manager = nullptr;
 std::unique_ptr<PropertyManager> GameManager::property_manager = nullptr;
 std::unique_ptr<EconomyManager> GameManager::economy_manager = nullptr;
@@ -18,6 +20,7 @@ GameManager::GameManager(int maxTurns,int jumlah):
             max_turns(maxTurns),
             current_state(GameState::START_TURN),pending_debt(0.0f),pending_creditor(nullptr) {
         current_player_index=0;
+    max_turn_limit = maxTurns;
         card_manager =std::make_unique<CardManager>();
         property_manager = std::make_unique<PropertyManager>(nullptr);
         economy_manager = std::make_unique<EconomyManager>();
@@ -488,6 +491,27 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
             bool success = economy_manager->transferMoney(player, current_owner, rent);
         }
+    }
+}
+
+int GameManager::getMaxTurns() {
+    return GameManager::players.empty() ? 0 : GameManager::players.size() > 0 ? 0 : 0;
+}
+
+void GameManager::checkGameOver() {
+    int alive_count = 0;
+    for (const auto& player : players) {
+        if (player && player->getPlayerState() != PlayerState::BANKCRUPT) {
+            ++alive_count;
+        }
+    }
+
+    if (alive_count <= 1) {
+        std::vector<Player*> raw_players;
+        for (const auto& player : players) {
+            raw_players.push_back(player.get());
+        }
+        ViewGame::displayWinBankruptcy(raw_players);
     }
 }
 
