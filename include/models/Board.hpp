@@ -15,6 +15,7 @@ private:
 
 public:
     Board();
+    std::unordered_map<std::string, std::vector<Tile*>> getcolorTileMap();
     std::string toSaveFormat() const;
     Tile& getTile(int index);
     void addTile(std::unique_ptr<Tile> tile);

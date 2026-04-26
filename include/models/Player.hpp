@@ -7,6 +7,7 @@
 #include "../../include/models/SkillCard.hpp"
 
 class PropertyTile;
+class Tile;
 
 enum PlayerState {
     FREE,
@@ -26,8 +27,9 @@ private:
     std::vector<std::unique_ptr<Effect>> active_effects;
 
 public:
+    const std::vector<std::unique_ptr<SkillCard>>& getAllskillCard() const;
     std::vector<PropertyTile*> owned_properties;
-
+    const std::vector<Tile*>& getPropertiesByGroup(const std::string& color) const;
     Player(std::string name, float balance, int position, PlayerState player_state);
     std::string getname();
     void receive(int amount);
@@ -64,4 +66,10 @@ public:
 
     //Saveload impl
     std::string toSaveFormat() const;
+
+    std::string getName() const;
+
+    int getBalance() const;
+
+    void setPosition(int index);
 };

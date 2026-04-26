@@ -1,7 +1,7 @@
 #include "../../include/models/Card.hpp"
 
 Card::Card(std::string name):name(name){}
-std::string Card::getName(){
+std::string Card::getName() const{
     return name;
 }
 

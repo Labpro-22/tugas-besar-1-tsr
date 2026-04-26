@@ -15,9 +15,10 @@ protected:
     static std::mt19937 gen;
 public:
     Card(std::string name);
-    std::string getName();
+    std::string getName() const;
     virtual ~Card() = default; // Butuh for dynamically allocated cards nanti
     virtual void onDraw(Player& p) = 0;
+    virtual std::string toSaveFormat() const = 0;
 };
 
 /**

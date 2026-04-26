@@ -83,6 +83,16 @@ void RailroadTile::setMult(const std::map<int,int>& mult){
     railroad_multiplier=mult;
 }
 
+std::string RailroadTile::getStatusString() const {
+    std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();
+    
+    if (!current_owner) {
+        return ""; 
+    }
+
+    return current_owner->getname();
+}
+
 // UtilityTile
 UtilityTile::UtilityTile(int index, std::string name, std::string code, std::string color, float buy_price, float mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status) 
     : PropertyTile(index, name, code, color, buy_price, mortgage_price, owner, festival_level, festival_turns_left, property_status) {}
@@ -114,4 +124,13 @@ PropertyType UtilityTile::getPropertyType() const{
 };
 void UtilityTile::setMult(const std::map<int,int>& mult){
     utility_multiplier=mult;
+
+std::string UtilityTile::getStatusString() const {
+    std::shared_ptr<Player> current_owner = this->getPropertyOwner().lock();
+    
+    if (!current_owner) {
+        return ""; 
+    }
+
+    return current_owner->getname();
 }

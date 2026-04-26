@@ -8,11 +8,12 @@
 #include "../../include/models/Saveable.hpp"
 #include "../../include/utils/SaveData.hpp"
 
+#include "../../include/models/ActionCard.hpp"
 class CardManager : Saveable {
 private:
-    Deck<std::unique_ptr<Card>> chance_deck;
-    Deck<std::unique_ptr<Card>> community_chest_deck;
-    Deck<std::unique_ptr<Card>> skill_deck;
+    Deck<std::unique_ptr<ActionCard>> chance_deck;
+    Deck<std::unique_ptr<ActionCard>> community_chest_deck;
+    Deck<std::unique_ptr<SkillCard>> skill_deck;
 
     std::unique_ptr<SkillCard> createSkillCardFromSave(const CardSaveData& cardData) const;
     std::unique_ptr<Card> createSkillDeckCard(const std::string& cardName) const;
@@ -37,7 +38,7 @@ public:
     void takeSkillCardFromPlayer(Player& player, int index);
 
     // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
-    void discardCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck);
     void loadCardState(const GameSaveData& data);
+    void discardCard(std::unique_ptr<ActionCard> usedCard, Deck<std::unique_ptr<ActionCard>>& deck);
     std::string toSaveFormat() const override;
 };

@@ -22,6 +22,10 @@ std::string SkillCard::toSaveFormat() const{
     return out.str();
 }
 
+std::string SkillCard::getName() const {
+    return name;
+}
+
 // MoveSkillCard
 MoveSkillCard::MoveSkillCard(std::string name):SkillCard(name){}
 void MoveSkillCard::onDraw(Player& p) {
@@ -106,4 +110,12 @@ void LassoSkillCard::useEffect(Player& p) {
 DemolitionSkillCard::DemolitionSkillCard(std::string name):SkillCard(name){}
 void DemolitionSkillCard::useEffect(Player& p) {
     // TODO: Implement demolition skill card effect
+}
+
+int MoveSkillCard::getStep() const {
+    return step;
+}
+
+float DiscountSkillCard::getPercentage() const {
+    return percentage;
 }

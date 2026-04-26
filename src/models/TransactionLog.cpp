@@ -1,5 +1,6 @@
 #include "../../include/core/TransactionLog.hpp"
 #include "../../include/utils/SaveData.hpp"
+#include <sstream>
 
 
 const char* actionStrings[] = {
@@ -114,11 +115,25 @@ void TransactionLog::loadLogState(const std::vector<LogSaveData>& data){
         logs.emplace_back(savedLog.turn, savedLog.username, parseActionType(savedLog.action_type), savedLog.detail);
     }
 }
-
-std::string TransactionLog::toSaveFormat() const{
-    std::string temp=std::to_string(logs.size())+"\n";
-    for(LogEntry log : logs){
-        temp+=log.toSaveFormat() + "\n";
+std::string LogEntry::toSaveFormat() const {
+    std::ostringstream out;
+    // <TURN> <USERNAME> <JENIS_AKSI> <DETAIL>
+    out << turn_number << " " 
+        << username << " " 
+        << getTextForEnum(getActionType()) << " " 
+        << description << "\n";
+        
+    return out.str();
+}
+std::string TransactionLog::toSaveFormat() const {
+    std::ostringstream out;
+    
+    // <JUMLAH_ENTRI_LOG>
+    out << logs.size() << "\n";
+    
+    for (const auto& log : logs) {
+        out << log.toSaveFormat();
     }
-    return temp;
+    
+    return out.str();
 }

@@ -51,4 +51,7 @@ public:
 
     void InitializeBoard(FullConfigData&& config);
     void loadBoardState(std::vector<PropertySaveData> data);
+
+
+    std::string toSaveFormat() const;
 };

@@ -67,27 +67,28 @@ void CardManager::initializeDecks(){}
 
 // Ketika pemain mendarat di petak Kesempatan
 void CardManager::drawKesempatan(Player& player){
-    std::unique_ptr<Card> card = chance_deck.drawCard();
+    std::unique_ptr<ActionCard> card = chance_deck.drawCard();
     card->onDraw(player);
-    discardCard(std::move(card),chance_deck);
+    discardCard(std::move(card), chance_deck);
 }
 // Ketika pemain mendarat di petak Dana Umum
 void CardManager::drawDanaUmum(Player& player){
-    std::unique_ptr<Card> card = chance_deck.drawCard();
+    std::unique_ptr<ActionCard> card = community_chest_deck.drawCard();
     card->onDraw(player);
-    discardCard(std::move(card),chance_deck);
+    discardCard(std::move(card), community_chest_deck);
 }
 // Memberikan Skill Card ke pemain
 void CardManager::giveSkillCardToPlayer(Player& player){
-    std::unique_ptr<Card> card = chance_deck.drawCard();
+    std::unique_ptr<SkillCard> card = std::move(skill_deck.drawCard());
     card->onDraw(player);
+    player.addSkillCard(std::move(card));
 }
 
 void CardManager::takeSkillCardFromPlayer(Player& player, int index){
     skill_deck.addToDiscard(std::move(player.removeSkillCard(index)));
 }
 
-void CardManager::discardCard(std::unique_ptr<Card> usedCard, Deck<std::unique_ptr<Card>>& deck){
+void CardManager::discardCard(std::unique_ptr<ActionCard> usedCard, Deck<std::unique_ptr<ActionCard>>& deck){
        deck.addToDiscard(std::move(usedCard));
 }
 
