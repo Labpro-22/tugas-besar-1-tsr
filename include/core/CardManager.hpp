@@ -5,7 +5,7 @@
 #include "../../include/models/Card.hpp"
 #include "../../include/models/Player.hpp" 
 #include "../../include/models/Saveable.hpp"
-
+#include "../../include/models/ActionCard.hpp"
 class CardManager : Saveable {
 private:
     Deck<std::unique_ptr<ActionCard>> chance_deck;
