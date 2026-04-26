@@ -4,16 +4,15 @@
 #include <memory>
 #include <string>
 
-class Player;
-class Board;
-class TileVisitor;
 
 class SkillCard: public Card
 {
+protected:
+    std::string name;
 public:
     SkillCard(std::string name);
-    void onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
-    virtual void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) = 0;
+    void onDraw(Player& p) override;
+    virtual void useEffect(Player& p) = 0;
 
     virtual std::string toSaveFormat() const;
 };
@@ -24,8 +23,8 @@ private:
     int step;
 public:
     MoveSkillCard(std::string name);
-    void onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
-    void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>&, TileVisitor& visitor) override;
+    void onDraw(Player& p) override;
+    void useEffect(Player& p) override;
     std::string toSaveFormat() const override;
 };
 
@@ -35,8 +34,8 @@ private:
     float percentage;
 public:
     DiscountSkillCard(std::string name);
-    void onDraw(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
-    void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
+    void onDraw(Player& p) override;
+    void useEffect(Player& p) override;
     std::string toSaveFormat() const override;
 };
 
@@ -46,7 +45,7 @@ private:
     /* data */
 public:
     ShieldSkillCard(std::string name);
-    void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
+    void useEffect(Player& p) override;
 };
 
 class TeleportSkillCard: public SkillCard
@@ -55,7 +54,7 @@ private:
     /* data */
 public:
     TeleportSkillCard(std::string name);
-    void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
+    void useEffect(Player& p) override;
 };
 
 class LassoSkillCard: public SkillCard
@@ -64,7 +63,7 @@ private:
     /* data */
 public:
     LassoSkillCard(std::string name);
-    void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
+    void useEffect(Player& p) override;
 };
 
 class DemolitionSkillCard: public SkillCard
@@ -73,5 +72,5 @@ private:
     /* data */
 public:
     DemolitionSkillCard(std::string name);
-    void useEffect(Player& p, Board& b, std::vector<std::shared_ptr<Player>>& all, TileVisitor& visitor) override;
+    void useEffect(Player& p) override;
 };

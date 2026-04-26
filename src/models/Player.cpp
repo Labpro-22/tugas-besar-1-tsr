@@ -1,243 +1,49 @@
 #include <algorithm>
 #include <memory>
-#include "../models/Player.hpp"
-#include "../models/PropertyTile.hpp"
-#include "../models/SkillCard.hpp"
-#include "../models/Board.hpp"
-
-Player::Player(std::string name, int balance, int position):name(name),balance(balance),position(position){}
-Player& Player::operator+=(int amount){
-    balance += amount;
-    return *this;
-}
-Player& Player::operator-=(int amount){
-    balance -= amount;
-    return *this;
-}
-Player Player::operator+(int amount) const{
-    Player result = *this;
-    result.balance += amount;
-    return result;
-}
-Player Player::operator-(int amount) const{
-    Player result = *this;
-    result.balance -= amount;
-    return result;
-}
-void Player::transferTo(Player& player, int amount){
-    int paid_amount=amount;
-    for (const auto& effect : active_effects) {
-        if (effect->blocksPayment()) {
-            paid_amount= 0;
-        }
-    }
-    balance -= paid_amount;
-    player+=paid_amount;
-}
-void Player::movePlayer(int steps){
-    position+=steps;
-}
-void Player::addProperty(PropertyTile* property){
-    this->owned_properties.push_back(property);
-}
-void Player::removeProperty(PropertyTile* property){
-    owned_properties.erase(
-        std::remove(owned_properties.begin(), owned_properties.end(), property),
-        owned_properties.end()
-    );
-}
-void Player::addSkillCard(std::unique_ptr<SkillCard> card){
-    this->saved_cards.push_back(std::move(card));
-}
-
-/*
-Refactored, check Player.hpp for further details
-*/
-std::unique_ptr<SkillCard> Player::useSkillCard(int index){
-    if (index < 0 || index >= saved_cards.size()) {
-        return nullptr;
-    }
-    std::unique_ptr<SkillCard> cardToUse = std::move(saved_cards[index]);
-    saved_cards.erase(saved_cards.begin() + index);
-    return cardToUse;
-}
-void Player::addEffect(std::unique_ptr<Effect> effect){
-    this->active_effects.push_back(std::move(effect));
-}
-int Player::getTotalAssetValue(){
-    int sum=this->balance;
-    for (auto& asset:this->owned_properties){
-        sum+=asset->getBuyPrice();
-    }
-    return sum;
-}
-bool Player::canPay(int amount){
-    return this->balance >= amount;
-}
-void Player::buyProperty(PropertyTile &property){
-    float harga=property.getBuyPrice();
-    for (auto &ef:this->active_effects){
-        ef->modifyPayment(harga);
-    }
-    if(!this->canPay(harga)){
-        throw "uang tak cukup";
-    }
-    *this-=harga;
-    this->addProperty(&property);
-    property.setPropertyOwner(std::make_shared<Player>(this));
-}
-void Player::sellProperty(PropertyTile &property, Player& other){
-    this->removeProperty(&property);
-    *this+=property.getBuyPrice();
-    other.buyProperty(property);
-}
-int Player::liquidateAsset(int required){
-    std::vector<PropertyTile*> properties_to_sell = owned_properties;
-    std::sort(
-        properties_to_sell.begin(),
-        properties_to_sell.end(),
-        [](PropertyTile* a, PropertyTile* b) {
-            return a->getBuyPrice() < b->getBuyPrice();
-        }
-    );
-
-    int liquidated = 0;
-    for (PropertyTile* property : properties_to_sell) {
-        if (liquidated >= required) {
-            break;
-        }
-
-        int sell_value = property->getBuyPrice();
-        liquidated += sell_value;
-        balance += sell_value;
-        removeProperty(property);
-        property->setPropertyStatus(BANK);
-        property->setPropertyOwner(std::shared_ptr<Player>());
-    }
-
-    return liquidated;
-}
-
-
-
-
-
-class Effect {
-public:
-    virtual ~Effect() = default;
-    virtual void onTurnStart(Player&) {}
-    virtual void onTurnEnd(Player&) {}
-    virtual bool isExpired() const = 0;
-    virtual bool blocksPayment() const;
-    virtual int modifyPayment(int amount) const;
-};
-
-class ShieldEffect : public Effect {
-private:
-    int turns_left;
-
-public:
-    explicit ShieldEffect(int duration = 1);
-    void onTurnEnd(Player&) override;
-    bool isExpired() const override;
-    bool blocksPayment() const override;
-};
-
-class DiscountEffect : public Effect {
-private:
-    int percent;
-    int turns_left;
-
-public:
-    DiscountEffect(int percent, int duration = 1);
-    void onTurnEnd(Player&) override;
-    bool isExpired() const override;
-    int modifyPayment(int amount) const override;
-};
-
-
-bool Player::inJail() {
-    return player_state == PlayerState::INJAIL;
-}
-
-void Player::setInJail() {
-    player_state = PlayerState::INJAIL;
-}
-
-void Player::setFree() {
-    player_state = PlayerState::FREE;
-}
-
-void Player::startTurn(Board &board) {
-    for (const auto& effect : active_effects) {
-        effect->onTurnStart(*this);
-    }
-    std::uniform_int_distribution<> dist(1, 100);
-    this->movePlayer(dist(gen));
-    board.getTile(this->position).onLand(*this);
-}
-
-void Player::endTurn() {
-    for (const auto& effect : active_effects) {
-        effect->onTurnEnd(*this);
-    }
-
-    active_effects.erase(
-        std::remove_if(
-            active_effects.begin(),
-            active_effects.end(),
-            [](const std::unique_ptr<Effect>& effect) {
-                return effect->isExpired();
-            }
-        ),
-        active_effects.end()
-    );
-}
-
-int Player::getPosition() {
-    return position;
-}
-int Player::countOwnedRailroad() const {
-    return std::count_if(owned_properties.begin(), owned_properties.end(),
-        [](PropertyTile* prop) {
-            return prop->getPropertyType() == PropertyType::RAILROAD;
-        });
-}
-int Player::countOwnedUtility() const {
-    return std::count_if(owned_properties.begin(), owned_properties.end(),
-        [](PropertyTile* prop) {
-            return prop->getPropertyType() == PropertyType::UTILITY;
-        });
-}
-=======
-#include <algorithm>
-#include <memory>
 #include <sstream>
-#include "../models/Player.hpp"
-#include "../models/PropertyTile.hpp"
-#include "../models/SkillCard.hpp"
-#include "../models/Board.hpp"
+#include <iostream>
+#include "../../include/models/Player.hpp"
+#include "../../include/models/PropertyTile.hpp"
+#include "../../include/models/SkillCard.hpp"
+#include "../../include/models/Board.hpp"
+#include "../../include/core/PropertyManager.hpp"
 
-Player::Player(std::string name, int balance, int position, PlayerState player_state):name(name),balance(balance),position(position){}
-Player& Player::operator+=(int amount){
+std::random_device Player::rd;
+std::mt19937 Player::gen(Player::rd());
+
+Player::Player(std::string name, float balance, int position, PlayerState player_state): name(name), balance(balance), position(position), player_state(player_state) {}
+std::string Player::getname() {
+    return name;
+}
+Player& Player::operator+=(float amount){
     balance += amount;
     return *this;
 }
-Player& Player::operator-=(int amount){
+Player& Player::operator-=(float amount){
     balance -= amount;
     return *this;
 }
-Player Player::operator+(int amount) const{
-    Player result = *this;
+Player Player::operator+(float amount) const{
+    Player result(name, balance, position, player_state);
     result.balance += amount;
     return result;
 }
-Player Player::operator-(int amount) const{
-    Player result = *this;
+Player Player::operator-(float amount) const{
+    Player result(name, balance, position, player_state);
     result.balance -= amount;
     return result;
 }
-void Player::transferTo(Player& player, int amount){
+void Player::receive(int amount){
+    *this+=amount;
+}
+void Player::pay(int amount){
+        *this-=amount;
+}
+void Player::declareBankruptcy(){
+    this->player_state=PlayerState::BANKCRUPT;
+}
+
+void Player::transferTo(Player& player, float amount){
     int paid_amount=amount;
     for (const auto& effect : active_effects) {
         if (effect->blocksPayment()) {
@@ -246,9 +52,14 @@ void Player::transferTo(Player& player, int amount){
     }
     balance -= paid_amount;
     player+=paid_amount;
+
+}
+float Player::getmoney(){
+    return this->balance;
 }
 void Player::movePlayer(int steps){
-    position+=steps;
+    int size=PropertyManager::getBoard().getSize();
+    position=(position+steps) % size;
 }
 void Player::addProperty(PropertyTile* property){
     this->owned_properties.push_back(property);
@@ -262,29 +73,20 @@ void Player::removeProperty(PropertyTile* property){
 void Player::addSkillCard(std::unique_ptr<SkillCard> card){
     this->saved_cards.push_back(std::move(card));
 }
-
-/*
-Refactored, check Player.hpp for further details
-*/
-std::unique_ptr<SkillCard> Player::useSkillCard(int index){
-    if (index < 0 || index >= saved_cards.size()) {
-        return nullptr;
-    }
-    std::unique_ptr<SkillCard> cardToUse = std::move(saved_cards[index]);
-    saved_cards.erase(saved_cards.begin() + index);
-    return cardToUse;
+void Player::useSkillCard(int index){
+    this->saved_cards[index]->useEffect(*this);
 }
 void Player::addEffect(std::unique_ptr<Effect> effect){
     this->active_effects.push_back(std::move(effect));
 }
-int Player::getTotalAssetValue(){
-    int sum=this->balance;
+float Player::getTotalAssetValue(){
+    float sum=this->balance;
     for (auto& asset:this->owned_properties){
         sum+=asset->getBuyPrice();
     }
     return sum;
 }
-bool Player::canPay(int amount){
+bool Player::canPay(float amount){
     return this->balance >= amount;
 }
 void Player::buyProperty(PropertyTile &property){
@@ -297,14 +99,15 @@ void Player::buyProperty(PropertyTile &property){
     }
     *this-=harga;
     this->addProperty(&property);
-    property.setPropertyOwner(std::make_shared<Player>(this));
+    property.setPropertyStatus(PropertyStatus::OWNED);
+    property.setPropertyOwner(shared_from_this());
 }
-void Player::sellProperty(PropertyTile &property, Player& other){
+void Player::sellProperty(PropertyTile &property){
     this->removeProperty(&property);
     *this+=property.getBuyPrice();
-    other.buyProperty(property);
+    property.setPropertyStatus(PropertyStatus::BANK);
 }
-int Player::liquidateAsset(int required){
+float Player::liquidateAsset(float required){
     std::vector<PropertyTile*> properties_to_sell = owned_properties;
     std::sort(
         properties_to_sell.begin(),
@@ -341,6 +144,9 @@ std::string Player::toSaveFormat() const {
     case PlayerState::INJAIL:
         out<<"INJAIL\n";
         break;
+    case PlayerState::BANKCRUPT:
+        out<<"BANKCRUPT\n";
+        break;
     }
 
     out << saved_cards.size() << "\n";
@@ -366,12 +172,13 @@ void Player::setFree() {
     player_state = PlayerState::FREE;
 }
 
-void Player::startTurn(Board &board) {
+void Player::startTurn(int step) {
+    auto& board = PropertyManager::getBoard();
     for (const auto& effect : active_effects) {
         effect->onTurnStart(*this);
     }
-    std::uniform_int_distribution<> dist(1, 100);
-    this->movePlayer(dist(gen));
+    // std::uniform_int_distribution<> dist(1, 100);
+    this->movePlayer(step);
     board.getTile(this->position).onLand(*this);
 }
 
@@ -407,4 +214,3 @@ int Player::countOwnedUtility() const {
             return prop->getPropertyType() == PropertyType::UTILITY;
         });
 }
->>>>>>> 1e0dc82 (changed card manager privileges)
