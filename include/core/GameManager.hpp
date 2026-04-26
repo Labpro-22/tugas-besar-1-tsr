@@ -98,4 +98,5 @@ public:
 
     // Implementasi save
     std::string toSaveFormat() const;
+    void save(const std::string& filedir);
 };

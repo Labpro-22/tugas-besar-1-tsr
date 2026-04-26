@@ -5,5 +5,5 @@
 class GameManager;
 class SaveLoadManager{
      public:
-        void save(GameManager g, std::string dir);
+        void save(GameManager& g, std::string dir);
 };

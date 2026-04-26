@@ -434,10 +434,16 @@ std::string GameManager::toSaveFormat() const{
     //<STATE_DECK>
     out << card_manager->toSaveFormat();
     //<STATE_LOG>
+    out << logger->toSaveFormat();
 
 
     return out.str();
 }
 int GameManager::getCurrentTurn(){
     return current_player_index;
+}
+
+void GameManager::save(const std::string& filedir) {
+    SaveLoadManager slm;
+    slm.save(*this, filedir); 
 }

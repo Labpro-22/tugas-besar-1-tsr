@@ -45,7 +45,6 @@ public:
     void doUnmortgage(std::shared_ptr<Player> player);
 
 
-    int getFestivalLevel() const { return festival_level; }
-    int getFestivalTurnsLeft() const { return festival_turns_left; }
+
     std::string toSaveFormat() const;
 };
