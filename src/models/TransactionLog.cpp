@@ -49,9 +49,6 @@ std::string LogEntry::printFormat()const{
     }
     return "[Turn "+std::to_string(getTurnNumber())+"] "+getUsername()+" | "+enumstr+temp+" | "+getDesc();
 }
-std::string LogEntry::toSaveFormat()const{
-    return std::to_string(turn_number)+ " " +username+ " " +getTextForEnum(getActionType())+ " " +description;
-}
 
 void TransactionLog::recordEvent(LogEntry entry){
     logs.push_back(entry);
