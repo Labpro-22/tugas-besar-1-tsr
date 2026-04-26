@@ -29,14 +29,14 @@ public:
 
     // ------ OUTPUT --------
 
-    static void displayBoard();
+    static void displayBoard(const GameManager& gm);
     
     static void displayDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile);
     static void displayManualDiceRollResult(const std::string& playerName, int dice1, int dice2, const std::string& destTile);
 
-    static void displayPropertyDeed(const std::string& propertyCode);
+    static void displayPropertyDeed(const GameManager& gm, const std::string& propertyCode);
 
-    static void displayPlayerProperties(const std::string& playerName);
+    static void displayPlayerProperties(const GameManager& gm, const std::string& playerName);
 
     // Buy
     static void displayBuyPromptStreet(const std::string& prop_name, const std::string& prop_code, const std::string& color, int price, int rent, int current_money);
