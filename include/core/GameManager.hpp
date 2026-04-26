@@ -52,9 +52,9 @@ static std::unique_ptr<CardManager> card_manager;
     ~GameManager() = default;
 
     // Siklus utama permainan
-    void startGame(){}
-    void processCommand(const std::string& commandLine);
-    
+    void startGame();
+    // void processCommand(const std::string& commandLine);    
+    void displayBoard() const;    
     GameState getState() const { return current_state; }
 
     // Implementasi visitor tile

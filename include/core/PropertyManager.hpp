@@ -27,8 +27,11 @@ public:
     bool tryBuildHotel(Player& player, StreetTile& tile);
 
     // Mengecek: Tidak boleh digadai jika masih ada bangunan di color group tersebut
-    bool tryMortgage(Player& player, PropertyTile& tile);
-    bool tryUnmortgage(Player& player, PropertyTile& tile);
+    bool tryMortgage(std::shared_ptr<Player> player, PropertyTile* tile);
+    bool tryUnmortgage(std::shared_ptr<Player> player, PropertyTile* tile);
+
+    // Membungkus panggilan tile->calculateRent(), misal tambahan untuk kasus khusus UtilityTile yang membutuhkan nilai dadu
+    float getFinalRentPrice(PropertyTile* tile, int diceRoll = 0) const;
 
     // Memulai festival di suatu PropertyTile
     void startFestival(PropertyTile& tile);
