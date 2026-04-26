@@ -30,10 +30,10 @@ void FinancialActionCard::onDraw(Player& p) {
             }
             break;
         case transaction_type::PLAYER_TO_BANK:
-            p.pay(amount);
+            p -= amount;
             break;
         case transaction_type::BANK_TO_PLAYER:
-            p.receive(amount);
+            p += amount;
             break;
     }
 }

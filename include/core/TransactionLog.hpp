@@ -29,7 +29,7 @@ enum actions{
 };
 extern const char* actionStrings[];
 
-class LogEntry{
+class LogEntry : public Saveable{
 private:
     int turn_number;
     std::string username;
@@ -46,6 +46,7 @@ public:
     std::string getDesc() const;
     actions getActionType() const;
     std::string printFormat()const;
+    std::string toSaveFormat() const override;
     const char * getTextForEnum( int enumVal )const
     {
       return actionStrings[enumVal];

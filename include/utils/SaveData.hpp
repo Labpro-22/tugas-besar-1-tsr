@@ -6,7 +6,7 @@
 class CardSaveData {
 public:
     std::string card_type;
-    int value;
+    float value;
     int remaining_duration;
 
     CardSaveData() : value(0), remaining_duration(0) {}
@@ -15,7 +15,7 @@ public:
 class PlayerSaveData {
 public:
     std::string username;
-    int balance;
+    float balance;
     std::string position_code;
     std::string status;
     std::vector<CardSaveData> hand_cards;
@@ -31,7 +31,7 @@ public:
     std::string status;    
     int festival_multiplier;
     int festival_duration;
-    std::string build_level; 
+    int build_level; 
 
     PropertySaveData() : festival_multiplier(1), festival_duration(0) {}
 };
@@ -57,7 +57,7 @@ public:
     std::string current_active_player;
     
     std::vector<PropertySaveData> properties;
-    std::vector<std::string> ability_deck; 
+    std::vector<std::string> skill_card_deck; 
     std::vector<LogSaveData> logs;
 
     GameSaveData() : current_turn(0), max_turn(0), player_count(0) {}
