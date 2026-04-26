@@ -36,6 +36,10 @@ int StreetTile::getBuildingLevel() const {
     return building_level;
 }
 
+void StreetTile::setBuildingLevel(int level) {
+    building_level = level;
+}
+
 bool StreetTile::canBuildHouse() const {
     return building_level < 4;
 }

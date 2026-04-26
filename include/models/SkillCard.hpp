@@ -23,6 +23,8 @@ public:
 
     void onDraw(Player& p) override;
     virtual void useEffect(Player& p) = 0;
+    virtual void loadFromSave(float value, int remainingDuration);
+
     virtual std::string toSaveFormat() const;
 };
 
@@ -38,6 +40,7 @@ public:
 
     void onDraw(Player& p) override;
     void useEffect(Player& p) override;
+    void loadFromSave(float value, int remainingDuration) override;
     std::string toSaveFormat() const override;
 };
 
@@ -53,6 +56,7 @@ public:
 
     void onDraw(Player& p) override;
     void useEffect(Player& p) override;
+    void loadFromSave(float value, int remainingDuration) override;
     std::string toSaveFormat() const override;
 };
 

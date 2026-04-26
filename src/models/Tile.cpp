@@ -38,6 +38,9 @@ float TaxTile::getTaxAmount(){
 void TaxTile::onLand(Player& p) {
     GameManager::visitTaxTile(this, p);
 }
+TaxType TaxTile::getTaxType()const{
+    return tax_type;
+}
 
 // FestivalTile
 FestivalTile::FestivalTile(int index, std::string name, std::string code, std::string color)

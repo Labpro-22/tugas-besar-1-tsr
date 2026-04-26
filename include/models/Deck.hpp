@@ -1,6 +1,6 @@
 #pragma once
 #include "Saveable.hpp"
-#include "GameException.hpp" // Ensure this is included here now
+#include "../core/GameException.hpp" // Ensure this is included here now
 #include <stack>
 #include <vector>
 #include <memory>
@@ -15,6 +15,14 @@ private:
     std::vector<T> discard;
 
 public:
+    void setCards(std::vector<T>&& newCards) {
+        cards = std::move(newCards);
+    }
+
+    void clearDiscard() {
+        discard.clear();
+    }
+
     T drawCard() {
         if (cards.empty()) {
             throw GameplayException("Deck: Cannot draw from an empty deck!");

@@ -1,4 +1,5 @@
 #include "../../include/core/TransactionLog.hpp"
+#include "../../include/utils/SaveData.hpp"
 #include <sstream>
 
 
@@ -79,6 +80,37 @@ std::string TransactionLog::getRecentLogs(int n)const{
 }
 void TransactionLog::clearLogs(){
     logs.clear();
+}
+
+static actions parseActionType(const std::string& actionType) {
+    if (actionType == "DADU") return DADU;
+    if (actionType == "DOUBLE") return DOUBLE;
+    if (actionType == "SEWA") return SEWA;
+    if (actionType == "BELI") return BELI;
+    if (actionType == "RAILROAD") return RAILROAD;
+    if (actionType == "UTILITY") return UTILITY;
+    if (actionType == "KARTU") return KARTU;
+    if (actionType == "FESTIVAL") return FESTIVAL;
+    if (actionType == "GOJAIL") return GOJAIL;
+    if (actionType == "LELANG") return LELANG;
+    if (actionType == "GADAI") return GADAI;
+    if (actionType == "PAJAK") return PAJAK;
+    if (actionType == "UNMORTGAGE") return UNMORTGAGE;
+    if (actionType == "BANKRUPT") return BANKRUPT;
+    if (actionType == "KESEMPATAN") return KESEMPATAN;
+    if (actionType == "DANA_UMUM") return DANA_UMUM;
+    if (actionType == "WIN") return WIN;
+    if (actionType == "BUILD_HOUSE") return BUILD_HOUSE;
+    if (actionType == "BUILD_HOTEL") return BUILD_HOTEL;
+    if (actionType == "SAVE") return SAVE;
+    return LOAD;
+}
+
+void TransactionLog::loadLogState(const std::vector<LogSaveData>& data){
+    clearLogs();
+    for (const auto& savedLog : data) {
+        logs.emplace_back(savedLog.turn, savedLog.username, parseActionType(savedLog.action_type), savedLog.detail);
+    }
 }
 std::string LogEntry::toSaveFormat() const {
     std::ostringstream out;
