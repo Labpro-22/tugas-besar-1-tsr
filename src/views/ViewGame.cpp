@@ -94,7 +94,7 @@ std::string ViewGame::getUserInput() {
     return input;
 }
 
-void ViewGame::displayBoard(const GameManager& gm) {
+void ViewGame::displayBoard() {
     const int CELL_WIDTH = 10;
 
     auto fetchTileDisplayData = [&](int tileId) -> std::pair<std::string, std::string> {
@@ -156,7 +156,7 @@ void ViewGame::displayBoard(const GameManager& gm) {
         } else if (i == 3) {
             std::cout << "   ==================================   " << std::string(40, ' ');
         } else if (i == 5) {
-            std::string turnInfo = "TURN " + std::to_string(gm.getCurrentTurn()) + " / " + std::to_string(gm.getMaxTurns());
+            std::string turnInfo = "TURN " + std::to_string(GameManager::getCurrentTurn()) + " / " + std::to_string(GameManager::getMaxTurns());
             std::cout << "           " << padTo(turnInfo, 23) << "        " << std::string(40, ' ');
         } else {
             std::cout << std::string(80, ' '); 
@@ -197,7 +197,7 @@ void ViewGame::displayManualDiceRollResult(const std::string& playerName, int di
     std::cout << "Bidak mendarat di: " << destTile << ".\n";
 }
 
-void ViewGame::displayPropertyDeed(const GameManager& gm, const std::string& propertyCode) {
+void ViewGame::displayPropertyDeed(const std::string& propertyCode) {
     Tile* target_tile = nullptr;
     Board& board = GameManager::property_manager->getBoard();
     
@@ -267,7 +267,7 @@ void ViewGame::displayPropertyDeed(const GameManager& gm, const std::string& pro
     std::cout << "+================================+\n";
 }
 
-void ViewGame::displayPlayerProperties(const GameManager& gm, const std::string& playerName) {
+void ViewGame::displayPlayerProperties(const std::string& playerName) {
     std::cout << "\n=== Properti Milik: " << playerName << " ===\n";
 
     std::map<std::string, std::vector<PropertyTile*>> grouped_properties;
@@ -842,7 +842,7 @@ void ViewGame::displayDropCardList(const std::vector<SkillCard*>& cards) {
     std::cout << "\nDaftar Kartu Kemampuan Anda:\n";
     for (size_t i = 0; i < cards.size(); ++i) {
         std::string desc = "Efek kartu spesial";
-        
+
         if (cards[i]->isMoveCard()) {
             MoveSkillCard* mc = static_cast<MoveSkillCard*>(cards[i]);
             desc = "Maju " + std::to_string(mc->getStep()) + " Petak";

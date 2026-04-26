@@ -31,8 +31,7 @@ private:
 
     // Status permainan
     GameState current_state;
-
-    std::shared_ptr<Player> getCurrentPlayer();
+    
     void nextPlayer();
     void checkGameOver();
 
@@ -70,10 +69,10 @@ static std::unique_ptr<CardManager> card_manager;
     static void visitRailroadTile(RailroadTile* tile, Player& player) ;
     static void visitUtilityTile(UtilityTile* tile, Player& player) ;
 
-    int getCurrentTurn() const;
-    int getMaxTurns() const;
-    const PropertyTile& getCurrentProperty() const;
-    const Player& getCurrentPlayer() const;
+    static int getCurrentTurn();
+    static int getMaxTurns();
+    static const PropertyTile& getCurrentProperty();
+    static const Player& getCurrentPlayer();
 
     // Implementasi save
     std::string toSaveFormat() const;
