@@ -39,21 +39,21 @@ private:
     void setupCommands(); // Fungsi mendaftarkan isi commandMap
 
     // Handler tiap command
-    void printBoard(const std::string& args);
-    void printCertificate(const std::string& args);     
-    void printProperty(const std::string& args);
-    void printLog(const std::string& args);     
-    void mortgage(const std::string& args);
-    void redeem(const std::string& args);
-    void build(const std::string& args);       
-    void useAbility(const std::string& args);
-    int rollDice(const std::string& args);
-    void setDice(const std::string& args);     
-    void bid(const std::string& args);       
-    void pass(const std::string& args);          
-    void save(const std::string& args); 
-    void load(const std::string& args);
-    void endTurn(const std::string& args);
+    void printBoard();
+    void printCertificate();     
+    void printProperty();
+    void printLog();     
+    void mortgage();
+    void redeem();
+    void build();       
+    void useAbility();
+    int rollDice();
+    void setDice();     
+    void bid();       
+    void pass();          
+    void save(); 
+    void load();
+    void endTurn();
 
 
     std::shared_ptr<Player> getCurrentPlayer();

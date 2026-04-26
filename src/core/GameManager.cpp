@@ -57,8 +57,6 @@ void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
 
     //Someone help with handling inputs please like parsing it
     
-    //Zek make a player set festival so i could call it
-
 }
 
 void GameManager::visitGoTile(GoTile* tile, Player& player) {
@@ -82,9 +80,6 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
     int rent = tile->calculateRent();
     if(current_owner && current_owner.get() != &player){
         bool success = economy_manager->transferMoney(player, *current_owner, rent);
-    }
-    else{
-        player.buyProperty(*tile);
     }
 }
 
