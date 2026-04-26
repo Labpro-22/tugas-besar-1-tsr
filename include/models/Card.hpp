@@ -11,7 +11,7 @@ protected:
     static std::random_device rd;
     static std::mt19937 gen;
 public:
-    Card()=default;
+    Card();
     virtual ~Card() = default; // Butuh for dynamically allocated cards nanti
     virtual void onDraw(Player& p) = 0;
 };

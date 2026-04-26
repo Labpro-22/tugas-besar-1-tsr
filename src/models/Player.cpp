@@ -128,7 +128,7 @@ float Player::liquidateAsset(float required){
         balance += sell_value;
         removeProperty(property);
         property->setPropertyStatus(BANK);
-        property->setPropertyOwner(std::shared_ptr<Player>());
+        property->setPropertyOwner(shared_from_this());
     }
 
     return liquidated;
