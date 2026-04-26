@@ -9,5 +9,7 @@ void CardManager::drawDanaUmum(Player& player){}
 // Memberikan Skill Card ke pemain
 void CardManager::giveSkillCardToPlayer(Player& player){}
 // Fungsi ini dipanggil oleh GameManager ketika pemain selesai menggunakan SkillCard.
-void CardManager::discardSkillCard(std::unique_ptr<SkillCard>  usedCard){}
+void CardManager::discardSkillCard(std::unique_ptr<SkillCard>  usedCard){
+	skill_deck.AddToDiscard(std::move(usedCard));
+}
 std::string CardManager::toSaveFormat() const{}

@@ -79,6 +79,15 @@ void Player::addSkillCard(std::unique_ptr<SkillCard> card){
 void Player::useSkillCard(int index){
     this->saved_cards[index]->useEffect(*this);
 }
+std::unique_ptr<SkillCard> Player::takeSkillCard(int index) {
+    if (index < 0 || index >= static_cast<int>(saved_cards.size())) {
+        return nullptr;
+    }
+
+    std::unique_ptr<SkillCard> selected = std::move(saved_cards[index]);
+    saved_cards.erase(saved_cards.begin() + index);
+    return selected;
+}
 void Player::addEffect(std::unique_ptr<Effect> effect){
     this->active_effects.push_back(std::move(effect));
 }

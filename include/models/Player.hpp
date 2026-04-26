@@ -47,6 +47,7 @@ const std::vector<std::unique_ptr<SkillCard>>& getAllskillCard() const;
     float getmoney();
     void addSkillCard(std::unique_ptr<SkillCard> card);
     void useSkillCard(int index);
+    std::unique_ptr<SkillCard> takeSkillCard(int index);
     void addEffect(std::unique_ptr<Effect> effect);
 
     float getTotalAssetValue();
