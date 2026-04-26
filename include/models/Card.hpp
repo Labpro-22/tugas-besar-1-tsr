@@ -1,17 +1,21 @@
 #pragma once
 #include <vector>
 #include <random>
+#include <string>
 class Player;
 class Board;
 class TileVisitor;
 
 class Card
 {
+private:
+    std::string name;
 protected:
     static std::random_device rd;
     static std::mt19937 gen;
 public:
-    Card();
+    Card(std::string name);
+    std::string getName();
     virtual ~Card() = default; // Butuh for dynamically allocated cards nanti
     virtual void onDraw(Player& p) = 0;
 };
