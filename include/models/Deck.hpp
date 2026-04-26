@@ -44,7 +44,7 @@ public:
         std::shuffle(discard.begin(), discard.end(), g);
         
         for (auto& card : discard) {
-            cards.push(std::move(card));
+            cards.push_back(std::move(card));
         }
         
         discard.clear();

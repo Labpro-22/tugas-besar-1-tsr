@@ -775,31 +775,75 @@ void ViewGame::displayLogEntry(const std::vector<LogEntry>& logs) {
 }
 
 
-void ViewGame::displayWinMaxTurn(const std::vector<Player*>& players, const std::vector<std::string>& winners) {
-    std::cout << "\n" << ANSI_CYAN << "Permainan selesai! (Batas giliran tercapai)" << ANSI_RESET << "\n\n";
+void ViewGame::displayWinMaxTurn(const std::vector<Player*>& players) {
+    std::cout << "\nPermainan selesai! (Batas giliran tercapai)\n\n";
     std::cout << "Rekap pemain:\n\n";
-    
-    for (const auto* p : players) {
-        std::cout << p->getName() << "\n";
-        std::cout << "Uang      : M" << p->getBalance() << "\n";
+
+    std::vector<Player*> winners;
+
+    for (const auto& player : players) {
+        std::cout << player->getName() << "\n";
+        std::cout << "Uang      : M" << player->getBalance() << "\n";
+        std::cout << "Properti  : " << player->owned_properties.size() << "\n";
+        std::cout << "Kartu     : " << player->getAllskillCard().size() << "\n\n";
+
+        if (winners.empty()) {
+            winners.push_back(player);
+        } else {
+            Player* current_lead = winners.front();
+            bool is_better = false;
+            bool is_tie = false;
+
+            if (player->getBalance() > current_lead->getBalance()) {
+                is_better = true;
+            } 
+            else if (player->getBalance() == current_lead->getBalance()) {
+                if (player->owned_properties.size() > current_lead->owned_properties.size()) {
+                    is_better = true;
+                } 
+                else if (player->owned_properties.size() == current_lead->owned_properties.size()) {
+                    if (player->getAllskillCard().size() > current_lead->getAllskillCard().size()) {
+                        is_better = true;
+                    } 
+                    else if (player->getAllskillCard().size() == current_lead->getAllskillCard().size()) {
+                        is_tie = true; 
+                    }
+                }
+            }
+
+            if (is_better) {
+                winners.clear();
+                winners.push_back(player);
+            } else if (is_tie) {
+                winners.push_back(player);
+            }
+        }
     }
 
-    std::cout << ANSI_GREEN << "Pemenang: ";
+    std::cout << "Pemenang: ";
     for (size_t i = 0; i < winners.size(); ++i) {
-        std::cout << winners[i] << (i < winners.size() - 1 ? ", " : "");
+        std::cout << winners[i]->getName();
+        if (i < winners.size() - 1) std::cout << ", ";
     }
-    std::cout << ANSI_RESET << "\n";
+    std::cout << "\n";
 }
 
-void ViewGame::displayWinBankruptcy(const std::string& winner, const std::vector<std::string>& remaining_players) {
-    std::cout << "\n" << ANSI_CYAN << "Permainan selesai! (Semua pemain kecuali satu bangkrut)" << ANSI_RESET << "\n\n";
-    
+void ViewGame::displayWinBankruptcy(const std::vector<Player*>& players) {
+    std::cout << "\nPermainan selesai! (Semua pemain kecuali satu bangkrut)\n\n";
     std::cout << "Pemain tersisa:\n";
-    for (const auto& p_name : remaining_players) {
-        std::cout << "- " << p_name << "\n";
+
+    Player* winner = nullptr;
+
+    for (const auto& player : players) {
+        if (!(player->getPlayerState() == PlayerState::BANKCRUPT)) { 
+            std::cout << "- " << player->getName() << "\n";
+            winner = player;
+        }
     }
-    
-    std::cout << "\n" << ANSI_GREEN << "Pemenang: " << winner << ANSI_RESET << "\n";
+
+    if (winner != nullptr) {
+        std::cout << "\nPemenang: " << winner->getName() << "\n";
+    }
 }
 
 void ViewGame::displayCardDraw(const std::string& petak_type, const std::string& card_text) {

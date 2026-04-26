@@ -24,7 +24,7 @@ public:
     // Transaksi Dasar
     void addMoney(Player& player, float amount);
     bool deductMoney(Player& player, float amount);
-    bool transferMoney(Player& payer, Player& receiver, float amount);
+    bool transferMoney(Player& payer, std::shared_ptr<Player> receiver, float amount);
 
     // Pemrosesan pajak
     bool processTax(std::shared_ptr<Player> player, TaxType type, float baseTaxAmount);
@@ -41,5 +41,5 @@ public:
     // Proses ketika pemain tidak bisa membayar kewajiban
 
     bool isBankruptcyInevitable(Player& player, float debtAmount) const;
-    void executeBankruptcy(std::shared_ptr<Player>  bankruptPlayer, std::shared_ptr<Player> creditor,float amount);
+    void executeBankruptcy(Player&  bankruptPlayer, std::shared_ptr<Player> creditor,float amount);
 };

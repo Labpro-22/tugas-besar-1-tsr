@@ -84,3 +84,7 @@ JailTile::JailTile(int index, std::string name, std::string code, std::string co
 void JailTile::onLand(Player& p) {
     GameManager::visitJailTile(this, p);
 }
+
+int JailTile::getFine() const {
+    return jail_fine;
+}

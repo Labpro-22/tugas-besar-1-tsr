@@ -17,3 +17,5 @@ SaveLoadException::SaveLoadException(const std::string& msg)
 
 GameplayException::GameplayException(const std::string& msg) 
     : GameException("[Gameplay Violation]: " + msg) {}
+MoneyNotEnough::MoneyNotEnough(const std::string& msg, int amount) 
+    : GameException("[Gameplay Violation]: " + msg + std::to_string(amount)) {}

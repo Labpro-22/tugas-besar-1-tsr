@@ -60,7 +60,7 @@ public:
     bool inJail();
     void setInJail();
     void setFree();
-    void startTurn(int step);
+    void startTurn();
     void endTurn();
     int getPosition();
 
@@ -72,4 +72,6 @@ public:
     int getBalance() const;
 
     void setPosition(int index);
+
+    PlayerState getPlayerState() const;
 };

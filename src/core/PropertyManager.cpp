@@ -143,7 +143,6 @@ bool PropertyManager::tryBuildHotel(std::shared_ptr<Player> player, StreetTile* 
     tile->buildHotel();
     return true;
 }
-
 bool PropertyManager::tryMortgage(std::shared_ptr<Player> player, PropertyTile* tile){
     if (!player || !tile || !board) {
         return false;
@@ -233,7 +232,7 @@ void PropertyManager::startFestival(PropertyTile* tile){
     tile->applyFestival();
 }
 
-std::vector<PropertyTile*> PropertyManager::findPropertiesOwnedByPlayer(std::shared_ptr<Player> player) const {
+std::vector<PropertyTile*> PropertyManager::findPropertiesOwnedByPlayer(Player* player) const {
     std::vector<PropertyTile*> ownedProperties;
 
     if (!player || !board) {
@@ -249,7 +248,7 @@ std::vector<PropertyTile*> PropertyManager::findPropertiesOwnedByPlayer(std::sha
         }
 
         std::shared_ptr<Player> owner = property->getPropertyOwner().lock();
-        if (owner && owner.get() == player.get()) {
+        if (owner && owner.get() == player) {
             ownedProperties.push_back(property);
         }
     }
@@ -258,7 +257,7 @@ std::vector<PropertyTile*> PropertyManager::findPropertiesOwnedByPlayer(std::sha
 }
 
 void PropertyManager::doMortgage(std::shared_ptr<Player> player){
-    std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
+    std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player.get());
 
     ViewGame v;
     std::string input = v.getUserInput();
@@ -281,7 +280,7 @@ void PropertyManager::doMortgage(std::shared_ptr<Player> player){
 }
 
 void PropertyManager::doUnmortgage(std::shared_ptr<Player> player){
-    std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player);
+    std::vector<PropertyTile*> owned = findPropertiesOwnedByPlayer(player.get());
 
     ViewGame v;
     std::string input = v.getUserInput();
@@ -393,6 +392,8 @@ void PropertyManager::loadBoardState(std::vector<PropertySaveData> data){
             }
         }
     }
+}
+
 std::string PropertyManager::toSaveFormat() const {
     std::ostringstream out;
     std::vector<PropertyTile*> properties;

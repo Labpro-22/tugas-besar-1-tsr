@@ -11,6 +11,7 @@
 #include "../../include/models/Player.hpp"
 #include "../../include/core/TransactionLog.hpp"
 #include "../utils/IOManager.hpp"
+#include "../views/ViewGame.hpp"
 
 // State Machine
 enum class GameState {
@@ -29,6 +30,8 @@ private:
     static int current_player_index; 
     int current_turn_count;   
     int max_turns;
+    float start_money;
+    int die1, die2;
 
     // Status permainan
     GameState current_state;
@@ -45,25 +48,28 @@ private:
     void printBoard(const std::string& args);
     void printCertificate(const std::string& args);     
     void printProperty(const std::string& args);
-    void printLog(const std::string& args);     
+    // void printLog(const std::string& args);     
     void mortgage(const std::string& args);
     void redeem(const std::string& args);
     void build(const std::string& args);       
     void useAbility(const std::string& args);
     void rollDice(const std::string& args);
     void setDice(const std::string& args);     
-    void bid(const std::string& args);       
-    void pass(const std::string& args);          
+    // void bid(const std::string& args);       
+    // void pass(const std::string& args);          
     void save(const std::string& args); 
-    void load(const std::string& args);
-    void endTurn(const std::string& args);
-
-
+    // void load(const std::string& args);
+    // void endTurn(const std::string& args);
+    void loadConfig(const std::string& args);
+    void loadSaveState(const std::string& args);
     std::shared_ptr<Player> getCurrentPlayer();
     void nextPlayer();
     void checkGameOver();
 
+    void getPlayerInJail(Player& player);
+
 public:
+    static int max_turn_limit;
     static std::unique_ptr<CardManager> card_manager;
     static std::unique_ptr<PropertyManager> property_manager;
     static std::unique_ptr<EconomyManager> economy_manager;
@@ -71,11 +77,7 @@ public:
     
     // Data pemain dan turn
     static std::vector<std::shared_ptr<Player>> players;
-    GameManager(int maxTurns, std::vector<std::shared_ptr<Player>> initialPlayers, 
-                std::unique_ptr<CardManager> cMgr, 
-                std::unique_ptr<PropertyManager> pMgr, 
-                std::unique_ptr<EconomyManager> eMgr,
-                std::unique_ptr<TransactionLog> tLogger);
+    GameManager(int maxTurns,int jumlah);
     ~GameManager() = default;
 
     // Siklus utama permainan
@@ -87,7 +89,7 @@ public:
     // Implementasi visitor tile
 
     static void visitCardTile(CardTile* tile, Player& player) ;
-    static void visitTaxTile(TaxTile* tile, std::shared_ptr<Player> player) ;
+    static void visitTaxTile(TaxTile* tile, Player& player) ;
     static void visitFestivalTile(FestivalTile* tile, Player& player) ;
     static void visitGoTile(GoTile* tile, Player& player) ;
     static void visitGoToJailTile(GoToJailTile* tile, Player& player) ;
@@ -102,6 +104,5 @@ public:
 
     // Implementasi save
     std::string toSaveFormat() const;
-    void save(const std::string& filedir);
     void processRequiredPayment(std::shared_ptr<Player> payer, std::shared_ptr<Player> creditor, float amount);
 };

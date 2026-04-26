@@ -18,17 +18,21 @@ bool EconomyManager::deductMoney(Player& player, float amount){
     player-=amount;
     return true;
 }
-bool EconomyManager::transferMoney(Player& payer, Player& receiver, float amount){
-    payer.transferTo(receiver,amount);
+bool EconomyManager::transferMoney(Player& payer, std::shared_ptr<Player> receiver, float amount){
+    try{payer.transferTo(*receiver,amount);
+    } catch(MoneyNotEnough e){
+        executeBankruptcy(payer,receiver,amount);
+    }
     return true;
 }
 // Pemrosesan pajak
 bool EconomyManager::processTax(std::shared_ptr<Player> player, TaxType type, float baseTaxAmount){
+
     auto &logger=GameManager::logger;
     float tax;
     if (type==TaxType::PPH){
-        int pilihan;
-        std::cin>>pilihan;
+        int pilihan = 2;
+        ViewGame::getInt(pilihan);
         if( pilihan==1){
             tax=baseTaxAmount;
         }
@@ -43,7 +47,7 @@ bool EconomyManager::processTax(std::shared_ptr<Player> player, TaxType type, fl
         return true;
     } else{
         std::cout << "Kamu gagal membayar pajak!\n";
-        executeBankruptcy(player,nullptr,tax);
+        executeBankruptcy(*player,nullptr,tax);
         return false;
     }
 }
@@ -127,15 +131,15 @@ bool EconomyManager::isBankruptcyInevitable(Player& player, float debtAmount) co
     }
     return false;
 }
-void EconomyManager::executeBankruptcy(std::shared_ptr<Player> bankruptPlayer, std::shared_ptr<Player> creditor, float amount) {
-    bankruptPlayer->declareBankruptcy();
-    float remaining_cash = bankruptPlayer->getBalance();
-    bankruptPlayer->pay(remaining_cash); 
+void EconomyManager::executeBankruptcy(Player& bankruptPlayer, std::shared_ptr<Player> creditor, float amount) {
+    bankruptPlayer.declareBankruptcy();
+    float remaining_cash = bankruptPlayer.getBalance();
+    bankruptPlayer.pay(remaining_cash); 
     
     if (creditor) {
         creditor->receive(remaining_cash);
     }
-    std::vector<PropertyTile*> owned_properties = GameManager::property_manager->findPropertiesOwnedByPlayer(bankruptPlayer);
+    std::vector<PropertyTile*> owned_properties = GameManager::property_manager->findPropertiesOwnedByPlayer(&bankruptPlayer);
 
     for (PropertyTile* prop : owned_properties) {
         if (creditor) {

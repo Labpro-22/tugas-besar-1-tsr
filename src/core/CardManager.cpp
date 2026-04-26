@@ -39,7 +39,7 @@ std::unique_ptr<SkillCard> CardManager::createSkillCardFromSave(const CardSaveDa
     return nullptr;
 }
 
-std::unique_ptr<Card> CardManager::createSkillDeckCard(const std::string& cardName) const {
+std::unique_ptr<SkillCard> CardManager::createSkillDeckCard(const std::string& cardName) const {
     if (cardName == "move") {
         return std::make_unique<MoveSkillCard>(cardName);
     }
@@ -107,23 +107,25 @@ void CardManager::initializeDecks() {
 void CardManager::drawKesempatan(Player& player){
     std::unique_ptr<ActionCard> card = chance_deck.drawCard();
     card->onDraw(player);
+    ViewGame::displayCardDraw("kartu kesempatan", card->getName());
     discardCard(std::move(card), chance_deck);
 }
 // Ketika pemain mendarat di petak Dana Umum
 void CardManager::drawDanaUmum(Player& player){
     std::unique_ptr<ActionCard> card = community_chest_deck.drawCard();
     card->onDraw(player);
+    ViewGame::displayCardDraw("kartu dana umum", card->getName());
     discardCard(std::move(card), community_chest_deck);
 }
 // Memberikan Skill Card ke pemain
 void CardManager::giveSkillCardToPlayer(Player& player){
-    std::unique_ptr<SkillCard> card = std::move(skill_deck.drawCard());
+    std::unique_ptr<SkillCard> card = skill_deck.drawCard();
     card->onDraw(player);
     player.addSkillCard(std::move(card));
 }
 
 void CardManager::takeSkillCardFromPlayer(Player& player, int index){
-    skill_deck.addToDiscard(std::move(player.removeSkillCard(index)));
+    skill_deck.addToDiscard(player.removeSkillCard(index));
 }
 
 void CardManager::discardCard(std::unique_ptr<ActionCard> usedCard, Deck<std::unique_ptr<ActionCard>>& deck){
@@ -135,15 +137,9 @@ void CardManager::loadCardState(const GameSaveData& data){
     skillCards.reserve(data.skill_card_deck.size());
     
     for (const auto& cardName : data.skill_card_deck) {
-        std::unique_ptr<Card> base_card = createSkillDeckCard(cardName);
-        
-        if (base_card) {
-            if (SkillCard* raw_skill_card = dynamic_cast<SkillCard*>(base_card.get())) {
-                base_card.release();
-                std::unique_ptr<SkillCard> new_skill_card(raw_skill_card);
-                skillCards.push_back(std::move(new_skill_card));
-            } else {
-            }
+        auto card = createSkillDeckCard(cardName);
+        if (card) {
+            skillCards.push_back(std::move(card));
         }
     }
     
