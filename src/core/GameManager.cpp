@@ -1,6 +1,38 @@
 #include "../../include/core/GameManager.hpp"
+#include "../../include/views/ViewGame.hpp"
 #include <sstream>
 #include <iostream>
+
+void GameManager::printBoard(const std::string& args){
+    ViewGame v;
+    v.renderBoard(property_manager->getBoard());
+}
+
+void GameManager::printProperty(const std::string& args){
+    
+}
+
+int rollDice(const std::string& args){
+    std::random_device rd; 
+    std::mt19937 gen(rd()); 
+
+    std::uniform_int_distribution<> distr(1, 6);
+
+    return distr(gen) + distr(gen);
+}
+
+void GameManager::mortgage(const std::string& args){
+    bool mortgageTry = property_manager->tryMortgage();
+}
+
+
+
+
+
+ 
+
+
+//VisitTilesFunctions are below
 
 
 
@@ -16,11 +48,17 @@ void GameManager::visitCardTile(CardTile* tile, Player& player) {
 }
 
 void GameManager::visitTaxTile(TaxTile* tile, Player& player) {
-    economy_manager->deductMoney(player, tile->getTaxAmount());
+    bool trying = economy_manager->processTax(player, tile->getTaxType(), tile->getTaxAmount(), logger);;
 }
 
 void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
-    //idk right now
+    ViewGame v;
+    std::string input = v.getInput();
+
+    //Someone help with handling inputs please like parsing it
+    
+    //Zek make a player set festival so i could call it
+
 }
 
 void GameManager::visitGoTile(GoTile* tile, Player& player) {
@@ -45,6 +83,9 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
     if(current_owner && current_owner.get() != &player){
         bool success = economy_manager->transferMoney(player, *current_owner, rent);
     }
+    else{
+        player.buyProperty(*tile);
+    }
 }
 
 void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
@@ -52,6 +93,9 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
     int rent = tile->calculateRent();
     if(current_owner && current_owner.get() != &player){
         bool success = economy_manager->transferMoney(player, *current_owner, rent);
+    }
+    else{
+        player.buyProperty(*tile);
     }
 }
 
@@ -61,6 +105,9 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
     int rent = tile->calculateRent();
     if(current_owner && current_owner.get() != &player){
         bool success = economy_manager->transferMoney(player, *current_owner, rent);
+    }
+    else{
+        player.buyProperty(*tile);
     }
 }
 

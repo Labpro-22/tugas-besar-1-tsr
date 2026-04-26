@@ -47,6 +47,7 @@ private:
 public:
     TaxTile(int index, std::string name, std::string code, std::string color, TaxType tax_type, int tax_amount);
     int getTaxAmount();
+    TaxType getTaxType();
     void onLand(Player& p) override;
 };
 

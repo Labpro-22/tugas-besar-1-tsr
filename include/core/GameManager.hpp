@@ -47,7 +47,7 @@ private:
     void redeem(const std::string& args);
     void build(const std::string& args);       
     void useAbility(const std::string& args);
-    void rollDice(const std::string& args);
+    int rollDice(const std::string& args);
     void setDice(const std::string& args);     
     void bid(const std::string& args);       
     void pass(const std::string& args);          
