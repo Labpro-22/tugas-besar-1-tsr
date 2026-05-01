@@ -53,7 +53,7 @@ void GameManager::startGame() {
         std::cin>>N;
         for (size_t i = 0; i < N; i++)
         {
-            players.push_back(std::make_shared<Player>("Pemain"+std::to_string(i), start_money, 0, PlayerState::FREE));
+            players.push_back(std::make_shared<Player>("Pemain"+std::to_string(i+1), start_money, 0, PlayerState::FREE));
         }
     }
    
@@ -146,7 +146,9 @@ void GameManager::startGame() {
                 }
             }
         }
-
+        if(current_player->getPlayerState() == PlayerState::FREE){
+            property_manager->getTileAt(current_player->getPosition()).onLand(*current_player);
+        }
         current_player->endTurn();
         current_player_index = (current_player_index + 1) % players.size();
         if (current_player_index == 0) current_turn_count++;
@@ -186,7 +188,9 @@ void GameManager::setDice(const std::string& args){ //belum
     die1 = dice1;
     die2 = dice2;
     auto player = players[current_player_index];
-    player->movePlayer(dice1 + dice2);
+    if(player->getPlayerState()==PlayerState::FREE){
+        player->movePlayer(dice1 + dice2);
+    }
     ViewGame::displayManualDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
 }
 
@@ -200,7 +204,9 @@ void GameManager::rollDice(const std::string& args){
     die1=dice1;
     die2=dice2;
     auto player=players[current_player_index];
-    player->movePlayer(dice1+dice2);;
+    if(player->getPlayerState()==PlayerState::FREE){
+        player->movePlayer(dice1 + dice2);
+    }
     ViewGame::displayDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
 }
 
@@ -445,8 +451,8 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
         ViewGame::displayMessage(prompt.str());        
         bool nak = ViewGame::getYesNo();
         if (player.canPay(tile->getBuyPrice()) && nak) {
-            std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M1." << player.getBalance() << "\n"; 
             player.buyProperty(*tile);
+            std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M" << player.getBalance() << "\n"; 
         } else{
             ViewGame::displayMessage("Properti ini akan masuk ke sistem lelang...");
             economy_manager->startAuction(tile);
@@ -455,8 +461,10 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
-            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
+            float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
+            rent=playermoneybefore-player.getBalance();
+            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     } else if (status == PropertyStatus::MORTGAGED) {
         ViewGame::displayMortgagedRent(*tile, player);
@@ -472,8 +480,10 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
-            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
+            float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
+            rent=playermoneybefore-player.getBalance();
+            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     }
 }
@@ -488,8 +498,10 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
-            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
+            float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
+            rent=playermoneybefore-player.getBalance();
+            ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     }
 }

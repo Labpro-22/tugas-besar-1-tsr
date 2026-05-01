@@ -57,7 +57,7 @@ void EconomyManager::startAuction(PropertyTile* property){
     current_highest_bid = 0;
     current_highest_bidder.reset();
     size_t bidder_index = (GameManager::getCurrentTurn()+1 )% active_bidders.size();
-    ViewGame::displayAuctionStart(property->getName(),GameManager::players[bidder_index]->getname());
+    ViewGame::displayAuctionStart(property->getName(),GameManager::players[GameManager::getCurrentTurn()]->getname());
     while (!isAuctionOver()) {
         std::string highest_bidder_name = current_highest_bidder ? current_highest_bidder->getname() : "-";//
         ViewGame::displayAuctionTurn(active_bidders[bidder_index]->getname(),current_highest_bid,highest_bidder_name);
@@ -112,6 +112,7 @@ bool EconomyManager::isAuctionOver() const{
 void EconomyManager::resolveAuction(PropertyTile *tile, std::shared_ptr<Player> & winner){
     auto& logger= GameManager::logger;
     auto &propMgr=GameManager::property_manager;
+    winner->pay(current_highest_bid);
     propMgr->assignOwnership(tile,winner);
     logger->recordEvent(LogEntry(0,winner->getname(),actions::LELANG,"si A menang lelang cuy"));
 }

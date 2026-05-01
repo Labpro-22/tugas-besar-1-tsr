@@ -388,9 +388,9 @@ void ViewGame::displayPlayerProperties(const std::string& playerName) {
 
 void ViewGame::displayRentPayment(const PropertyTile& property, const Player& victim, const Player& owner, float rent_amount) {
     int victim_after = victim.getBalance();
-    int victim_before = victim_after - rent_amount;
+    int victim_before = victim_after + rent_amount;
     int owner_after = owner.getBalance();
-    int owner_before = owner_after + rent_amount;
+    int owner_before = owner_after - rent_amount;
 
     std::string condition = "Tanah/Fasilitas";
     if (property.isStreet()) {
