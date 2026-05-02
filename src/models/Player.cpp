@@ -14,7 +14,9 @@
 std::random_device Player::rd;
 std::mt19937 Player::gen(Player::rd());
 
-Player::Player(std::string name, float balance, int position, PlayerState player_state): name(name), balance(balance), position(position), player_state(player_state) {}
+Player::Player(std::string name, float balance, int position, PlayerState player_state)
+    : name(name), balance(balance), position(position), player_state(player_state), jail_turns(0) {}
+
 std::string Player::getname() {
     return name;
 }
@@ -63,9 +65,26 @@ void Player::transferTo(Player& player, float amount){
 float Player::getmoney(){
     return this->balance;
 }
-void Player::movePlayer(int steps){
-    int size=PropertyManager::getBoard().getSize();
-    position=(position+steps) % size;
+void Player::movePlayer(int steps) {
+    int size = PropertyManager::getBoard().getSize();
+    int old_position = position;
+    
+    int new_pos = (position + steps) % size;
+    if (new_pos < 0) new_pos += size;
+    position = new_pos;
+
+    if (steps > 0 && (old_position + steps) >= size) {
+        Board& board = GameManager::property_manager->getBoard();
+        for (int i = 0; i < board.getSize(); ++i) {
+            if (board.getTile(i).getCode() == "GO") { 
+                GoTile* go_tile = static_cast<GoTile*>(&board.getTile(i));
+                float reward = go_tile->getReward();
+                this->receive(reward); 
+                std::cout << "\nKamu melewati petak GO! Menerima bonus gaji sebesar M" << reward << ".\n";
+                break;
+            }
+        }
+    }
 }
 void Player::addProperty(PropertyTile* property){
     this->owned_properties.push_back(property);
@@ -180,14 +199,6 @@ bool Player::inJail() {
     return player_state == PlayerState::INJAIL;
 }
 
-void Player::setInJail() {
-    player_state = PlayerState::INJAIL;
-}
-
-void Player::setFree() {
-    player_state = PlayerState::FREE;
-}
-
 void Player::startTurn() {
     for (const auto& effect : active_effects) {
         effect->onTurnStart(*this);
@@ -255,4 +266,26 @@ void Player::setPosition(int index) {
 
 PlayerState Player::getPlayerState() const {
     return player_state;
+}
+
+void Player::setInJail() {
+    player_state = PlayerState::INJAIL;
+    resetJailTurns();
+}
+
+void Player::setFree() {
+    player_state = PlayerState::FREE;
+    resetJailTurns();
+}
+
+int Player::getJailTurns() const {
+    return jail_turns;
+}
+
+void Player::incrementJailTurns() {
+    jail_turns++;
+}
+
+void Player::resetJailTurns() {
+    jail_turns = 0;
 }

@@ -42,11 +42,10 @@ void ViewGame::displayException(const GameException& e) {
 
 std::string ViewGame::getUserCommand() {
     std::vector<std::string> valid_commands = {
-        "CETAK_PAPAN", "LEMPAR_DADU", "ATUR_DADU", "CETAK_AKTA", 
+        "CETAK_PAPAN", "LEMPAR_DADU", "ATUR_DADU", "CETAK_AKTA",
         "CETAK_PROPERTI", "GADAI", "TEBUS", "BANGUN", "SIMPAN", 
-        "MUAT", "CETAK_LOG", "GUNAKAN_KEMAMPUAN", "HELP"
+        "MUAT", "GUNAKAN_KEMAMPUAN", "BAYAR_DENDA", "HELP", "EXIT"
     };
-
     std::string input;
     while (true) {
         std::cout << "\n> ";

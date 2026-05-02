@@ -66,6 +66,7 @@ private:
     std::shared_ptr<Player> getCurrentPlayer();
     void nextPlayer();
     void checkGameOver();
+    void payJailFine(const std::string& args);
 
     void getPlayerInJail(Player& player);
     void helpMessage();

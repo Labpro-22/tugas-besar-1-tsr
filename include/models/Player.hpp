@@ -23,6 +23,7 @@ private:
     float balance;
     int position;
     PlayerState player_state;
+    int jail_turns;
     std::vector<std::unique_ptr<SkillCard>> saved_cards;
     std::vector<std::unique_ptr<Effect>> active_effects;
 
@@ -74,4 +75,8 @@ public:
     void setPosition(int index);
 
     PlayerState getPlayerState() const;
+
+    int getJailTurns() const;
+    void incrementJailTurns();
+    void resetJailTurns();
 };
