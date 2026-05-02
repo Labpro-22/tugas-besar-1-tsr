@@ -1,0 +1,12 @@
+1 30
+2
+Miskin 50 GO ACTIVE
+0
+Sultan 5000 GO ACTIVE
+0
+Miskin Sultan
+Miskin
+1
+TSK street Sultan OWNED 4 1 0
+0
+0

@@ -95,7 +95,7 @@ void GameManager::startGame() {
             }
             bool dice_rolled = false;
             while (true) {
-                std::cout << "\nMasukkan Input: ";
+                std::cout << "\n[" << current_player->getname() << "] Masukkan Input: ";
                 std::string raw_command = ViewGame::getUserCommand();
                 std::stringstream ss(raw_command);
                 std::string command;
@@ -512,6 +512,7 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
             player.buyProperty(*tile);
             std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M" << player.getBalance() << "\n"; 
         } else{
+            std::cout << "Gagal membeli! Uang kamu tidak cukup (Butuh M" << tile->getBuyPrice() << ")\n";
             ViewGame::displayMessage("Properti ini akan masuk ke sistem lelang...");
             economy_manager->startAuction(tile);
         }

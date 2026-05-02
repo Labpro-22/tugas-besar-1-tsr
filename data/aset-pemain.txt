@@ -1,0 +1,16 @@
+1 30
+3
+Miskin 50 37 FREE
+0
+Sultan 5000 0 FREE
+0
+Penonton 5000 0 FREE
+0
+Miskin Sultan Penonton
+Miskin
+3
+BDG street Miskin OWNED 1 0 2
+GBR railroad Miskin MORTGAGED 1 0 0
+JKT street Sultan OWNED 1 0 H
+0
+0

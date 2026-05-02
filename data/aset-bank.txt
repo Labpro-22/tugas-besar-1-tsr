@@ -1,0 +1,15 @@
+1 30
+3
+Koruptor 10 37 FREE
+0
+Bankir 5000 0 FREE
+0
+Saksi 5000 0 FREE
+0
+Koruptor Bankir Saksi
+Koruptor
+2
+GRT street Koruptor OWNED 1 0 3
+PLN utility Koruptor MORTGAGED 1 0 0
+0
+0

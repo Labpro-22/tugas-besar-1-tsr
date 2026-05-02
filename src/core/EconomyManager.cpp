@@ -31,8 +31,7 @@ bool EconomyManager::processTax(std::shared_ptr<Player> player, TaxType type, fl
     auto &logger=GameManager::logger;
     float tax;
     if (type==TaxType::PPH){
-        int pilihan = 2;
-        ViewGame::getInt(pilihan);
+        int pilihan = ViewGame::getInt(2);
         if( pilihan==1){
             tax=baseTaxAmount;
         }
