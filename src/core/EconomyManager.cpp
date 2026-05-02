@@ -168,27 +168,55 @@ bool EconomyManager::isBankruptcyInevitable(Player& player, float debtAmount) co
     return false;
 }
 void EconomyManager::executeBankruptcy(Player& bankruptPlayer, std::shared_ptr<Player> creditor, float amount) {
+    auto& logger = GameManager::logger;
+    
     bankruptPlayer.declareBankruptcy();
+    
     float remaining_cash = bankruptPlayer.getBalance();
     bankruptPlayer.pay(remaining_cash); 
     
-    if (creditor) {
-        creditor->receive(remaining_cash);
-    }
     std::vector<PropertyTile*> owned_properties = GameManager::property_manager->findPropertiesOwnedByPlayer(&bankruptPlayer);
 
-    for (PropertyTile* prop : owned_properties) {
-        if (creditor) {
+    if (creditor != nullptr) {
+        std::cout << "\nBANGKRUT KE PEMAIN LAIN!\n";
+        std::cout << bankruptPlayer.getname() << " bangkrut kepada " << creditor->getname() << "!\n";
+        
+        creditor->receive(remaining_cash);
+        std::cout << creditor->getname() << " menerima sisa uang tunai: M" << remaining_cash << "\n";
+        
+        for (PropertyTile* prop : owned_properties) {
             GameManager::property_manager->assignOwnership(prop, creditor);
-        } else {
+            std::cout << "- Properti " << prop->getName() << " dialihkan ke " << creditor->getname() << "\n";
+        }
+        
+        logger->recordEvent(LogEntry(0, bankruptPlayer.getname(), actions::BANKRUPT, "Bangkrut dan menyerahkan aset ke " + creditor->getname()));
+    } 
+    else {
+        std::cout << "\nBANGKRUT KE BANK!\n";
+        std::cout << bankruptPlayer.getname() << " bangkrut kepada Bank!\n";
+        std::cout << "Sisa uang tunai M" << remaining_cash << " disita oleh Bank.\n";
+        
+        std::vector<PropertyTile*> properties_to_auction;
+        
+        for (PropertyTile* prop : owned_properties) {
             GameManager::property_manager->assignOwnership(prop, nullptr);
-            prop->setPropertyStatus(BANK);
+            prop->setPropertyStatus(PropertyStatus::BANK);
             
             if (prop->getPropertyType() == PropertyType::STREET) {
-                dynamic_cast<StreetTile*>(prop)->resetBuildings(); 
+                static_cast<StreetTile*>(prop)->resetBuildings(); 
+            }
+            
+            properties_to_auction.push_back(prop);
+            std::cout << "- Properti " << prop->getName() << " disita dan bangunan dihancurkan.\n";
+        }
+        
+        logger->recordEvent(LogEntry(0, bankruptPlayer.getname(), actions::BANKRUPT, "Bangkrut ke Bank. Aset disita."));
+        
+        if (!properties_to_auction.empty()) {
+            std::cout << "\nBank akan melelang properti yang disita satu per satu...\n";
+            for (PropertyTile* prop : properties_to_auction) {
+                this->startAuction(prop); 
             }
         }
     }
 }
-
-
