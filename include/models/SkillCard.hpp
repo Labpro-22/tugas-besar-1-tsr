@@ -23,8 +23,6 @@ public:
     virtual void useEffect(Player& p) = 0;
     virtual void loadFromSave(float value, int remainingDuration);
 
-    std::string getName() const;
-
     virtual std::string toSaveFormat() const;
 
 

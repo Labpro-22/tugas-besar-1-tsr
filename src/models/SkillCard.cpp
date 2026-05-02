@@ -16,15 +16,17 @@ void SkillCard::loadFromSave(float value, int remainingDuration) {
     (void)value;
     (void)remainingDuration;
 }
+
+std::string SkillCard::getName() const {
+    return Card::getName();
+}
 std::string SkillCard::toSaveFormat() const {
     std::ostringstream out;
     out << Card::getName() << "\n";
     return out.str();
 }
 
-std::string SkillCard::getName() const {
-    return Card::getName();
-}
+
 
 // MoveSkillCard
 MoveSkillCard::MoveSkillCard(std::string name):SkillCard(name){}

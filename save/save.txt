@@ -1,13 +1,13 @@
 TURN_SAAT_INI MAX_TURN
-2 15
+1 15
 JUMLAH_PEMAIN
 3
 STATE_PEMAIN
-Pemain1 940 25FREE
+Pemain1 900 15FREE
 0
-Pemain2 1000 35FREE
+Pemain2 680 16FREE
 0
-Pemain3 740 14FREE
+Pemain3 1000 7FREE
 0
 Pemain1 Pemain2 Pemain3
 GILIRAN_AKTIF_SAAT_INI
@@ -15,14 +15,14 @@ Pemain3
 STATE_PROPERTI
 28
 GRT street BANK BANK 1 0 0
-TSK street Pemain1 OWNED 1 0 0
+TSK street BANK BANK 1 0 0
 GBR street BANK BANK 1 0 BGR street BANK BANK 1 0 0
-DPK street Pemain3 OWNED 1 0 0
+DPK street Pemain1 OWNED 1 0 0
 BKS street BANK BANK 1 0 0
 MGL street BANK BANK 1 0 0
-PLN street BANK BANK 1 0 SOL street BANK BANK 1 0 0
-YOG street Pemain3 OWNED 1 0 0
-STB street BANK BANK 1 0 MAL street BANK BANK 1 0 0
+PLN street BANK BANK 1 0 SOL street Pemain2 OWNED 1 0 0
+YOG street BANK BANK 1 0 0
+STB street BANK BANK 1 0 MAL street Pemain2 OWNED 1 0 0
 SMG street BANK BANK 1 0 0
 SBY street BANK BANK 1 0 0
 MKS street BANK BANK 1 0 0
@@ -41,72 +41,65 @@ STATE_DECK
 Tertangkap Tilang
 Pajak Mendadak
 Maju 3 Langkah
+Pajak Mendadak
+Tertangkap Tilang
+Pajak Mendadak
 Tiket Kereta Api
 Maju 3 Langkah
 Tertangkap Tilang
+Tertangkap Tilang
+Tiket Kereta Api
 Maju 3 Langkah
 Tiket Kereta Api
-Pajak Mendadak
-Tertangkap Tilang
-Tertangkap Tilang
-Pajak Mendadak
 Maju 3 Langkah
-Tiket Kereta Api
 Pajak Mendadak
-~Tiket Kereta Api
+Tiket Kereta Api
 16
-Jalan Mundur
 Salah Tangkap
 Bonus Deviden
+Salah Tangkap
 Jalan Mundur
 Kereta Cepat
 Kereta Cepat
+Bonus Deviden
+Bonus Deviden
+Jalan Mundur
+Jalan Mundur
+Bonus Deviden
+Kereta Cepat
+Salah Tangkap
+Salah Tangkap
 Kereta Cepat
 Jalan Mundur
-Salah Tangkap
-Bonus Deviden
-Salah Tangkap
-Bonus Deviden
-Bonus Deviden
-Jalan Mundur
-Salah Tangkap
-~Kereta Cepat
 18
- 0
-
- 0
-
-
-
- 0
-
-
- 0
-
-
-
-
- 0
-
- 0
-
+discount 0
+lasso
+shield
+demolition
+move 0
+shield
+teleport
+shield
+discount 0
+demolition
+demolition
+lasso
+lasso
+teleport
+move 1280655686
+teleport
+move 0
+discount 0
 STATE_LOG
-18
-0 Pemain1 DADU Melempar dadu: 1 dan 2
-0 Pemain1 BELI Membeli properti: TASIKMALAYA seharga M60
-0 Pemain2 DADU Melempar dadu: 5 dan 2
-0 Pemain3 DADU Melempar dadu: 3 dan 5
-0 Pemain3 BELI Membeli properti: DEPOK seharga M100
-1 Pemain1 DADU Melempar dadu: 6 dan 1
-1 Pemain2 DADU Melempar dadu: 6 dan 6
-1 Pemain2 DOUBLE Mendapat double!
-1 Pemain2 DADU Melempar dadu: 2 dan 1
-1 Pemain2 RAILROAD Mendapatkan stasiun: STASIUN_TUGU
-1 Pemain2 KESEMPATAN Mengambil kartu Kesempatan
-1 Pemain3 DADU Melempar dadu: 5 dan 1
-1 Pemain3 BELI Membeli properti: YOGYAKARTA seharga M160
-2 Pemain1 DADU Melempar dadu: 1 dan 6
-2 Pemain1 RAILROAD Mendapatkan stasiun: STASIUN_TUGU
-2 Pemain1 DANA_UMUM Mengambil kartu Dana Umum
-2 Pemain2 DADU Melempar dadu: 6 dan 4
-2 Pemain2 RAILROAD Mendapatkan stasiun: STASIUN_GUBENG
+11
+0 Pemain1 DADU Melempar dadu: 2 dan 6
+0 Pemain1 BELI Membeli properti: DEPOK seharga M100
+0 Pemain2 DADU Melempar dadu: 2 dan 2
+0 Pemain2 DOUBLE Mendapat double!
+0 Pemain2 DADU Melempar dadu: 5 dan 4
+0 Pemain2 BELI Membeli properti: SOLO seharga M140
+0 Pemain3 DADU Melempar dadu: 1 dan 6
+1 Pemain1 DADU Melempar dadu: 1 dan 6
+1 Pemain1 RAILROAD Mendapatkan stasiun: STASIUN_BANDUNG
+1 Pemain2 DADU Melempar dadu: 1 dan 2
+1 Pemain2 BELI Membeli properti: MALANG seharga M180
