@@ -4,10 +4,13 @@
 GameSaveData IOManager::loadGameData(const std::string& filepath){
     GameSaveData res;
     
-    std::ifstream file("./data/"+filepath);
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        std::cout << "ERROR: Gagal membuka file di " << filepath << "!\n";
+        return res; 
+    }
     std::string line;
 
-    // header
     std::getline(file,line);
     std::istringstream header1(line);
     header1 >> res.current_turn >> res.max_turn;
@@ -15,9 +18,8 @@ GameSaveData IOManager::loadGameData(const std::string& filepath){
     std::istringstream header2(line);
     header2 >> res.player_count;
     
-    // players
     std::string username, pos, status;
-    int balance;
+    // int balance;
     for(int i=0;i<res.player_count;i++){
         std::getline(file,line);
         std::istringstream playerLine(line);
@@ -47,7 +49,6 @@ GameSaveData IOManager::loadGameData(const std::string& filepath){
         res.players.push_back(player);
     }
 
-    // turns
     std::getline(file,line);
     std::istringstream turnOrder(line);
     std::string name;
@@ -58,7 +59,6 @@ GameSaveData IOManager::loadGameData(const std::string& filepath){
     std::istringstream curr_player(line);
     curr_player >> res.current_active_player;
 
-    // property
     std::getline(file,line);
     std::istringstream propertyCount(line);
     int property_count;
@@ -67,24 +67,35 @@ GameSaveData IOManager::loadGameData(const std::string& filepath){
         std::getline(file,line);
         std::istringstream propertyLine(line);
         PropertySaveData property;
-        propertyLine >> property.tile_code >> property.type >> property.owner_name >> property.status >> property.festival_multiplier >> property.festival_duration >> property.build_level;
+        
+        std::string b_level_str; 
+        propertyLine >> property.tile_code >> property.type >> property.owner_name >> property.status >> property.festival_multiplier >> property.festival_duration >> b_level_str;
+        
+        if (b_level_str == "H") {
+            property.build_level = 5;
+        } else {
+            property.build_level = std::stoi(b_level_str);
+        }
+        
         res.properties.push_back(property);
     }
-
-    // deck
-    std::getline(file,line);
-    std::istringstream cardDeckCount(line);
-    int card_deck_count;
-    cardDeckCount >> card_deck_count;
-    for(int i=0;i<card_deck_count;i++){
+    for (int deck_idx = 0; deck_idx < 3; deck_idx++) {
         std::getline(file,line);
-        std::istringstream deckLine(line);
-        std::string card;
-        deckLine >> card;
-        res.skill_card_deck.push_back(card);        
+        std::istringstream cardDeckCount(line);
+        int card_deck_count;
+        cardDeckCount >> card_deck_count;
+        for(int i=0;i<card_deck_count;i++){
+            std::getline(file,line);
+            std::istringstream deckLine(line);
+            std::string card;
+            deckLine >> card;
+        
+            if (deck_idx == 2) {
+                res.skill_card_deck.push_back(card);        
+            }
+        }
     }
 
-    // logs
     std::getline(file,line);
     std::istringstream logsCount(line);
     int logs_count;

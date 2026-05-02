@@ -450,13 +450,15 @@ std::string PropertyManager::toSaveFormat() const {
         // <N_BANGUNAN>
         if (type == PropertyType::STREET) {
             StreetTile* street = dynamic_cast<StreetTile*>(prop);
-            int bLevel = street->getBuildingLevel();
-            
-            // 5 is Hotel, 0-4 is houses
-            if (bLevel == 5) {
-                out << "H\n";
+            if (street == nullptr) {
+                out << "0\n";
             } else {
-                out << bLevel << "\n";
+                int bLevel = street->getBuildingLevel();
+                if (bLevel == 5) {
+                    out << "H\n";
+                } else {
+                    out << bLevel << "\n";
+                }
             }
         } else {
             out << "0\n"; 

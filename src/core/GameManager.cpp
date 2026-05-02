@@ -8,7 +8,7 @@
 #include <iterator>
 int GameManager::current_player_index = 0;
 int GameManager::max_turn_limit = 0;
-int GameManager::currentTurn = 1;
+int GameManager::current_turn_count = 0;
 std::unique_ptr<CardManager> GameManager::card_manager = nullptr;
 std::unique_ptr<PropertyManager> GameManager::property_manager = nullptr;
 std::unique_ptr<EconomyManager> GameManager::economy_manager = nullptr;
@@ -17,7 +17,6 @@ std::vector<std::shared_ptr<Player>> GameManager::players = {};
 std::unordered_map<std::string, std::function<void(const std::string&)>> GameManager::command_map = {};
 
 GameManager::GameManager(int maxTurns,int jumlah):
-            current_turn_count(0),
             max_turns(maxTurns),
             current_state(GameState::START_TURN),pending_debt(0.0f),pending_creditor(nullptr) {
         current_player_index=0;
@@ -36,7 +35,7 @@ GameManager::GameManager(int maxTurns,int jumlah):
         command_map["BANGUN"] = [this](const std::string& args) { this->build(args); };
         command_map["SIMPAN"] = [this](const std::string& args) { this->save(args); };
         command_map["MUAT"] = [this](const std::string& args) { this->loadSaveState(args); };
-        // command_map["CETAK_LOG"] = [this](const std::string& args) { this->printLog(args); };
+        command_map["CETAK_LOG"] = [this](const std::string& args) { this->printLog(args); };
         command_map["GUNAKAN_KEMAMPUAN"] = [this](const std::string& args) { this->useAbility(args); };
         command_map["HELP"] = [this](const std::string& args) {this->helpMessage();};
         command_map["BAYAR_DENDA"] = [this](const std::string& args) { this->payJailFine(args); };
@@ -67,6 +66,7 @@ void GameManager::startGame() {
         // for (int i = 0; i < N; i++) {
         //     players.push_back(std::make_shared<Player>("Pemain"+std::to_string(i+1), start_money, 0, PlayerState::FREE));
         // }
+        card_manager->initializeDecks();
     }
    
     while (current_turn_count <= max_turns) {
@@ -198,7 +198,6 @@ void GameManager::startGame() {
         current_player->endTurn();
         current_player_index = (current_player_index + 1) % players.size();
         if (current_player_index == 0) current_turn_count++;
-        currentTurn = current_turn_count;
     }
     
     std::vector<Player*> raw_players;
@@ -220,6 +219,36 @@ void GameManager::printProperty(const std::string& args){
     ViewGame::displayPlayerProperties(players[current_player_index]->getname());
 }
 
+void GameManager::printLog(const std::string& args){
+    std::string logs;
+    if (args.empty()) {
+        // No arguments: show all logs
+        logs = logger->getAllLogs();
+        if (logs.empty()) {
+            ViewGame::displayMessage("Tidak ada log transaksi.");
+            return;
+        }
+    } else {
+        // Parse the number of recent logs to display
+        try {
+            int n = std::stoi(args);
+            if (n <= 0) {
+                ViewGame::displayMessage("Jumlah log harus lebih dari 0.");
+                return;
+            }
+            logs = logger->getRecentLogs(n);
+            if (logs.empty()) {
+                ViewGame::displayMessage("Tidak ada log transaksi.");
+                return;
+            }
+        } catch (const std::exception& e) {
+            ViewGame::displayMessage("Format CETAK_LOG harus: CETAK_LOG atau CETAK_LOG <jumlah>. Contoh: CETAK_LOG 5");
+            return;
+        }
+    }
+    ViewGame::displayMessage(logs);
+}
+
 void GameManager::setDice(const std::string& args){ //belum
     std::stringstream ss(args);
     int dice1;
@@ -238,6 +267,14 @@ void GameManager::setDice(const std::string& args){ //belum
     if(player->getPlayerState()==PlayerState::FREE){
         player->movePlayer(dice1 + dice2);
     }
+    
+    std::string desc = "Mengatur dadu: " + std::to_string(dice1) + " dan " + std::to_string(dice2);
+    logger->recordEvent(LogEntry(current_turn_count, player->getname(), DADU, desc));
+    
+    if (dice1 == dice2) {
+        logger->recordEvent(LogEntry(current_turn_count, player->getname(), DOUBLE, "Mendapat double!"));
+    }
+    
     ViewGame::displayManualDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
 }
 
@@ -254,13 +291,21 @@ void GameManager::rollDice(const std::string& args){
     if(player->getPlayerState()==PlayerState::FREE){
         player->movePlayer(dice1 + dice2);
     }
+    
+    std::string desc = "Melempar dadu: " + std::to_string(dice1) + " dan " + std::to_string(dice2);
+    logger->recordEvent(LogEntry(current_turn_count, player->getname(), DADU, desc));
+    
+    if (dice1 == dice2) {
+        logger->recordEvent(LogEntry(current_turn_count, player->getname(), DOUBLE, "Mendapat double!"));
+    }
+    
     ViewGame::displayDiceRollResult(players[current_player_index]->getname(),dice1,dice2,PropertyManager::getBoard().getTile(player->getPosition()).getName());
 }
 
 void GameManager::mortgage(const std::string& args){
     auto player = players[current_player_index];
-
     std::vector<PropertyTile*> mortgagable_props;
+    
     for (auto* prop : player->owned_properties) {
         if (prop->getPropertyStatus() == PropertyStatus::OWNED) {
             mortgagable_props.push_back(prop);
@@ -268,24 +313,25 @@ void GameManager::mortgage(const std::string& args){
     }
 
     if (mortgagable_props.empty()) {
-        ViewGame::displayMessage("Tidak ada properti yang dapat digadaikan saat ini.");
+        ViewGame::displayMessage("Tidak ada properti yang dapat digadaikan.");
         return;
     }
 
     ViewGame::displayMortgageList(mortgagable_props);
     int choice = ViewGame::getInt(mortgagable_props.size());
-    
     if (choice == 0) return; 
 
-    int index = choice - 1; 
-    
-    property_manager->tryMortgage(player, mortgagable_props[index]);
+    PropertyTile* prop = mortgagable_props[choice - 1];
+    if (property_manager->tryMortgage(player, prop)) {
+        std::string desc = "Menggadaikan properti: " + prop->getName();
+        logger->recordEvent(LogEntry(current_turn_count, player->getname(), GADAI, desc));
+    }
 }
 
 void GameManager::redeem(const std::string& args){
     auto player = players[current_player_index];
-
     std::vector<PropertyTile*> mortgaged_props;
+
     for (auto* prop : player->owned_properties) {
         if (prop->getPropertyStatus() == PropertyStatus::MORTGAGED) {
             mortgaged_props.push_back(prop);
@@ -299,16 +345,15 @@ void GameManager::redeem(const std::string& args){
 
     ViewGame::displayUnmortgageList(mortgaged_props, player->getBalance());
     int choice = ViewGame::getInt(mortgaged_props.size()); 
-    
     if (choice == 0) return;
 
-    int index = choice - 1; 
-    auto property = mortgaged_props[index];
-
-    if(property_manager->tryUnmortgage(player, property)){
-        ViewGame::displayUnmortgageSuccess(property->getName(), property->getMortgageValue(), player->getBalance());
-    } else{
-        ViewGame::displayUnmortgageFailure(property->getName(), property->getMortgageValue(), player->getBalance());
+    PropertyTile* prop = mortgaged_props[choice - 1];
+    if(property_manager->tryUnmortgage(player, prop)){
+        std::string desc = "Menebus properti: " + prop->getName();
+        logger->recordEvent(LogEntry(current_turn_count, player->getname(), UNMORTGAGE, desc));
+        ViewGame::displayUnmortgageSuccess(prop->getName(), prop->getMortgageValue(), player->getBalance());
+    } else {
+        ViewGame::displayUnmortgageFailure(prop->getName(), prop->getMortgageValue(), player->getBalance());
     }
 }
 
@@ -386,8 +431,12 @@ void GameManager::build(const std::string& args){ //ga yakin, dibantu teman ini
     }
 
     if (previous_level == 4) {
+        std::string desc = "Membangun hotel di: " + selected_street->getName();
+        logger->recordEvent(LogEntry(current_turn_count, player->getname(), BUILD_HOTEL, desc));
         ViewGame::displayUpgradeHotelSuccess(selected_street->getName(), build_cost, player->getBalance());
     } else {
+        std::string desc = "Membangun rumah di: " + selected_street->getName();
+        logger->recordEvent(LogEntry(current_turn_count, player->getname(), BUILD_HOUSE, desc));
         ViewGame::displayBuildSuccess(selected_street->getName(), build_cost, player->getBalance());
     }
 }
@@ -425,6 +474,8 @@ void GameManager::useAbility(const std::string& args){
 
     player->useSkillCard(index);
     GameManager::card_manager->takeSkillCardFromPlayer(*player,index);
+    std::string desc = "Menggunakan kartu: " + std::string(selected_card->getName());
+    logger->recordEvent(LogEntry(current_turn_count, player->getname(), KARTU, desc));
     ViewGame::displaySkillCardActivated(selected_card->getName(), effect_desc);
 }
 
@@ -447,10 +498,11 @@ void GameManager::getPlayerInJail(Player& player) {
 void GameManager::visitCardTile(CardTile* tile, Player& player) {
     if(tile->getType() == CHANCE){
         card_manager->drawKesempatan(player);
-
+        logger->recordEvent(LogEntry(current_turn_count, player.getname(), KESEMPATAN, "Mengambil kartu Kesempatan"));
     }
     else{
         card_manager->drawDanaUmum(player);
+        logger->recordEvent(LogEntry(current_turn_count, player.getname(), DANA_UMUM, "Mengambil kartu Dana Umum"));
     }
 }
 
@@ -463,6 +515,8 @@ void GameManager::visitTaxTile(TaxTile* tile, Player& player) {
 
     bool trying = economy_manager->processTax(player.shared_from_this(), tile->getTaxType(), tile->getTaxAmount());
     if (trying) {
+        std::string desc = "Membayar pajak: M" + std::to_string(static_cast<int>(tile->getTaxAmount()));
+        logger->recordEvent(LogEntry(current_turn_count, player.getname(), PAJAK, desc));
         std::cout << "Kamu berhasil membayar\n";
     }
 }
@@ -498,6 +552,8 @@ void GameManager::visitFestivalTile(FestivalTile* tile, Player& player) {
 
     if (selected_property) {
         property_manager->startFestival(selected_property); 
+        std::string desc = "Merayakan festival di: " + selected_property->getName();
+        logger->recordEvent(LogEntry(current_turn_count, player.getname(), FESTIVAL, desc));
         ViewGame::displayMessage("Efek festival diaktifkan di " + selected_property->getName() + "!");
     }
 }
@@ -518,6 +574,7 @@ void GameManager::visitGoToJailTile(GoToJailTile* tile, Player& player) {
     }
     player.setInJail();
     player.setPosition(pen_index);
+    logger->recordEvent(LogEntry(current_turn_count, player.getname(), GOJAIL, "Dipaksa masuk ke penjara"));
 }
 
 void GameManager::visitFreeParkingTile(FreeParkingTile* tile, Player& player) {
@@ -538,6 +595,8 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
         bool nak = ViewGame::getYesNo();
         if (player.canPay(tile->getBuyPrice()) && nak) {
             player.buyProperty(*tile);
+            std::string desc = "Membeli properti: " + tile->getName() + " seharga M" + std::to_string(static_cast<int>(tile->getBuyPrice()));
+            logger->recordEvent(LogEntry(current_turn_count, player.getname(), BELI, desc));
             std::cout << tile->getName() << "kini menjadi milikmu!" << "\n" << "Uang tersisa: M" << player.getBalance() << "\n"; 
         } else{
             std::cout << "Gagal membeli! Uang kamu tidak cukup (Butuh M" << tile->getBuyPrice() << ")\n";
@@ -551,6 +610,8 @@ void GameManager::visitStreetTile(StreetTile* tile, Player& player) {
             float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
             rent=playermoneybefore-player.getBalance();
+            std::string desc = "Membayar sewa " + tile->getName() + " kepada " + current_owner->getname() + " sebesar M" + std::to_string(static_cast<int>(rent));
+            logger->recordEvent(LogEntry(current_turn_count, player.getname(), SEWA, desc));
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     } else if (status == PropertyStatus::MORTGAGED) {
@@ -565,6 +626,7 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
         player.addProperty(tile);
         tile->setPropertyStatus(PropertyStatus::OWNED);
         tile->setPropertyOwner(player.shared_from_this());
+        logger->recordEvent(LogEntry(current_turn_count, player.getname(), RAILROAD, "Mendapatkan stasiun: " + tile->getName()));
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
@@ -572,6 +634,8 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
             float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
             rent=playermoneybefore-player.getBalance();
+            std::string desc = "Membayar sewa stasiun " + tile->getName() + " kepada " + current_owner->getname() + " sebesar M" + std::to_string(static_cast<int>(rent));
+            logger->recordEvent(LogEntry(current_turn_count, player.getname(), SEWA, desc));
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     }
@@ -585,13 +649,15 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
         player.addProperty(tile);
         tile->setPropertyStatus(PropertyStatus::OWNED);
         tile->setPropertyOwner(player.shared_from_this());
+        logger->recordEvent(LogEntry(current_turn_count, player.getname(), RAILROAD, "Mendapatkan utility: " + tile->getName()));
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
             float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
-            rent = playermoneybefore-player.getBalance();
+            std::string desc = "Membayar sewa fasilitas umum " + tile->getName() + " kepada " + current_owner->getname() + " sebesar M" + std::to_string(static_cast<int>(rent));
+            logger->recordEvent(LogEntry(current_turn_count, player.getname(), SEWA, desc));
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     }
@@ -623,12 +689,15 @@ std::string GameManager::toSaveFormat() const {
     std::ostringstream out;
     
     // <TURN_SAAT_INI> <MAX_TURN>
+    // out << "TURN_SAAT_INI MAX_TURN" << std::endl;
     out << current_turn_count << " " << max_turns << "\n";
     
     // <JUMLAH_PEMAIN>
+    // out << "JUMLAH_PEMAIN" << std::endl;
     out << players.size() << "\n";
 
     // <STATE_PEMAIN_1..N>
+    // out << "STATE_PEMAIN" << std::endl;
     for(const std::shared_ptr<Player>& p : players){
         out << p->toSaveFormat();
     }
@@ -643,13 +712,17 @@ std::string GameManager::toSaveFormat() const {
     }
     
     // <GILIRAN_AKTIF_SAAT_INI>
+    // out << "GILIRAN_AKTIF_SAAT_INI" << std::endl;
     out << players[current_player_index]->getName() << "\n"; 
 
     // <STATE_PROPERTI>
+    // out << "STATE_PROPERTI" << std::endl;
     out << property_manager->toSaveFormat();
     // <STATE_DECK>
+    // out << "STATE_DECK" << std::endl;
     out << card_manager->toSaveFormat();
     // <STATE_LOG>
+    // out << "STATE_LOG" << std::endl;
     out << logger->toSaveFormat();
 
     return out.str();
@@ -675,6 +748,7 @@ void GameManager::loadConfig(const std::string& args){
 
 void GameManager::loadSaveState(const std::string& args){
     const std::string& filename = args;
+    logger->recordEvent(LogEntry(current_turn_count, "System", LOAD, "Permainan dimuat dari: " + filename));
     GameSaveData data = IOManager::loadGameData(filename);
 
     current_turn_count = data.current_turn;
@@ -792,7 +866,8 @@ int GameManager::getCurrentTurn(){
 void GameManager::save(const std::string& args) {
     const std::string &filedir=args;
     SaveLoadManager slm;
-    slm.save(*this, filedir); 
+    slm.save(*this, filedir);
+    logger->recordEvent(LogEntry(current_turn_count, players[current_player_index]->getname(), SAVE, "Permainan disimpan di: " + filedir));
 }
 
 void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::shared_ptr<Player> creditor, float amount) {
@@ -812,9 +887,8 @@ void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::sha
     else {
         // DEATH
         std::cout << payer->getName() << " HAS GONE BANKRUPT!\n";
+        logger->recordEvent(LogEntry(current_turn_count, payer->getName(), BANKRUPT, "Bangkrut dan keluar dari permainan"));
         economy_manager->executeBankruptcy(*payer, creditor, amount);
-        
-        logger->recordEvent(LogEntry(current_turn_count, payer->getName(), BANKRUPT, "Went Bankrupt"));
         checkGameOver();
     }
 }
@@ -841,7 +915,7 @@ void GameManager::helpMessage() {
 }
 
 int GameManager::getGameTurn() {
-    return currentTurn;
+    return 1;
 }
 int GameManager::getGameMaxTurn() {
     return max_turn_limit;

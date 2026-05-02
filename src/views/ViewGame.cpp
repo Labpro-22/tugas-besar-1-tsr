@@ -44,7 +44,7 @@ std::string ViewGame::getUserCommand() {
     std::vector<std::string> valid_commands = {
         "CETAK_PAPAN", "LEMPAR_DADU", "ATUR_DADU", "CETAK_AKTA",
         "CETAK_PROPERTI", "GADAI", "TEBUS", "BANGUN", "SIMPAN", 
-        "MUAT", "GUNAKAN_KEMAMPUAN", "BAYAR_DENDA", "HELP", "EXIT"
+        "MUAT", "GUNAKAN_KEMAMPUAN", "BAYAR_DENDA", "HELP", "EXIT", "CETAK_LOG"
     };
     std::string input;
     while (true) {

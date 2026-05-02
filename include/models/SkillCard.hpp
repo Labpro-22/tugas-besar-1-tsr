@@ -5,14 +5,11 @@
 #include <string>
 
 class SkillCard : public Card {
-protected:
-    std::string name;
 
 public:
     SkillCard(std::string name);
     virtual ~SkillCard() = default;
     
-    std::string getName() const;
 
     virtual bool isMoveCard() const { return false; }
     virtual bool isDiscountCard() const { return false; }
@@ -26,6 +23,8 @@ public:
     virtual void loadFromSave(float value, int remainingDuration);
 
     virtual std::string toSaveFormat() const;
+
+
 };
 
 class MoveSkillCard : public SkillCard {
