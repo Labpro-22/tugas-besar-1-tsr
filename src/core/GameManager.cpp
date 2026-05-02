@@ -611,15 +611,15 @@ std::string GameManager::toSaveFormat() const {
     std::ostringstream out;
     
     // <TURN_SAAT_INI> <MAX_TURN>
-    out << "TURN_SAAT_INI MAX_TURN" << std::endl;
+    // out << "TURN_SAAT_INI MAX_TURN" << std::endl;
     out << current_turn_count << " " << max_turns << "\n";
     
     // <JUMLAH_PEMAIN>
-    out << "JUMLAH_PEMAIN" << std::endl;
+    // out << "JUMLAH_PEMAIN" << std::endl;
     out << players.size() << "\n";
 
     // <STATE_PEMAIN_1..N>
-    out << "STATE_PEMAIN" << std::endl;
+    // out << "STATE_PEMAIN" << std::endl;
     for(const std::shared_ptr<Player>& p : players){
         out << p->toSaveFormat();
     }
@@ -634,17 +634,17 @@ std::string GameManager::toSaveFormat() const {
     }
     
     // <GILIRAN_AKTIF_SAAT_INI>
-    out << "GILIRAN_AKTIF_SAAT_INI" << std::endl;
+    // out << "GILIRAN_AKTIF_SAAT_INI" << std::endl;
     out << players[current_player_index]->getName() << "\n"; 
 
     // <STATE_PROPERTI>
-    out << "STATE_PROPERTI" << std::endl;
+    // out << "STATE_PROPERTI" << std::endl;
     out << property_manager->toSaveFormat();
     // <STATE_DECK>
-    out << "STATE_DECK" << std::endl;
+    // out << "STATE_DECK" << std::endl;
     out << card_manager->toSaveFormat();
     // <STATE_LOG>
-    out << "STATE_LOG" << std::endl;
+    // out << "STATE_LOG" << std::endl;
     out << logger->toSaveFormat();
 
     return out.str();

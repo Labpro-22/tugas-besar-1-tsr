@@ -1,105 +1,97 @@
-TURN_SAAT_INI MAX_TURN
-1 15
-JUMLAH_PEMAIN
+0 15
 3
-STATE_PEMAIN
-Pemain1 900 15FREE
+Pemain1 1000 5 FREE
 0
-Pemain2 680 16FREE
+Pemain2 940 3 FREE
 0
-Pemain3 1000 7FREE
+Pemain3 1000 0 FREE
 0
 Pemain1 Pemain2 Pemain3
-GILIRAN_AKTIF_SAAT_INI
 Pemain3
-STATE_PROPERTI
 28
 GRT street BANK BANK 1 0 0
-TSK street BANK BANK 1 0 0
-GBR street BANK BANK 1 0 BGR street BANK BANK 1 0 0
-DPK street Pemain1 OWNED 1 0 0
+TSK street Pemain2 OWNED 1 0 0
+GBR street BANK BANK 1 0 0
+BGR street BANK BANK 1 0 0
+DPK street BANK BANK 1 0 0
 BKS street BANK BANK 1 0 0
 MGL street BANK BANK 1 0 0
-PLN street BANK BANK 1 0 SOL street Pemain2 OWNED 1 0 0
+PLN street BANK BANK 1 0 0
+SOL street BANK BANK 1 0 0
 YOG street BANK BANK 1 0 0
-STB street BANK BANK 1 0 MAL street Pemain2 OWNED 1 0 0
+STB street BANK BANK 1 0 0
+MAL street BANK BANK 1 0 0
 SMG street BANK BANK 1 0 0
 SBY street BANK BANK 1 0 0
 MKS street BANK BANK 1 0 0
 BLP street BANK BANK 1 0 0
 MND street BANK BANK 1 0 0
-TUG street BANK BANK 1 0 PLB street BANK BANK 1 0 0
+TUG street BANK BANK 1 0 0
+PLB street BANK BANK 1 0 0
 PKB street BANK BANK 1 0 0
-PAM street BANK BANK 1 0 MED street BANK BANK 1 0 0
+PAM street BANK BANK 1 0 0
+MED street BANK BANK 1 0 0
 BDG street BANK BANK 1 0 0
 DEN street BANK BANK 1 0 0
 MTR street BANK BANK 1 0 0
-GUB street BANK BANK 1 0 JKT street BANK BANK 1 0 0
+GUB street BANK BANK 1 0 0
+JKT street BANK BANK 1 0 0
 IKN street BANK BANK 1 0 0
-STATE_DECK
 16
 Tertangkap Tilang
 Pajak Mendadak
-Maju 3 Langkah
-Pajak Mendadak
-Tertangkap Tilang
-Pajak Mendadak
 Tiket Kereta Api
-Maju 3 Langkah
-Tertangkap Tilang
 Tertangkap Tilang
 Tiket Kereta Api
-Maju 3 Langkah
 Tiket Kereta Api
+Pajak Mendadak
+Maju 3 Langkah
+Maju 3 Langkah
+Tertangkap Tilang
 Maju 3 Langkah
 Pajak Mendadak
+Pajak Mendadak
 Tiket Kereta Api
+Tertangkap Tilang
+Maju 3 Langkah
 16
-Salah Tangkap
-Bonus Deviden
+Jalan Mundur
+Kereta Cepat
 Salah Tangkap
 Jalan Mundur
+Salah Tangkap
+Bonus Deviden
+Jalan Mundur
+Salah Tangkap
 Kereta Cepat
 Kereta Cepat
 Bonus Deviden
 Bonus Deviden
-Jalan Mundur
-Jalan Mundur
 Bonus Deviden
-Kereta Cepat
-Salah Tangkap
 Salah Tangkap
 Kereta Cepat
 Jalan Mundur
 18
-discount 0
-lasso
-shield
-demolition
-move 0
-shield
-teleport
-shield
-discount 0
-demolition
-demolition
-lasso
-lasso
-teleport
 move 1280655686
-teleport
+shield
 move 0
+demolition
+teleport
+teleport
+teleport
 discount 0
-STATE_LOG
-11
-0 Pemain1 DADU Melempar dadu: 2 dan 6
-0 Pemain1 BELI Membeli properti: DEPOK seharga M100
-0 Pemain2 DADU Melempar dadu: 2 dan 2
-0 Pemain2 DOUBLE Mendapat double!
-0 Pemain2 DADU Melempar dadu: 5 dan 4
-0 Pemain2 BELI Membeli properti: SOLO seharga M140
-0 Pemain3 DADU Melempar dadu: 1 dan 6
-1 Pemain1 DADU Melempar dadu: 1 dan 6
-1 Pemain1 RAILROAD Mendapatkan stasiun: STASIUN_BANDUNG
-1 Pemain2 DADU Melempar dadu: 1 dan 2
-1 Pemain2 BELI Membeli properti: MALANG seharga M180
+discount 0
+demolition
+lasso
+demolition
+lasso
+move 0
+shield
+shield
+discount 0
+lasso
+4
+0 Pemain1 DADU Melempar dadu: 3 dan 2
+0 Pemain1 RAILROAD Mendapatkan stasiun: STASIUN_GAMBIR
+0 Pemain2 DADU Melempar dadu: 1 dan 2
+0 Pemain2 BELI Membeli properti: TASIKMALAYA seharga M60

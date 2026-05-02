@@ -17,9 +17,6 @@ void SkillCard::loadFromSave(float value, int remainingDuration) {
     (void)remainingDuration;
 }
 
-std::string SkillCard::getName() const {
-    return Card::getName();
-}
 std::string SkillCard::toSaveFormat() const {
     std::ostringstream out;
     out << Card::getName() << "\n";

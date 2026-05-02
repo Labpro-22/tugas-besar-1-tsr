@@ -10,7 +10,6 @@ public:
     SkillCard(std::string name);
     virtual ~SkillCard() = default;
     
-    std::string getName() const;
 
     virtual bool isMoveCard() const { return false; }
     virtual bool isDiscountCard() const { return false; }

@@ -150,7 +150,7 @@ float Player::liquidateAsset(float required){
 }
 std::string Player::toSaveFormat() const {
     std::ostringstream out;
-    out << name << " " << balance << " " << position;
+    out << name << " " << balance << " " << position << " ";
     switch (player_state)
     {
     case PlayerState::FREE:
