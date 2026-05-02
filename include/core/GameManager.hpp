@@ -28,7 +28,7 @@ enum class GameState {
 class GameManager {
 private:
     static int current_player_index; 
-    int current_turn_count;   
+    static int current_turn_count;   
     int max_turns;
     float start_money;
     int die1, die2;
@@ -48,7 +48,7 @@ private:
     void printBoard(const std::string& args);
     void printCertificate(const std::string& args);     
     void printProperty(const std::string& args);
-    // void printLog(const std::string& args);     
+    void printLog(const std::string& args);     
     void mortgage(const std::string& args);
     void redeem(const std::string& args);
     void build(const std::string& args);       

@@ -1,0 +1,112 @@
+TURN_SAAT_INI MAX_TURN
+2 15
+JUMLAH_PEMAIN
+3
+STATE_PEMAIN
+Pemain1 940 25FREE
+0
+Pemain2 1000 35FREE
+0
+Pemain3 740 14FREE
+0
+Pemain1 Pemain2 Pemain3
+GILIRAN_AKTIF_SAAT_INI
+Pemain3
+STATE_PROPERTI
+28
+GRT street BANK BANK 1 0 0
+TSK street Pemain1 OWNED 1 0 0
+GBR street BANK BANK 1 0 BGR street BANK BANK 1 0 0
+DPK street Pemain3 OWNED 1 0 0
+BKS street BANK BANK 1 0 0
+MGL street BANK BANK 1 0 0
+PLN street BANK BANK 1 0 SOL street BANK BANK 1 0 0
+YOG street Pemain3 OWNED 1 0 0
+STB street BANK BANK 1 0 MAL street BANK BANK 1 0 0
+SMG street BANK BANK 1 0 0
+SBY street BANK BANK 1 0 0
+MKS street BANK BANK 1 0 0
+BLP street BANK BANK 1 0 0
+MND street BANK BANK 1 0 0
+TUG street BANK BANK 1 0 PLB street BANK BANK 1 0 0
+PKB street BANK BANK 1 0 0
+PAM street BANK BANK 1 0 MED street BANK BANK 1 0 0
+BDG street BANK BANK 1 0 0
+DEN street BANK BANK 1 0 0
+MTR street BANK BANK 1 0 0
+GUB street BANK BANK 1 0 JKT street BANK BANK 1 0 0
+IKN street BANK BANK 1 0 0
+STATE_DECK
+16
+Tertangkap Tilang
+Pajak Mendadak
+Maju 3 Langkah
+Tiket Kereta Api
+Maju 3 Langkah
+Tertangkap Tilang
+Maju 3 Langkah
+Tiket Kereta Api
+Pajak Mendadak
+Tertangkap Tilang
+Tertangkap Tilang
+Pajak Mendadak
+Maju 3 Langkah
+Tiket Kereta Api
+Pajak Mendadak
+~Tiket Kereta Api
+16
+Jalan Mundur
+Salah Tangkap
+Bonus Deviden
+Jalan Mundur
+Kereta Cepat
+Kereta Cepat
+Kereta Cepat
+Jalan Mundur
+Salah Tangkap
+Bonus Deviden
+Salah Tangkap
+Bonus Deviden
+Bonus Deviden
+Jalan Mundur
+Salah Tangkap
+~Kereta Cepat
+18
+ 0
+
+ 0
+
+
+
+ 0
+
+
+ 0
+
+
+
+
+ 0
+
+ 0
+
+STATE_LOG
+18
+0 Pemain1 DADU Melempar dadu: 1 dan 2
+0 Pemain1 BELI Membeli properti: TASIKMALAYA seharga M60
+0 Pemain2 DADU Melempar dadu: 5 dan 2
+0 Pemain3 DADU Melempar dadu: 3 dan 5
+0 Pemain3 BELI Membeli properti: DEPOK seharga M100
+1 Pemain1 DADU Melempar dadu: 6 dan 1
+1 Pemain2 DADU Melempar dadu: 6 dan 6
+1 Pemain2 DOUBLE Mendapat double!
+1 Pemain2 DADU Melempar dadu: 2 dan 1
+1 Pemain2 RAILROAD Mendapatkan stasiun: STASIUN_TUGU
+1 Pemain2 KESEMPATAN Mengambil kartu Kesempatan
+1 Pemain3 DADU Melempar dadu: 5 dan 1
+1 Pemain3 BELI Membeli properti: YOGYAKARTA seharga M160
+2 Pemain1 DADU Melempar dadu: 1 dan 6
+2 Pemain1 RAILROAD Mendapatkan stasiun: STASIUN_TUGU
+2 Pemain1 DANA_UMUM Mengambil kartu Dana Umum
+2 Pemain2 DADU Melempar dadu: 6 dan 4
+2 Pemain2 RAILROAD Mendapatkan stasiun: STASIUN_GUBENG

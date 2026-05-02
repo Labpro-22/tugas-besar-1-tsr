@@ -5,8 +5,6 @@
 #include <string>
 
 class SkillCard : public Card {
-protected:
-    std::string name;
 
 public:
     SkillCard(std::string name);
@@ -25,7 +23,11 @@ public:
     virtual void useEffect(Player& p) = 0;
     virtual void loadFromSave(float value, int remainingDuration);
 
+    std::string getName() const;
+
     virtual std::string toSaveFormat() const;
+
+
 };
 
 class MoveSkillCard : public SkillCard {

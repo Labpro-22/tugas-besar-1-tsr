@@ -16,14 +16,14 @@ void SkillCard::loadFromSave(float value, int remainingDuration) {
     (void)value;
     (void)remainingDuration;
 }
-std::string SkillCard::toSaveFormat() const{
+std::string SkillCard::toSaveFormat() const {
     std::ostringstream out;
-    out << name << "\n";
+    out << Card::getName() << "\n";
     return out.str();
 }
 
 std::string SkillCard::getName() const {
-    return name;
+    return Card::getName();
 }
 
 // MoveSkillCard
@@ -39,9 +39,9 @@ void MoveSkillCard::loadFromSave(float value, int remainingDuration) {
     (void)remainingDuration;
     step = static_cast<int>(value);
 }
-std::string MoveSkillCard::toSaveFormat() const{
+std::string MoveSkillCard::toSaveFormat() const {
     std::ostringstream out;
-    out << name << " " << step << "\n";
+    out << Card::getName() << " " << step << "\n";
     return out.str();
 }
 
@@ -59,9 +59,9 @@ void DiscountSkillCard::loadFromSave(float value, int remainingDuration) {
     (void)remainingDuration;
     percentage = value;
 }
-std::string DiscountSkillCard::toSaveFormat() const{
+std::string DiscountSkillCard::toSaveFormat() const {
     std::ostringstream out;
-    out << name << " " << percentage << "\n";
+    out << Card::getName() << " " << percentage << "\n";
     return out.str();
 }
 
