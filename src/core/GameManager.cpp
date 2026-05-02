@@ -8,7 +8,7 @@
 #include <iterator>
 int GameManager::current_player_index = 0;
 int GameManager::max_turn_limit = 0;
-int GameManager::current_turn_count = 0;
+int GameManager::current_turn_count = 1;
 std::unique_ptr<CardManager> GameManager::card_manager = nullptr;
 std::unique_ptr<PropertyManager> GameManager::property_manager = nullptr;
 std::unique_ptr<EconomyManager> GameManager::economy_manager = nullptr;
@@ -206,7 +206,7 @@ void GameManager::startGame() {
 }
 
 void GameManager::printBoard(const std::string& args){
-    ViewGame::displayBoard();
+    ViewGame::displayBoard(current_turn_count, max_turns);
 }
 
 void GameManager::printCertificate(const std::string& args){

@@ -128,7 +128,7 @@ std::string ViewGame::getUserInput() {
     return input;
 }
 
-void ViewGame::displayBoard() {
+void ViewGame::displayBoard(int current_turn, int max_turn) {
     const int CELL_WIDTH = 10;
     const int COLS       = 11;
     const int TOTAL      = COLS * (CELL_WIDTH + 1) + 1;
@@ -188,8 +188,8 @@ void ViewGame::displayBoard() {
     };
 
     std::string playerCount = std::to_string(GameManager::players.size());
-    std::string turnInfo    = "TURN " + std::to_string(GameManager::getGameTurn())
-                            + " / "   + std::to_string(GameManager::getGameMaxTurn());
+    std::string turnInfo    = "TURN " + std::to_string(current_turn)
+                            + " / "   + std::to_string(max_turn);
 
     std::cout << "\n";
 

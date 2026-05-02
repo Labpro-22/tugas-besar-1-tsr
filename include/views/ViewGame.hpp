@@ -33,7 +33,7 @@ public:
     static void displayMessage(const std::string& message);
 
     // CETAK_PAPAN
-    static void displayBoard();
+    static void displayBoard(int current_turn, int max_turn);
     
     // DADU
     static void displayDiceRollResult(const std::string& player_name, float dice1, float dice2, const std::string& dest_tile);
