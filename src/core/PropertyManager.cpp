@@ -213,11 +213,12 @@ bool PropertyManager::tryUnmortgage(std::shared_ptr<Player> player, PropertyTile
             return false;
         }
     }
-    if(!GameManager::economy_manager->deductMoney(*player, tile->getBuyPrice())){
+    if(!GameManager::economy_manager->deductMoney(*player, tile->getMortgageValue())){
         return false;
     }
 
-    tile->setPropertyStatus(MORTGAGED);
+    tile->setPropertyStatus(OWNED); 
+    
     return true;
 }
 

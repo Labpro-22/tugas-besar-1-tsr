@@ -2,7 +2,8 @@
 
 # Compiler settings
 CXX      := g++
-CXXFLAGS := -Wall -Wextra -std=c++17 -I include
+CXXFLAGS := -Wall -Wextra -std=c++17 -g -O0 -fsanitize=address -I include
+LDFLAGS  := -fsanitize=address
 
 # Directories
 SRC_DIR     := src
@@ -32,7 +33,7 @@ directories:
 
 # Link object files to create executable
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 	@echo "Build successful! Executable is at $(TARGET)"
 
 # Compile source files into object files

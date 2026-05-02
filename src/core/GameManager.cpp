@@ -8,6 +8,7 @@
 #include <iterator>
 int GameManager::current_player_index = 0;
 int GameManager::max_turn_limit = 0;
+int GameManager::currentTurn = 1;
 std::unique_ptr<CardManager> GameManager::card_manager = nullptr;
 std::unique_ptr<PropertyManager> GameManager::property_manager = nullptr;
 std::unique_ptr<EconomyManager> GameManager::economy_manager = nullptr;
@@ -37,12 +38,13 @@ GameManager::GameManager(int maxTurns,int jumlah):
         command_map["MUAT"] = [this](const std::string& args) { this->loadSaveState(args); };
         // command_map["CETAK_LOG"] = [this](const std::string& args) { this->printLog(args); };
         command_map["GUNAKAN_KEMAMPUAN"] = [this](const std::string& args) { this->useAbility(args); };
+        command_map["HELP"] = [this](const std::string& args) {this->helpMessage();};
 }
 
 void GameManager::startGame() {
     ViewGame::displayMessage("config dir: ");
     loadConfig(ViewGame::getUserInput());
-    std::cout<<"apakah ingin new game: (y or n)";
+    std::cout<<"apakah ingin new game: (y or n): ";
     if(!ViewGame::getYesNo()){
         std::cout<<"path directory save/load: ";
         std::string dir =ViewGame::getUserInput();
@@ -91,8 +93,9 @@ void GameManager::startGame() {
             if (current_player->getPlayerState() == PlayerState::INJAIL) {
                 ViewGame::displayMessage("Kamu di penjara. Lempar dadu dan dapatkan double untuk keluar.");
             }
-
+            bool dice_rolled = false;
             while (true) {
+                std::cout << "\nMasukkan Input: ";
                 std::string raw_command = ViewGame::getUserCommand();
                 std::stringstream ss(raw_command);
                 std::string command;
@@ -116,10 +119,21 @@ void GameManager::startGame() {
 
                 it->second(args);
 
-                if (command == "LEMPAR_DADU" || command == "ATUR_DADU") {
-                    roll_count++;
+                if (command == "LEMPAR_DADU") {
+                    dice_rolled = true;
                     break;
+                } else if (command == "ATUR_DADU") {
+                    std::stringstream arg_check(args);
+                    int d1, d2;
+                    if (arg_check >> d1 >> d2) {
+                        dice_rolled = true;
+                        break;
+                    }
                 }
+            }
+
+            if (dice_rolled) {
+                roll_count++;
             }
 
             if (current_player->getPlayerState() == PlayerState::INJAIL) {
@@ -138,20 +152,24 @@ void GameManager::startGame() {
                         getPlayerInJail(*current_player);
                         turn_finished = true;
                     } else {
+                        if(current_player->getPlayerState() == PlayerState::FREE){
+                            property_manager->getTileAt(current_player->getPosition()).onLand(*current_player);
+                        }
                         ViewGame::displayMessage("Double! Kamu boleh lempar dadu lagi. (" +
                             std::to_string(roll_count) + "/3)");
                     }
                 } else {
+                    if(current_player->getPlayerState() == PlayerState::FREE){
+                        property_manager->getTileAt(current_player->getPosition()).onLand(*current_player);
+                    }                    
                     turn_finished = true;
                 }
             }
         }
-        if(current_player->getPlayerState() == PlayerState::FREE){
-            property_manager->getTileAt(current_player->getPosition()).onLand(*current_player);
-        }
         current_player->endTurn();
         current_player_index = (current_player_index + 1) % players.size();
         if (current_player_index == 0) current_turn_count++;
+        currentTurn = current_turn_count;
     }
 
     std::vector<Player*> raw_players;
@@ -181,10 +199,10 @@ void GameManager::setDice(const std::string& args){ //belum
         ViewGame::displayMessage("Format ATUR_DADU harus: ATUR_DADU <dadu1> <dadu2>. Contoh: ATUR_DADU 6 7");
         return;
     }
-    if (dice1 < 1 || dice1 > 6 || dice2 < 1 || dice2 > 6) {
-        ViewGame::displayMessage("Nilai dadu harus di antara 1 sampai 6.");
-        return;
-    }
+    // if (dice1 < 1 || dice1 > 6 || dice2 < 1 || dice2 > 6) {
+    //     ViewGame::displayMessage("Nilai dadu harus di antara 1 sampai 6.");
+    //     return;
+    // }
     die1 = dice1;
     die2 = dice2;
     auto player = players[current_player_index];
@@ -211,20 +229,60 @@ void GameManager::rollDice(const std::string& args){
 }
 
 void GameManager::mortgage(const std::string& args){
-    ViewGame::displayMortgageList(players[current_player_index]->owned_properties);
-    int index=ViewGame::getInt(players[current_player_index]->owned_properties.size());
-    property_manager->tryMortgage(players[current_player_index],players[current_player_index]->owned_properties[index]);
+    auto player = players[current_player_index];
+
+    std::vector<PropertyTile*> mortgagable_props;
+    for (auto* prop : player->owned_properties) {
+        if (prop->getPropertyStatus() == PropertyStatus::OWNED) {
+            mortgagable_props.push_back(prop);
+        }
+    }
+
+    if (mortgagable_props.empty()) {
+        ViewGame::displayMessage("Tidak ada properti yang dapat digadaikan saat ini.");
+        return;
+    }
+
+    ViewGame::displayMortgageList(mortgagable_props);
+    int choice = ViewGame::getInt(mortgagable_props.size());
+    
+    if (choice == 0) return; 
+
+    int index = choice - 1; 
+    
+    property_manager->tryMortgage(player, mortgagable_props[index]);
 }
+
 void GameManager::redeem(const std::string& args){
-    ViewGame::displayUnmortgageList(players[current_player_index]->owned_properties, players[current_player_index]->getBalance());
-    int index=ViewGame::getInt(10);
-    auto property=players[current_player_index]->owned_properties[index];
-    if(property_manager->tryUnmortgage(players[current_player_index],property)){
-        ViewGame::displayUnmortgageSuccess(property->getName(),property->getMortgageValue(),players[current_player_index]->getBalance());
+    auto player = players[current_player_index];
+
+    std::vector<PropertyTile*> mortgaged_props;
+    for (auto* prop : player->owned_properties) {
+        if (prop->getPropertyStatus() == PropertyStatus::MORTGAGED) {
+            mortgaged_props.push_back(prop);
+        }
+    }
+
+    if (mortgaged_props.empty()) {
+        ViewGame::displayMessage("Tidak ada properti untuk ditebus.");
+        return;
+    }
+
+    ViewGame::displayUnmortgageList(mortgaged_props, player->getBalance());
+    int choice = ViewGame::getInt(mortgaged_props.size()); 
+    
+    if (choice == 0) return;
+
+    int index = choice - 1; 
+    auto property = mortgaged_props[index];
+
+    if(property_manager->tryUnmortgage(player, property)){
+        ViewGame::displayUnmortgageSuccess(property->getName(), property->getMortgageValue(), player->getBalance());
     } else{
-        ViewGame::displayUnmortgageFailure(property->getName(),property->getMortgageValue(),players[current_player_index]->getBalance());
+        ViewGame::displayUnmortgageFailure(property->getName(), property->getMortgageValue(), player->getBalance());
     }
 }
+
 void GameManager::build(const std::string& args){ //ga yakin, dibantu teman ini
     auto player = players[current_player_index];
     auto& board = PropertyManager::getBoard();
@@ -476,6 +534,8 @@ void GameManager::visitRailroadTile(RailroadTile* tile, Player& player) {
     if (status == PropertyStatus::BANK) {
         ViewGame::displayBuyAutoSuccess("Stasiun", tile->getName());
         player.addProperty(tile);
+        tile->setPropertyStatus(PropertyStatus::OWNED);
+        tile->setPropertyOwner(player.shared_from_this());
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
@@ -494,13 +554,15 @@ void GameManager::visitUtilityTile(UtilityTile* tile, Player& player) {
     if (status == PropertyStatus::BANK) {
         ViewGame::displayBuyAutoSuccess("Stasiun", tile->getName());
         player.addProperty(tile);
+        tile->setPropertyStatus(PropertyStatus::OWNED);
+        tile->setPropertyOwner(player.shared_from_this());
     } else if (status == PropertyStatus::OWNED) {
         std::shared_ptr<Player> current_owner = tile->getPropertyOwner().lock();
         if(current_owner && current_owner.get() != &player){
             float rent = tile->calculateRent();
             float playermoneybefore=player.getmoney();
             bool success = economy_manager->transferMoney(player, current_owner, rent);
-            rent=playermoneybefore-player.getBalance();
+            rent = playermoneybefore-player.getBalance();
             ViewGame::displayRentPayment(*tile,player,*current_owner,rent);
         }
     }
@@ -726,4 +788,32 @@ void GameManager::processRequiredPayment(std::shared_ptr<Player> payer, std::sha
         logger->recordEvent(LogEntry(current_turn_count, payer->getName(), BANKRUPT, "Went Bankrupt"));
         checkGameOver();
     }
+}
+
+void GameManager::helpMessage() {
+    std::cout
+        << "\n===== DAFTAR PERINTAH =====\n"
+        << "CETAK_PAPAN           : Menampilkan visualisasi papan permainan saat ini\n"
+        << "LEMPAR_DADU           : Melempar dadu untuk menentukan pergerakan pemain\n"
+        << "ATUR_DADU X Y         : Mengatur nilai dadu secara manual (X dan Y antara 1-6)\n"
+        << "CETAK_AKTA [KODE]     : Menampilkan informasi detail akta kepemilikan suatu properti\n"
+        << "CETAK_PROPERTI        : Menampilkan daftar seluruh properti yang dimiliki pemain\n"
+        << "GADAI                 : Melakukan penggadaian properti untuk mendapatkan dana\n"
+        << "TEBUS                 : Menebus properti yang sedang digadaikan\n"
+        << "BANGUN                : Membangun rumah atau hotel pada properti street\n"
+        << "GUNAKAN_KEMAMPUAN     : Mengaktifkan kartu kemampuan spesial milik pemain\n"
+        << "BAYAR_DENDA           : Membayar denda agar bisa keluar dari penjara\n"
+        << "SIMPAN [FILE]         : Menyimpan progres permainan ke dalam file\n"
+        << "MUAT [FILE]           : Memuat progres permainan dari file yang ada\n"
+        << "CETAK_LOG [N]         : Menampilkan N baris riwayat kejadian terakhir dalam game\n"
+        << "HELP                  : Menampilkan daftar perintah\n"
+        << "EXIT                  : Keluar dari permainan\n"
+        << "===========================\n";
+}
+
+int GameManager::getGameTurn() {
+    return currentTurn;
+}
+int GameManager::getGameMaxTurn() {
+    return max_turn_limit;
 }

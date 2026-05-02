@@ -23,7 +23,6 @@ protected:
     int festival_level;
     int festival_turns_left;
     PropertyStatus property_status;
-    PropertyType type;
 
 public:
     PropertyTile(int index, std::string name, std::string code, std::string color, float buy_price, float mortgage_price, std::shared_ptr<Player> owner, int festival_level, int festival_turns_left, PropertyStatus property_status);

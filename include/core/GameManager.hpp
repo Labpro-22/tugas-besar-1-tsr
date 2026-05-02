@@ -28,6 +28,7 @@ enum class GameState {
 class GameManager {
 private:
     static int current_player_index; 
+    static int currentTurn;
     int current_turn_count;   
     int max_turns;
     float start_money;
@@ -67,6 +68,7 @@ private:
     void checkGameOver();
 
     void getPlayerInJail(Player& player);
+    void helpMessage();
 
 public:
     static int max_turn_limit;
@@ -101,6 +103,9 @@ public:
 
     static int getCurrentTurn();
     static int getMaxTurns();
+
+    static int getGameTurn();
+    static int getGameMaxTurn();
 
     // Implementasi save
     std::string toSaveFormat() const;

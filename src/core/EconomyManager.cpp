@@ -53,22 +53,51 @@ bool EconomyManager::processTax(std::shared_ptr<Player> player, TaxType type, fl
 }
 // Proses lelang
 void EconomyManager::startAuction(PropertyTile* property){
-    active_bidders = GameManager::players;
-    current_highest_bid = 0;
-    current_highest_bidder.reset();
-    size_t bidder_index = (GameManager::getCurrentTurn()+1 )% active_bidders.size();
-    ViewGame::displayAuctionStart(property->getName(),GameManager::players[GameManager::getCurrentTurn()]->getname());
+    std::vector<std::shared_ptr<Player>> valid_bidders;
+    for (auto& p : GameManager::players) {
+        if (p->getPlayerState() != PlayerState::BANKCRUPT) {
+            valid_bidders.push_back(p);
+        }
+    }
+    active_bidders = valid_bidders;
+
+    current_highest_bid = -1;
+    current_highest_bidder.reset(); 
+    
+    int current_idx = -1;
+    auto current_p = GameManager::players[GameManager::getCurrentTurn()];
+    for (size_t i = 0; i < active_bidders.size(); i++) {
+        if (active_bidders[i] == current_p) {
+            current_idx = i;
+            break;
+        }
+    }
+    
+    size_t bidder_index = 0;
+    if (current_idx != -1) {
+        bidder_index = (current_idx + 1) % active_bidders.size();
+    }
+
+    ViewGame::displayAuctionStart(property->getName(), current_p->getname());
+    
     while (!isAuctionOver()) {
-        std::string highest_bidder_name = current_highest_bidder ? current_highest_bidder->getname() : "-";//
-        ViewGame::displayAuctionTurn(active_bidders[bidder_index]->getname(),current_highest_bid,highest_bidder_name);
+        std::string highest_bidder_name = current_highest_bidder ? current_highest_bidder->getname() : "-";
+        ViewGame::displayAuctionTurn(active_bidders[bidder_index]->getname(), current_highest_bid, highest_bidder_name);
+        
         std::string input;
         std::getline(std::cin >> std::ws, input);
         std::stringstream parser(input);
         std::string command;
         parser >> command;
-        std::transform(command.begin(), command.end(), command.begin(), ::toupper); //ini ga yakin rom
+        std::transform(command.begin(), command.end(), command.begin(), ::toupper); 
+        
         try {
             if (command == "PASS") {
+                if (active_bidders.size() == 1 && !current_highest_bidder) {
+                    ViewGame::displayMessage("Kamu adalah pemain terakhir, wajib melakukan BID (Minimal M0)!");
+                    continue;
+                }
+                
                 active_bidders.erase(active_bidders.begin() + bidder_index);
                 if (bidder_index >= active_bidders.size()) {
                     bidder_index = 0;
@@ -79,6 +108,7 @@ void EconomyManager::startAuction(PropertyTile* property){
                     ViewGame::displayMessage("Format BID salah. Gunakan: BID <jumlah>");
                     continue;
                 }
+                
                 placeBid(bid_amount, active_bidders[bidder_index]);
                 bidder_index = (bidder_index + 1) % active_bidders.size();
             } else {
@@ -86,30 +116,35 @@ void EconomyManager::startAuction(PropertyTile* property){
             }
         }
         catch(const char* e) {
-            std::cerr << e << " Penawaran saat ini: " << current_highest_bid << '\n';
+            std::cerr << e << " Penawaran saat ini: M" << current_highest_bid << '\n';
         }
     }
-    resolveAuction(property,active_bidders[0]);
+    
+    resolveAuction(property, active_bidders[0]);
 }
 void EconomyManager::placeBid(float amount, std::shared_ptr<Player> &player){
-    if (current_highest_bid<=amount){
-        current_highest_bid=amount;
-        current_highest_bidder=player;
-        return;
+    if (amount <= current_highest_bid) {
+        throw "Penawaran harus lebih tinggi dari penawaran saat ini!";
     }
-    throw "ga cukup uang elu";
-}
+    
+    if (!player->canPay(amount)) {
+        throw "Uang kamu tidak cukup untuk melakukan penawaran sebesar itu!";
+    }
+    
+    current_highest_bid = amount;
+    current_highest_bidder = player;
+} 
 void EconomyManager::foldBid(std::vector<std::shared_ptr<Player>>::iterator p){
     active_bidders.erase(p);
 }
 bool EconomyManager::isAuctionOver() const{
-    if (active_bidders.size()==1)
-    {
+    if (active_bidders.size() == 1 && current_highest_bidder != nullptr) {
         return true;
     }
     return false;
 }
 void EconomyManager::resolveAuction(PropertyTile *tile, std::shared_ptr<Player> & winner){
+    std::cout << winner->getName() << " memenangkan lelang properti: " << tile->getName() << "\n";
     auto& logger= GameManager::logger;
     auto &propMgr=GameManager::property_manager;
     winner->pay(current_highest_bid);

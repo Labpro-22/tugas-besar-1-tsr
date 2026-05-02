@@ -121,6 +121,7 @@ void Player::sellProperty(PropertyTile &property){
     this->removeProperty(&property);
     *this+=property.getBuyPrice();
     property.setPropertyStatus(PropertyStatus::BANK);
+    property.setPropertyOwner(std::shared_ptr<Player>(nullptr));
 }
 float Player::liquidateAsset(float required){
     std::vector<PropertyTile*> properties_to_sell = owned_properties;
@@ -142,8 +143,8 @@ float Player::liquidateAsset(float required){
         liquidated += sell_value;
         balance += sell_value;
         removeProperty(property);
-        property->setPropertyStatus(BANK);
-        property->setPropertyOwner(shared_from_this());
+        property->setPropertyStatus(PropertyStatus::BANK);
+        property->setPropertyOwner(std::shared_ptr<Player>(nullptr));
     }
 
     return liquidated;

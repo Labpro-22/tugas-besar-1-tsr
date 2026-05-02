@@ -44,7 +44,7 @@ std::string ViewGame::getUserCommand() {
     std::vector<std::string> valid_commands = {
         "CETAK_PAPAN", "LEMPAR_DADU", "ATUR_DADU", "CETAK_AKTA", 
         "CETAK_PROPERTI", "GADAI", "TEBUS", "BANGUN", "SIMPAN", 
-        "MUAT", "CETAK_LOG", "GUNAKAN_KEMAMPUAN"
+        "MUAT", "CETAK_LOG", "GUNAKAN_KEMAMPUAN", "HELP"
     };
 
     std::string input;
@@ -161,7 +161,7 @@ void ViewGame::displayBoard() {
 
         std::string playersOnTile = "";
         for (size_t i = 0; i < GameManager::players.size(); ++i) {
-            if (GameManager::players[i]->getPosition() == tileId)
+            if (GameManager::players[i]->getPosition() % 40 == tileId % 40)
                 playersOnTile += "(" + std::to_string(i + 1) + ")";
         }
 
@@ -189,8 +189,8 @@ void ViewGame::displayBoard() {
     };
 
     std::string playerCount = std::to_string(GameManager::players.size());
-    std::string turnInfo    = "TURN " + std::to_string(GameManager::getCurrentTurn())
-                            + " / "   + std::to_string(GameManager::getMaxTurns());
+    std::string turnInfo    = "TURN " + std::to_string(GameManager::getGameTurn())
+                            + " / "   + std::to_string(GameManager::getGameMaxTurn());
 
     std::cout << "\n";
 

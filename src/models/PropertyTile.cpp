@@ -65,19 +65,17 @@ float RailroadTile::calculateRent() const {
     if (it != railroad_multiplier.end()) {
         rent_price = it->second;
     }
-
     if (festival_turns_left > 0) {
         rent_price *= (1 << festival_level);
     }
-    
     return rent_price;
 }
 
 void RailroadTile::onLand(Player& p) {
     GameManager::visitRailroadTile(this, p);
 }
-PropertyType RailroadTile::getPropertyType() const{
-    return type;
+PropertyType RailroadTile::getPropertyType() const {
+    return PropertyType::RAILROAD;
 }
 void RailroadTile::setMult(const std::map<int,int>& mult){
     railroad_multiplier=mult;
@@ -119,9 +117,9 @@ float UtilityTile::calculateRent() const {
 void UtilityTile::onLand(Player& p) {
     GameManager::visitUtilityTile(this, p);
 }
-PropertyType UtilityTile::getPropertyType() const{
-    return type;
-};
+PropertyType UtilityTile::getPropertyType() const {
+    return PropertyType::UTILITY;
+}
 void UtilityTile::setMult(const std::map<int,int>& mult){
     utility_multiplier=mult;
 }
